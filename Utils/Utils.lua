@@ -395,7 +395,19 @@ end
 
 CraftScan_RecentUpdatesMixin = {}
 
-local currentVersion = 1.00
+local function CompareVersions(version1, version2)
+    local v1, v2 = {}, {}
+    for i = 1, 3 do
+        v1[i], v2[i] = tonumber(version1:match("(%d+)", i + 1)), tonumber(version2:match("(%d+)", i + 1))
+    end
+    for i = 1, 3 do
+        if v1[i] < v2[i] then return -1 end
+        if v1[i] > v2[i] then return 1 end
+    end
+    return 0
+end
+
+local currentVersion = 'v1.0.0'
 
 function CraftScan_RecentUpdatesMixin:OnHide()
     CraftScan.DB.settings.last_loaded_version = currentVersion;
@@ -404,34 +416,37 @@ end
 
 local function NotifyRecentChanges()
     local lastLoadedVersion = CraftScan.Utils.GetSetting('last_loaded_version');
-    if currentVersion <= lastLoadedVersion then
+    if type(lastLoadedVersion) ~= 'string' then
+        lastLoadedVersion = 'v0.0.0';
+    end
+
+    if CompareVersions(currentVersion, lastLoadedVersion) <= 0 then
         return;
     end
 
-    -- Test tagged release to CurseForge
     local releaseNotes = {
         {
-            version = 1.00,
+            version = 'v1.0.0',
             id = LID.RN_WELCOME,
         },
         {
-            version = 1.00,
+            version = 'v1.0.0',
             id = LID.RN_INITIAL_SETUP,
         },
         {
-            version = 1.00,
+            version = 'v1.0.0',
             id = LID.RN_INITIAL_TESTING,
         },
         {
-            version = 1.00,
+            version = 'v1.0.0',
             id = LID.RN_MANAGING_CRAFTERS,
         },
         {
-            version = 1.00,
+            version = 'v1.0.0',
             id = LID.RN_MANAGING_CUSTOMERS,
         },
         {
-            version = 1.00,
+            version = 'v1.0.0',
             id = LID.RN_KEYBINDS,
         },
     };
@@ -445,7 +460,7 @@ local function NotifyRecentChanges()
         organizer:Add(frame);
 
         frame.Header:SetText(L(section.id));
-        frame.Version:SetText(string.format("%s %.2f", L("Version"), section.version));
+        frame.Version:SetText(string.format("%s %s", L("Version"), section.version));
 
         local body = L(section.id + 1);
         local i = 2;
@@ -460,7 +475,7 @@ local function NotifyRecentChanges()
     end
 
     for _, entry in ipairs(releaseNotes) do
-        if entry.version > lastLoadedVersion then
+        if CompareVersions(entry.version, lastLoadedVersion) > 0 then
             CreateSection(entry);
         end
     end
@@ -481,9 +496,12 @@ local function doOnce()
 
     -- Can't seem to internationalize the binding header anymore. Comes as a raw string in Bindings.xml
     -- Can't find a proper API to tag these as search-able, so tossing the name in there.
-    BINDING_NAME_CRAFT_SCAN_TOGGLE                   = string.format("%s - %s",  L(LID.MAIN_BUTTON_BINDING_NAME), L(LID.CRAFT_SCAN));
-    BINDING_NAME_CRAFT_SCAN_GREET_CURRENT_CUSTOMER   = string.format("%s - %s", L(LID.GREET_BUTTON_BINDING_NAME), L(LID.CRAFT_SCAN));
-    BINDING_NAME_CRAFT_SCAN_DISMISS_CURRENT_CUSTOMER = string.format("%s - %s", L(LID.DISMISS_BUTTON_BINDING_NAME), L(LID.CRAFT_SCAN));
+    BINDING_NAME_CRAFT_SCAN_TOGGLE                   = string.format("%s - %s", L(LID.MAIN_BUTTON_BINDING_NAME),
+        L(LID.CRAFT_SCAN));
+    BINDING_NAME_CRAFT_SCAN_GREET_CURRENT_CUSTOMER   = string.format("%s - %s", L(LID.GREET_BUTTON_BINDING_NAME),
+        L(LID.CRAFT_SCAN));
+    BINDING_NAME_CRAFT_SCAN_DISMISS_CURRENT_CUSTOMER = string.format("%s - %s", L(LID.DISMISS_BUTTON_BINDING_NAME),
+        L(LID.CRAFT_SCAN));
 
     -- We alias our SavedVariable so we can easily switch to non-persistent mode for testing.
     CraftScan.DB                                     = {}
