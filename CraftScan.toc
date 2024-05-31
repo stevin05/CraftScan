@@ -1,0 +1,37 @@
+## Interface: 100206
+## Title: CraftScan
+## Version: 10.2-011
+## Notes: Scans chat for potential work orders
+## Author: Stevin
+## X-Curse-Project-ID: 
+## SavedVariables: CraftScan_DB
+## IconTexture: Interface\Icons\Trade_blacksmithing
+
+Consts.lua
+
+Locals/enUS.lua
+Locals/deDE.lua
+Locals/itIT.lua
+Locals/ruRU.lua
+Locals/ptBR.lua
+Locals/frFR.lua
+Locals/esES.lua
+Locals/esMX.lua
+Locals/koKR.lua
+Locals/zhTW.lua
+Locals/zhCN.lua
+Locals/Localization.lua
+
+Utils/Utils.xml
+
+RecipeSchematicMenu.xml
+
+AlertIcon.xml
+
+ChatScanner.lua
+
+OrderTableTemplate.xml
+
+OrderPage.xml
+
+Settings.lua
