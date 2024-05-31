@@ -15,16 +15,16 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.RENABLE_ADDONS]                  = "Re-enable Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]          =
         "Save your list of addons, and then disable them, allowing for a quick swap to an alt. This button can be clicked again to re-enable the addons at any time.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft %s.",      -- ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft %s.",          -- ItemLink
         [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, %s can craft %s.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]            = "that",
-        [LID.GREETING_I_HAVE_PROF]            = "I have %s.",           -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]           = "My alt, %s, has %s.", -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]            = "I have %s.",               -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]           = "My alt, %s, has %s.",      -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]             = "Let me know if you send an order so I can log over.",
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Toggle Order Page",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Greet Banner Customer",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Dismiss Banner Customer",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Toggle chat orders%s",                             -- Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Toggle chat orders%s",                                 -- Keybind
         [LID.BANNER_TOOLTIP]                  = "Left click: Greet customer%s\nRight click: Dismiss%s", -- Keybind, Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "Show CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Hide CraftScan",
@@ -107,6 +107,11 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.DEFAULT_KEYWORDS_ENCHANTING]     = "Enchanter, Crest",
         [LID.DEFAULT_KEYWORDS_JEWELCRAFTING]  = "JC, Jewelcrafter",
         [LID.DEFAULT_KEYWORDS_INSCRIPTION]    = "Inscription, Inscriptionist, Scribe",
+        [LID.ADDON_WHITELIST_LABEL]           = "Whitelist addon",
+        [LID.ADDON_WHITELIST_TOOLTIP]         =
+        "When you hit the button to temporarily disable all addons, keep this one enabled. To remove an addon, set it back to 'None'. CraftScan will always stay enabled. Keep only what you need to craft effectively. XXX: This is a little bugged - a new 'None' should pop up after making a selection. If it doesn't go to a different menu tab then come back and it should be there.",
+
+
 
         -- Release notes
         [LID.RN_WELCOME] = "Welcome to CraftScan!",

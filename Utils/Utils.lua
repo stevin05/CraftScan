@@ -315,11 +315,16 @@ function CraftScan.Utils.ToggleSavedAddons()
         print("Addons enabled. Reload UI.")
         CraftScan_DB.saved_addons = nil
 
-        return
+        return;
     end
 
-    local whitelist = CraftScan.Utils.saved(CraftScan_DB, 'addon_whitelist',
-        { CraftScan = true, BugGrabber = true, BugSack = true, Prat = true })
+    local configWhitelist = CraftScan.Utils.saved(CraftScan.DB.settings, 'disabled_addon_whitelist',
+        {})
+    local whitelist = { CraftScan = true };
+    for _, value in ipairs(configWhitelist) do
+        whitelist[value] = true;
+    end
+
     CraftScan_DB.saved_addons = {}
     local numAddOns = GetNumAddOns()
     for i = 1, numAddOns do
