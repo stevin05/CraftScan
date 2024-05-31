@@ -395,7 +395,7 @@ end
 
 CraftScan_RecentUpdatesMixin = {}
 
-local currentVersion = 0.01
+local currentVersion = 1.00
 
 function CraftScan_RecentUpdatesMixin:OnHide()
     CraftScan.DB.settings.last_loaded_version = currentVersion;
@@ -410,27 +410,27 @@ local function NotifyRecentChanges()
 
     local releaseNotes = {
         {
-            version = 0.01,
+            version = 1.00,
             id = LID.RN_WELCOME,
         },
         {
-            version = 0.01,
+            version = 1.00,
             id = LID.RN_INITIAL_SETUP,
         },
         {
-            version = 0.01,
+            version = 1.00,
             id = LID.RN_INITIAL_TESTING,
         },
         {
-            version = 0.01,
+            version = 1.00,
             id = LID.RN_MANAGING_CRAFTERS,
         },
         {
-            version = 0.01,
+            version = 1.00,
             id = LID.RN_MANAGING_CUSTOMERS,
         },
         {
-            version = 0.01,
+            version = 1.00,
             id = LID.RN_KEYBINDS,
         },
     };
