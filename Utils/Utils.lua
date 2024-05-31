@@ -408,6 +408,7 @@ local function NotifyRecentChanges()
         return;
     end
 
+    -- Test tagged release to CurseForge
     local releaseNotes = {
         {
             version = 1.00,
