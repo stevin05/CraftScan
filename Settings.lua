@@ -28,7 +28,7 @@ end
 -- the index in the array. Don't see a way to clean up a setting in real time, so
 -- we just leave around extra defaults until a reload.
 local function CreateMultiSelectDropDown(category, variable, name, options, tooltip, default)
-    local db = CraftScan.DB.settings[variable];
+    local db = CraftScan.Utils.saved(CraftScan.DB.settings, variable, {})
     local displayed = {};
 
     local seen = {}
