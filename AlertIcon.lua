@@ -210,23 +210,20 @@ CraftScan.Utils.onLoad(function()
         local callbacks = eventCallbacks[event];
         if callbacks then
             for _, callback in ipairs(callbacks) do
-                callback(...)
+                callback(event, ...)
             end
         end
     end)
 
-    local function UpdateFrameVisibility()
-        if CraftScan.Utils.ShouldShowAlertButton() then
+    local function UpdateFrameVisibility(...)
+        if CraftScan.Utils.IsScanningEnbled(...) then
             frame:Show()
         else
             frame:Hide()
         end
     end
 
-    frame:RegisterEventCallback("PLAYER_UPDATE_RESTING", UpdateFrameVisibility)
-    frame:RegisterEventCallback("ZONE_CHANGED_NEW_AREA", UpdateFrameVisibility)
-    frame:RegisterEventCallback("CINEMATIC_START", UpdateFrameVisibility)
-    frame:RegisterEventCallback("CINEMATIC_STOP", UpdateFrameVisibility)
+    CraftScan.Utils.RegisterEnableDisableCallback(UpdateFrameVisibility)
 
     frame.PageButton:UpdateIcon();
 
