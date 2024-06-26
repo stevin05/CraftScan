@@ -614,7 +614,7 @@ local function UpdateScannerEventRegistry()
     -- AddMessage call on the main window, and then when we process a CHAT_MSG
     -- event that matches, we grab the last message recorded here to get the
     -- full ChatFrame format.
-    if IsResting() then
+    if CraftScan.Utils.ShouldShowAlertButton() then
         disableHook = false;
 
         if not registered then
@@ -646,6 +646,8 @@ CraftScan.Utils.onLoad(function()
     frame:SetScript("OnEvent", OnMessage)
     CraftScanScannerMenu:RegisterEventCallback("PLAYER_UPDATE_RESTING", UpdateScannerEventRegistry);
     CraftScanScannerMenu:RegisterEventCallback("ZONE_CHANGED_NEW_AREA", UpdateScannerEventRegistry);
+    CraftScanScannerMenu:RegisterEventCallback("CINEMATIC_START", UpdateScannerEventRegistry);
+    CraftScanScannerMenu:RegisterEventCallback("CINEMATIC_STOP", UpdateScannerEventRegistry);
     hooksecurefunc(_G.ChatFrame1, "AddMessage", CaptureChatMessage);
     UpdateScannerEventRegistry();
 end)

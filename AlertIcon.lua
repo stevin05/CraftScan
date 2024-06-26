@@ -216,7 +216,7 @@ CraftScan.Utils.onLoad(function()
     end)
 
     local function UpdateFrameVisibility()
-        if IsResting() then
+        if CraftScan.Utils.ShouldShowAlertButton() then
             frame:Show()
         else
             frame:Hide()
@@ -225,6 +225,8 @@ CraftScan.Utils.onLoad(function()
 
     frame:RegisterEventCallback("PLAYER_UPDATE_RESTING", UpdateFrameVisibility)
     frame:RegisterEventCallback("ZONE_CHANGED_NEW_AREA", UpdateFrameVisibility)
+    frame:RegisterEventCallback("CINEMATIC_START", UpdateFrameVisibility)
+    frame:RegisterEventCallback("CINEMATIC_STOP", UpdateFrameVisibility)
 
     frame.PageButton:UpdateIcon();
 

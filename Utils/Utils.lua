@@ -306,6 +306,10 @@ function CraftScan.Utils.AddonsAreSaved()
     return CraftScan_DB.saved_addons
 end
 
+function CraftScan.Utils.ShouldShowAlertButton()
+    return IsResting() and not InCinematic() and not IsInCinematicScene();
+end
+
 function CraftScan.Utils.ToggleSavedAddons()
     if CraftScan_DB.saved_addons then
         for _, name in ipairs(CraftScan_DB.saved_addons) do
