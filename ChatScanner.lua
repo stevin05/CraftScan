@@ -146,8 +146,8 @@ end
 function CraftScan.Scanner.LoadConfig()
     resetConfig()
 
-    config.exclusions = ParseStringList(CraftScan.DB.exclusions)
-    config.inclusions = ParseStringList(CraftScan.DB.inclusions)
+    config.exclusions = ParseStringList(CraftScan.DB.settings.exclusions)
+    config.inclusions = ParseStringList(CraftScan.DB.settings.inclusions)
 
     -- Flatten the keywords, storing the path back to their source so we can
     -- find the greeting after getting a match.

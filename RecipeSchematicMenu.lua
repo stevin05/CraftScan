@@ -242,17 +242,18 @@ local function initMenu()
     -- The global menu for all professions
     local exclusions = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30,
         L("Excluded keywords"),
-        CraftScan.DB.exclusions,
+        CraftScan.DB.settings.exclusions,
         "CraftScan_Exclusions", function(self)
-            CraftScan.DB.exclusions = self:GetText()
+            CraftScan.DB.settings.exclusions = self:GetText()
             CraftScan.Scanner.LoadConfig()
         end,
         nil,
         scrollFrame);
-    local inclusions = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Keywords"), CraftScan.DB.inclusions,
+    local inclusions = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Keywords"),
+        CraftScan.DB.settings.inclusions,
         "CraftScan_Keywords",
         function(self)
-            CraftScan.DB.inclusions = self:GetText()
+            CraftScan.DB.settings.inclusions = self:GetText()
             CraftScan.Scanner.LoadConfig()
         end,
         nil,
@@ -265,7 +266,8 @@ local function initMenu()
             db_parent_prof.keywords = self:GetText()
             CraftScan.Scanner.LoadConfig()
         end, function()
-            return db_parent_prof.keywords or L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID])
+            return db_parent_prof.keywords or
+            L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID])
         end,
         scrollFrame)
 
@@ -294,11 +296,12 @@ local function initMenu()
         end, function()
             return db_prof.all_enabled, true
         end)
-    local profIsPrimary = CraftScan.Frames.createCheckBox(L("Primary expansion"), contentFrame, function(self, button, down)
-        local isChecked = self:GetChecked()
-        db_parent_prof.primary_expansion = isChecked and cur.profession.professionID or nil
-        CraftScan.Scanner.LoadConfig()
-    end, function()
+    local profIsPrimary = CraftScan.Frames.createCheckBox(L("Primary expansion"), contentFrame,
+        function(self, button, down)
+            local isChecked = self:GetChecked()
+            db_parent_prof.primary_expansion = isChecked and cur.profession.professionID or nil
+            CraftScan.Scanner.LoadConfig()
+        end, function()
         return db_parent_prof.primary_expansion and db_parent_prof.primary_expansion == cur.profession.professionID, true
     end)
     local profGreeting = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 45, L("Profession greeting"), nil,
@@ -332,10 +335,11 @@ local function initMenu()
             return db_cat and db_cat.greeting or ""
         end,
         scrollFrame)
-    local catOverride = CraftScan.Frames.createCheckBox(L("Override greeting"), contentFrame, function(self, button, down)
-        dbCat(true).override = self:GetChecked()
-        CraftScan.Scanner.LoadConfig()
-    end, function()
+    local catOverride = CraftScan.Frames.createCheckBox(L("Override greeting"), contentFrame,
+        function(self, button, down)
+            dbCat(true).override = self:GetChecked()
+            CraftScan.Scanner.LoadConfig()
+        end, function()
         local db_cat = dbCat()
         return db_cat and db_cat.override, true
     end)
@@ -361,10 +365,11 @@ local function initMenu()
             return db_recipe and db_recipe.greeting or ""
         end,
         scrollFrame)
-    local itemOverride = CraftScan.Frames.createCheckBox(L("Override greeting"), contentFrame, function(self, button, down)
-        saved(db_recipes, cur.recipe.recipeID, {}).override = self:GetChecked()
-        CraftScan.Scanner.LoadConfig()
-    end, function()
+    local itemOverride = CraftScan.Frames.createCheckBox(L("Override greeting"), contentFrame,
+        function(self, button, down)
+            saved(db_recipes, cur.recipe.recipeID, {}).override = self:GetChecked()
+            CraftScan.Scanner.LoadConfig()
+        end, function()
         local db_recipe = saved(db_recipes, cur.recipe.recipeID)
         return db_recipe and db_recipe.override, true
     end)

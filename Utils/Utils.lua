@@ -531,22 +531,22 @@ local function doOnce()
         CraftScan_DB = CraftScan_DB or {}
 
         CraftScan.DB.settings = CraftScan.Utils.saved(CraftScan_DB, 'settings', {})
+        CraftScan.DB.settings.inclusions = CraftScan.DB.settings.inclusions or L(LID.GLOBAL_INCLUSION_DEFAULT);
+        CraftScan.DB.settings.exclusions = CraftScan.DB.settings.exclusions or L(LID.GLOBAL_EXCLUSION_DEFAULT);
 
         local realmDB = CraftScan.Utils.saved(CraftScan_DB, GetRealmName(), {})
         CraftScan.DB.characters = CraftScan.Utils.saved(realmDB, 'characters', {})
         CraftScan.DB.listed_orders = CraftScan.Utils.saved(realmDB, 'listed_orders', {})
         CraftScan.DB.customers = CraftScan.Utils.saved(realmDB, 'customers', {})
-        CraftScan.DB.inclusions = CraftScan.Utils.saved(realmDB, 'inclusions', L(LID.GLOBAL_INCLUSION_DEFAULT));
-        CraftScan.DB.exclusions = CraftScan.Utils.saved(realmDB, 'exclusions', L(LID.GLOBAL_EXCLUSION_DEFAULT));
 
         UpgradePersistentConfig()
     else
         CraftScan.DB.settings = {}
+        CraftScan.DB.settings.inclusions = L(LID.GLOBAL_INCLUSION_DEFAULT);
+        CraftScan.DB.settings.exclusions = L(LID.GLOBAL_EXCLUSION_DEFAULT);
         CraftScan.DB.characters = {}
         CraftScan.DB.listed_orders = {}
         CraftScan.DB.customers = {}
-        CraftScan.DB.inclusions = L(LID.GLOBAL_INCLUSION_DEFAULT);
-        CraftScan.DB.exclusions = L(LID.GLOBAL_EXCLUSION_DEFAULT);
     end
 
     CraftScan.STATE = {};
