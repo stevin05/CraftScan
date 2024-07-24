@@ -5,7 +5,7 @@ local function L(id)
     return CraftScan.LOCAL:GetText(id);
 end
 
-local function CreateDropDown(category, variable, name, options, tooltip, onChange)
+local function CreateDropdown(category, variable, name, options, tooltip, onChange)
     local default = CraftScan.CONST.DEFAULT_SETTINGS[variable];
     local setting = Settings.RegisterAddOnSetting(category, name, variable, type(default), default);
 
@@ -15,7 +15,7 @@ local function CreateDropDown(category, variable, name, options, tooltip, onChan
         CraftScan.DB.settings[variable] = value;
         if onChange then onChange(value) end
     end);
-    local initializer = Settings.CreateDropDown(category, setting, options, tooltip);
+    local initializer = Settings.CreateDropdown(category, setting, options, tooltip);
     initializer:AddSearchTags(L(LID.CRAFT_SCAN));
 end
 
@@ -27,7 +27,7 @@ end
 -- each entry in the array, using the variable named 'variable<N>', where N is
 -- the index in the array. Don't see a way to clean up a setting in real time, so
 -- we just leave around extra defaults until a reload.
-local function CreateMultiSelectDropDown(category, variable, name, options, tooltip, default)
+local function CreateMultiSelectDropdown(category, variable, name, options, tooltip, default)
     local db = CraftScan.Utils.saved(CraftScan.DB.settings, variable, {})
     local displayed = {};
 
@@ -52,7 +52,7 @@ local function CreateMultiSelectDropDown(category, variable, name, options, tool
 
     -- Create a new drop down. When its value changes to a non-default value,
     -- create another one if no non-default value boxes are already present.
-    local function CreateOneDropDown(index, value)
+    local function CreateOneDropdown(index, value)
         displayed[index] = true;
         local variableN = variable .. index;
         local setting = Settings.RegisterAddOnSetting(category, name, variableN, type(default), default);
@@ -64,19 +64,19 @@ local function CreateMultiSelectDropDown(category, variable, name, options, tool
 
             local available = FirstAvailableSequentialSetting();
             if value ~= default and not displayed[available] then
-                CreateOneDropDown(available, default);
+                CreateOneDropdown(available, default);
             end
         end);
-        local initializer = Settings.CreateDropDown(category, setting, options, tooltip);
+        local initializer = Settings.CreateDropdown(category, setting, options, tooltip);
         initializer:AddSearchTags(L(LID.CRAFT_SCAN));
     end
 
     for i, value in ipairs(db) do
         if value ~= default then
-            CreateOneDropDown(i, value)
+            CreateOneDropdown(i, value)
         end
     end
-    CreateOneDropDown(FirstAvailableSequentialSetting(), default)
+    CreateOneDropdown(FirstAvailableSequentialSetting(), default)
 end
 
 local function CreateSlider(category, variable, name, options, tooltip)
@@ -105,7 +105,7 @@ CraftScan.Utils.onLoad(function()
             return container:GetData();
         end
 
-        CreateDropDown(category, "ping_sound", L(LID.PING_SOUND_LABEL), GetOptions, L(LID.PING_SOUND_TOOLTIP),
+        CreateDropdown(category, "ping_sound", L(LID.PING_SOUND_LABEL), GetOptions, L(LID.PING_SOUND_TOOLTIP),
             function(path)
                 PlaySoundFile(path, "Master");
             end
@@ -119,7 +119,7 @@ CraftScan.Utils.onLoad(function()
             return container:GetData();
         end
 
-        CreateDropDown(category, "banner_direction", L(LID.BANNER_SIDE_LABEL), GetOptions, L(LID.BANNER_SIDE_TOOLTIP));
+        CreateDropdown(category, "banner_direction", L(LID.BANNER_SIDE_LABEL), GetOptions, L(LID.BANNER_SIDE_TOOLTIP));
     end
     do
         local options = Settings.CreateSliderOptions(1, 10, 1);
@@ -161,7 +161,7 @@ CraftScan.Utils.onLoad(function()
             return container:GetData();
         end
 
-        CreateMultiSelectDropDown(category, variable, L(LID.ADDON_WHITELIST_LABEL), GetOptions,
+        CreateMultiSelectDropdown(category, variable, L(LID.ADDON_WHITELIST_LABEL), GetOptions,
             L(LID.ADDON_WHITELIST_TOOLTIP), default
         );
     end

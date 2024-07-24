@@ -405,6 +405,11 @@ local function UpgradePersistentConfig()
             end
         end
     end
+
+    -- These two were never saving correctly in this location, so it only holds the defaults.
+    -- Now located at CraftScan_DB.settings.{inclusions,exclusions}
+    CraftScan_DB['inclusions'] = nil;
+    CraftScan_DB['exclusions'] = nil;
 end
 
 function CraftScan.Utils.GetSetting(key)
