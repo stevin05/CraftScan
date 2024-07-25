@@ -610,6 +610,9 @@ end
 CraftScan_OpenProfessionButtonMixin = {}
 
 function CraftScan_OpenProfessionButtonMixin:OnClick(button)
+    -- With TWW update, this hide is no longer automatic.
+    HideUIPanel(CraftScan.Frames.OrdersPage);
+
     C_TradeSkillUI.OpenTradeSkill(self.profession.professionID);
     self:SetTabSelected(false);
     self.Text:SetPoint("CENTER", self, "CENTER", 0, 0);
@@ -624,6 +627,9 @@ end
 CraftScan_OpenChatOrdersButtonMixin = {}
 
 function CraftScan_OpenChatOrdersButtonMixin:OnClick(button)
+    -- With TWW update, this hide is no longer automatic.
+    HideUIPanel(ProfessionsFrame);
+
     ShowUIPanel(CraftScan.Frames.OrdersPage);
 end
 
