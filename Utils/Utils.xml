@@ -36,6 +36,25 @@
         </Layers>
     </Frame>
 
+    <Frame name="CraftScan_DebugFrame" inherits="DefaultPanelFlatTemplate" parent="UIParent" movable="true" enableMouse="true" frameStrata="DIALOG" virtual="true">
+        <Size x="425" y="855" />
+        <Frames>
+            <Button parentKey="ClosePanelButton" inherits="UIPanelCloseButtonDefaultAnchors" />
+        </Frames>
+    </Frame>
+
+    <ScrollFrame name="CraftScan_Debug" parentKey="ScrollFrame" inherits="InputScrollFrameTemplate" virtual="true">
+        <KeyValues>
+            <!--<KeyValue key="maxLetters" value="2047" type="number"/>-->
+            <KeyValue key="instructions" value="" type="string" />
+            <KeyValue key="hideCharCount" value="true" type="boolean"/>
+            <KeyValue key="scrollBarX" value="-17" type="number"/>
+            <KeyValue key="scrollBarTopY" value="-30" type="number"/>
+            <KeyValue key="scrollBarBottomY" value="5" type="number"/>
+        </KeyValues>
+    </ScrollFrame>
+
+
     <Frame name="CraftScanRecentUpdatesFrame" inherits="DefaultPanelFlatTemplate" mixin="CraftScan_RecentUpdatesMixin" parent="UIParent" movable="true" enableMouse="true" frameStrata="DIALOG" hidden="true">
         <Size x="400" y="400" />
         <Anchors>

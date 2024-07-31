@@ -57,13 +57,6 @@
       <Anchor point="TOPLEFT" relativePoint="TOPLEFT" />
     </Anchors>
   </Frame>
-  <ScrollFrame name="CraftScan_Debug" inherits="InputScrollFrameTemplate" virtual="true">
-    <KeyValues>
-      <!--<KeyValue key="maxLetters" value="2047" type="number"/>-->
-      <KeyValue key="instructions" value="" type="string" />
-      <KeyValue key="hideCharCount" value="true" type="boolean"/>
-    </KeyValues>
-  </ScrollFrame>
   <ScrollFrame name="CraftScan_Exclusions" inherits="InputScrollFrameTemplate" virtual="true">
     <KeyValues>
       <KeyValue key="maxLetters" value="2047" type="number"/>

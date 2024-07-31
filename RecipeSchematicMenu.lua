@@ -526,6 +526,14 @@ CraftScan.Utils.onLoad(function()
         db_prof = saved(db_player.professions, cur.profession.professionID, {})
         db_prof.parentProfID = cur.profession.parentProfessionID
 
+        if cur.profession.parentProfessionID == nil then
+            CraftScan.Utils.DIAG_PRINT_ENABLED = true;
+            print("You have hit https://github.com/stevin05/CraftScan/issues/3. Please copy the info from the debug window and paste it as a comment.");
+            CraftScan.Utils.printTable("You have hit https://github.com/stevin05/CraftScan/issues/3. Please copy this info and paste it as a comment.", cur.profession);
+            CraftScan.Utils.DIAG_PRINT_ENABLED = false;
+            return;
+        end
+
         db_player.parent_professions = db_player.parent_professions or {}
         db_parent_prof = saved(db_player.parent_professions, cur.profession.parentProfessionID, {
             scanning_enabled = true,

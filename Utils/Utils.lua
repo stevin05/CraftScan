@@ -97,6 +97,7 @@ function CraftScan.Frames.createTextInput(name, parent, sizeX, sizeY, labelText,
     return textFrame
 end
 
+local diagPrintFrame  = nil
 local diagPrint = nil
 local diagText = ''
 function CraftScan.Utils.printTable(label, tbl, indent)
@@ -136,13 +137,17 @@ function CraftScan.Utils.printTable(label, tbl, indent)
     end
 
     if not diagPrint then
-        diagPrint = CraftScan.Frames.createTextInput(nil, UIParent, 400, 800, "Diag Table Info", nil, "CraftScan_Debug",
+        diagPrintFrame = CreateFrame("Frame", "Section", UIParent, "CraftScan_DebugFrame")
+        diagPrint = CraftScan.Frames.createTextInput("Frame", diagPrintFrame, 400, 800, "https://github.com/stevin05/CraftScan", nil, "CraftScan_Debug",
             nil,
             function()
                 return diagText
             end)
-        diagPrint:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -250, -115)
+        diagPrintFrame:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -250, -115)
+        diagPrintFrame:SetTitle("CraftScan Debug Log");
+        diagPrint:SetPoint("TOPLEFT", diagPrintFrame, "TOPLEFT", 15, -25)
     else
+        diagPrintFrame:Show()
         diagPrint.updateDisplay()
     end
 end
