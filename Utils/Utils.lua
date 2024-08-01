@@ -97,9 +97,9 @@ function CraftScan.Frames.createTextInput(name, parent, sizeX, sizeY, labelText,
     return textFrame
 end
 
-local diagPrintFrame  = nil
-local diagPrint = nil
-local diagText = ''
+local diagPrintFrame = nil
+local diagPrint      = nil
+local diagText       = ''
 function CraftScan.Utils.printTable(label, tbl, indent)
     if not CraftScan.Utils.DIAG_PRINT_ENABLED then
         return
@@ -138,7 +138,8 @@ function CraftScan.Utils.printTable(label, tbl, indent)
 
     if not diagPrint then
         diagPrintFrame = CreateFrame("Frame", "Section", UIParent, "CraftScan_DebugFrame")
-        diagPrint = CraftScan.Frames.createTextInput("Frame", diagPrintFrame, 400, 800, "https://github.com/stevin05/CraftScan", nil, "CraftScan_Debug",
+        diagPrint = CraftScan.Frames.createTextInput("Frame", diagPrintFrame, 400, 800,
+            "https://github.com/stevin05/CraftScan", nil, "CraftScan_Debug",
             nil,
             function()
                 return diagText
@@ -374,33 +375,42 @@ local function UpgradePersistentConfig()
     for _, charConfig in pairs(CraftScan.DB.characters) do
         charConfig['enabled'] = nil
         if charConfig.professions then
+            local secondaryProfs = {};
             for profID, profConfig in pairs(charConfig.professions) do
                 local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(profID);
-                local parentProfConfigs = CraftScan.Utils.saved(charConfig, 'parent_professions', {});
-                local parentProfConfig = CraftScan.Utils.saved(parentProfConfigs, profInfo.parentProfessionID, {
-                    scanning_enabled = true,
-                    visual_alert_enabled = true,
-                    sound_alert_enabled = false,
-                })
-                profConfig.parentProfID = profInfo.parentProfessionID;
-                profConfig['scanning_enabled'] = nil
-                profConfig['auto_reply'] = nil
+                if not profInfo.isPrimaryProfession then
+                    table.insert(secondaryProfs, profID);
+                else
+                    local parentProfConfigs = CraftScan.Utils.saved(charConfig, 'parent_professions', {});
+                    local parentProfConfig = CraftScan.Utils.saved(parentProfConfigs, profInfo.parentProfessionID, {
+                        scanning_enabled = true,
+                        visual_alert_enabled = true,
+                        sound_alert_enabled = false,
+                    })
+                    profConfig.parentProfID = profInfo.parentProfessionID;
+                    profConfig['scanning_enabled'] = nil
+                    profConfig['auto_reply'] = nil
 
-                -- Moving profession keywords over to the parent profession so
-                -- they are only configured once. An item match will then
-                -- trigger its expansion's greeting, or if a generic match is
-                -- made, we use the primary expansion's greeting.
-                local keywords = profConfig['keywords'];
-                if keywords then
-                    if parentProfConfig['keywords'] then
-                        if #keywords > #parentProfConfig['keywords'] then
+                    -- Moving profession keywords over to the parent profession so
+                    -- they are only configured once. An item match will then
+                    -- trigger its expansion's greeting, or if a generic match is
+                    -- made, we use the primary expansion's greeting.
+                    local keywords = profConfig['keywords'];
+                    if keywords then
+                        if parentProfConfig['keywords'] then
+                            if #keywords > #parentProfConfig['keywords'] then
+                                parentProfConfig['keywords'] = keywords;
+                            end
+                        else
                             parentProfConfig['keywords'] = keywords;
                         end
-                    else
-                        parentProfConfig['keywords'] = keywords;
+                        profConfig['keywords'] = nil;
                     end
-                    profConfig['keywords'] = nil;
                 end
+            end
+            for _, profID in ipairs(secondaryProfs) do
+                -- We were accidentally saving secondary profs in the past. Erase them if found in the persistent config.
+                charConfig.professions[profID] = nil;
             end
             if charConfig.primary_expansions then
                 for parentProfessionID, professionID in pairs(charConfig.primary_expansions) do
