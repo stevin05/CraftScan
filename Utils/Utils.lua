@@ -378,7 +378,11 @@ local function UpgradePersistentConfig()
             local secondaryProfs = {};
             for profID, profConfig in pairs(charConfig.professions) do
                 local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(profID);
-                if not profInfo.isPrimaryProfession then
+
+                -- 'Supply Shipments' is a profession in the emerald dream. It
+                -- is marked as a primary profession, so got through our
+                -- filters, but it does not have a parentProfessionID.
+                if not profInfo.isPrimaryProfession or not profInfo.parentProfessionID then
                     table.insert(secondaryProfs, profID);
                 else
                     local parentProfConfigs = CraftScan.Utils.saved(charConfig, 'parent_professions', {});

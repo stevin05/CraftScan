@@ -183,6 +183,12 @@ function CraftScan_ScannerConfigButtonMixin:OnClick(button)
     end
 end
 
+function CraftScan_ScannerConfigButtonMixin:UncheckAndHide()
+    self.isSelected = false;
+    self:SetText(L(LID.SCANNER_CONFIG_SHOW));
+    self:Hide()
+end
+
 CraftScan_RecipeEnabledIndicatorMixin = {}
 
 function CraftScan_RecipeEnabledIndicatorMixin:OnEnter()
@@ -492,6 +498,20 @@ local function initMenu()
     AddHelp(exclusions, LID.HELP_GLOBAL_EXCLUSIONS);
 end
 
+local function HideSchematicOptions()
+    CraftScanFrame:Hide();
+    if menuShownButton then
+        menuShownButton:UncheckAndHide();
+        scanEnabledCheckBox:Hide();
+    end
+end
+
+local function ShowSchematicOptions()
+    if menuShownButton then
+        menuShownButton:Show();
+        scanEnabledCheckBox:Show();
+    end
+end
 
 CraftScan.Utils.onLoad(function()
     local player = GetUnitName("player")
@@ -505,14 +525,16 @@ CraftScan.Utils.onLoad(function()
         end
 
         cur.profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(cur.recipe.recipeID)
-        if not cur.profession.isPrimaryProfession then
+        if not cur.profession.isPrimaryProfession or not cur.profession.parentProfessionID then
             -- TODO Temporary - cleanup secondary professions from saved variables. This can be removed.
             db_player = saved(CraftScan.DB.characters, playerNameWithRealm)
             if db_player then
                 db_player.professions[cur.profession.professionID] = nil
             end
+            HideSchematicOptions();
             return
         end
+        ShowSchematicOptions();
         cur.category = C_TradeSkillUI.GetCategoryInfo(cur.recipe.categoryID)
 
         CraftScan.STATE.professionID = cur.profession.parentProfessionID;
