@@ -382,8 +382,11 @@ local function UpgradePersistentConfig()
                 -- 'Supply Shipments' is a profession in the emerald dream. It
                 -- is marked as a primary profession, so got through our
                 -- filters, but it does not have a parentProfessionID.
-                if not profInfo.isPrimaryProfession or not profInfo.parentProfessionID then
+                if not profInfo.isPrimaryProfession or not profInfo.parentProfessionID or not CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[profInfo.parentProfessionID] then
                     table.insert(secondaryProfs, profID);
+                    if profInfo.parentProfessionID then
+                        charConfig.parent_professions[profInfo.parentProfessionID] = nil;
+                    end
                 else
                     local parentProfConfigs = CraftScan.Utils.saved(charConfig, 'parent_professions', {});
                     local parentProfConfig = CraftScan.Utils.saved(parentProfConfigs, profInfo.parentProfessionID, {

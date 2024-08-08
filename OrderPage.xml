@@ -118,7 +118,7 @@
 			<CheckButton name="SoundAlertCheckBox" parentKey="SoundAlertCheckBox" inherits="CraftScan_CrafterToggleTemplate">
 				<KeyValues>
 					<KeyValue key="ppconfig_key" value="sound_alert_enabled" type="string"/>
-					<KeyValue key="enabled_tooltip" value="Sound alerts are enabled." type="string"/>
+					<KeyValue key="enabled_tooltip" value="Sound alerts are enabled (the WeakAuras sound library is required)." type="string"/>
 					<KeyValue key="disabled_tooltip" value="Sound alerts are muted." type="string"/>
 				</KeyValues>
 				<Anchors>

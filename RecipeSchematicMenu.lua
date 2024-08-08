@@ -273,7 +273,7 @@ local function initMenu()
             CraftScan.Scanner.LoadConfig()
         end, function()
             return db_parent_prof.keywords or
-            L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID])
+                L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID])
         end,
         scrollFrame)
 
@@ -308,8 +308,9 @@ local function initMenu()
             db_parent_prof.primary_expansion = isChecked and cur.profession.professionID or nil
             CraftScan.Scanner.LoadConfig()
         end, function()
-        return db_parent_prof.primary_expansion and db_parent_prof.primary_expansion == cur.profession.professionID, true
-    end)
+            return db_parent_prof.primary_expansion and db_parent_prof.primary_expansion == cur.profession.professionID,
+                true
+        end)
     local profGreeting = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 45, L("Profession greeting"), nil,
         "CraftScan_Greeting",
         function(self)
@@ -346,9 +347,9 @@ local function initMenu()
             dbCat(true).override = self:GetChecked()
             CraftScan.Scanner.LoadConfig()
         end, function()
-        local db_cat = dbCat()
-        return db_cat and db_cat.override, true
-    end)
+            local db_cat = dbCat()
+            return db_cat and db_cat.override, true
+        end)
 
     -- The specific item menu
     local itemKeywords = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Keywords"), "",
@@ -376,9 +377,9 @@ local function initMenu()
             saved(db_recipes, cur.recipe.recipeID, {}).override = self:GetChecked()
             CraftScan.Scanner.LoadConfig()
         end, function()
-        local db_recipe = saved(db_recipes, cur.recipe.recipeID)
-        return db_recipe and db_recipe.override, true
-    end)
+            local db_recipe = saved(db_recipes, cur.recipe.recipeID)
+            return db_recipe and db_recipe.override, true
+        end)
 
     CraftScan_CraftScanFrame_HelpPlate.FrameSize = { width = contentFrame:GetWidth(), height = contentFrame:GetHeight() };
 
@@ -525,15 +526,15 @@ CraftScan.Utils.onLoad(function()
         end
 
         cur.profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(cur.recipe.recipeID)
-        if not cur.profession.isPrimaryProfession or not cur.profession.parentProfessionID then
-            -- TODO Temporary - cleanup secondary professions from saved variables. This can be removed.
-            db_player = saved(CraftScan.DB.characters, playerNameWithRealm)
-            if db_player then
-                db_player.professions[cur.profession.professionID] = nil
-            end
+
+        if not cur.profession.isPrimaryProfession or not cur.profession.parentProfessionID or not CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID] then
+            -- Ignore Cooking, Fishing, gathering professions (we don't have
+            -- default keywords for them), and weird 'professions' like Emerald
+            -- Dream rep boxes (no parentProfessionID).
             HideSchematicOptions();
             return
         end
+
         ShowSchematicOptions();
         cur.category = C_TradeSkillUI.GetCategoryInfo(cur.recipe.categoryID)
 
