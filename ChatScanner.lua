@@ -261,7 +261,7 @@ local function getCrafterForMessage(message)
             -- presumable refers to the latest expansion.
             local crafterConfig = CraftScan.DB.characters[crafterInfo.crafter];
             local ppConfig = crafterConfig.parent_professions[crafterInfo.parentProfID];
-            if ppConfig.scanning_enabled then
+            if ppConfig.scanning_enabled and not ppConfig.character_disabled then
                 local maxProfID = 0;
                 for pID, pConfig in pairs(crafterConfig.professions) do
                     if pConfig.parentProfID == crafterInfo.parentProfID then

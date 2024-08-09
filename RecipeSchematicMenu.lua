@@ -162,59 +162,29 @@ function CraftScan_CraftScanFrameMixin:ToggleTutorial()
     end
 end
 
+local menuShownButtonInitialized = false;
+local function CreateMenuShownButton()
+    menuShownButton = CreateFrame("Button", "ToggleScannerConfigButton",
+        ProfessionsFrame.CraftingPage.SchematicForm,
+        "CraftScan_ScannerConfigButtonTemplate");
+    menuShownButton:SetText(L(LID.SCANNER_CONFIG_SHOW));
+    menuShownButton:SetPoint("TOPLEFT", ProfessionsFrame.CraftingPage.SchematicForm, "BOTTOMLEFT", 2, -4);
+    menuShownButtonInitialized = true;
+end
+
 CraftScan_CloseCraftScanFrameMixin = {}
 
 function CraftScan_CloseCraftScanFrameMixin:OnClick(button)
     menuShownButton:OnClick();
 end
 
-CraftScan_ScannerConfigButtonMixin = { isSelected = false }
-
-function CraftScan_ScannerConfigButtonMixin:OnClick(button)
-    self.isSelected = not self.isSelected;
-
-    if self.isSelected then
-        CraftScanFrame:Show()
-        onSchematicChange();
-        self:SetText(L(LID.SCANNER_CONFIG_HIDE));
-    else
-        self:SetText(L(LID.SCANNER_CONFIG_SHOW));
-        CraftScanFrame:Hide()
-    end
-end
-
-function CraftScan_ScannerConfigButtonMixin:UncheckAndHide()
-    self.isSelected = false;
-    self:SetText(L(LID.SCANNER_CONFIG_SHOW));
-    self:Hide()
-end
-
-CraftScan_RecipeEnabledIndicatorMixin = {}
-
-function CraftScan_RecipeEnabledIndicatorMixin:OnEnter()
-    GameTooltip:SetOwner(self, "ANCHOR_TOP");
-    if scanEnabledCheckBox:GetChecked() then
-        GameTooltip:SetText(string.format(L(LID.SCANNING_ENABLED),
-            db_prof.all_enabled and L(LID.SCAN_ALL_RECIPES) or L(LID.ITEM_SCAN_CHECK)))
-    else
-        GameTooltip:SetText(L(cur.recipe.learned and LID.SCANNING_DISABLED or LID.RECIPE_NOT_LEARNED))
-    end
-    GameTooltip:Show()
-end
-
-function CraftScan_RecipeEnabledIndicatorMixin:OnLeave()
-    GameTooltip:Hide()
-end
-
 -- Create and position the frames we'll need for user input.
 -- onSchematicChange will reference these frames and update their visibility and state.
 local menuInitialized = false
 local function initMenu()
-    menuShownButton = CreateFrame("Button", "ToggleScannerConfigButton",
-        ProfessionsFrame.CraftingPage.SchematicForm,
-        "CraftScan_ScannerConfigButtonTemplate");
-    menuShownButton:SetText(L(LID.SCANNER_CONFIG_SHOW));
-    menuShownButton:SetPoint("TOPLEFT", ProfessionsFrame.CraftingPage.SchematicForm, "BOTTOMLEFT", 2, -4);
+    if not menuShownButtonInitialized then
+        CreateMenuShownButton()
+    end
 
     scanEnabledCheckBox = CraftScan.Frames.createCheckBox(L(LID.ITEM_SCAN_CHECK),
         ProfessionsFrame.CraftingPage.SchematicForm,
@@ -503,67 +473,146 @@ local function HideSchematicOptions()
     CraftScanFrame:Hide();
     if menuShownButton then
         menuShownButton:UncheckAndHide();
+    end
+    if scanEnabledCheckBox then
         scanEnabledCheckBox:Hide();
     end
 end
 
 local function ShowSchematicOptions()
     if menuShownButton then
+        menuShownButton:ResetEnabled();
         menuShownButton:Show();
+    end
+    if scanEnabledCheckBox then
         scanEnabledCheckBox:Show();
     end
 end
 
-CraftScan.Utils.onLoad(function()
+local function OnRecipeSelected()
+    cur.recipe = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
+    if not cur.recipe then
+        onSchematicChange()
+        return
+    end
+
+    cur.profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(cur.recipe.recipeID)
+
+    if not cur.profession.isPrimaryProfession or not cur.profession.parentProfessionID or not CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID] then
+        -- Ignore Cooking, Fishing, gathering professions (we don't have
+        -- default keywords for them), and weird 'professions' like Emerald
+        -- Dream rep boxes (no parentProfessionID).
+        HideSchematicOptions();
+        return
+    end
+
+    -- At this point, the player has opened a tradeskill window, so it makes
+    -- sense to start tracking that character. Initialize the saved variables.
     local player = GetUnitName("player")
     local playerNameWithRealm = player .. "-" .. GetRealmName()
+    db_player = saved(CraftScan.DB.characters, playerNameWithRealm, {})
 
-    hooksecurefunc(ProfessionsFrame.CraftingPage, "SelectRecipe", function()
-        cur.recipe = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
-        if not cur.recipe then
-            onSchematicChange()
-            return
+    db_player.parent_professions = db_player.parent_professions or {}
+    db_parent_prof = saved(db_player.parent_professions, cur.profession.parentProfessionID, {
+        scanning_enabled = true,
+        visual_alert_enabled = true,
+        sound_alert_enabled = false,
+    })
+
+    if db_parent_prof.character_disabled then
+        HideSchematicOptions();
+
+        if not menuShownButtonInitialized then
+            CreateMenuShownButton()
         end
 
-        cur.profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(cur.recipe.recipeID)
+        menuShownButton:SetDisabled();
+        return;
+    end
 
-        if not cur.profession.isPrimaryProfession or not cur.profession.parentProfessionID or not CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID] then
-            -- Ignore Cooking, Fishing, gathering professions (we don't have
-            -- default keywords for them), and weird 'professions' like Emerald
-            -- Dream rep boxes (no parentProfessionID).
-            HideSchematicOptions();
-            return
-        end
+    db_player.professions = db_player.professions or {}
 
-        ShowSchematicOptions();
-        cur.category = C_TradeSkillUI.GetCategoryInfo(cur.recipe.categoryID)
+    db_prof = saved(db_player.professions, cur.profession.professionID, {})
+    db_prof.parentProfID = cur.profession.parentProfessionID
 
-        CraftScan.STATE.professionID = cur.profession.parentProfessionID;
-        CraftScan.Frames.MainButton:UpdateIcon();
+    db_recipes = saved(db_prof, "recipes", {})
 
-        -- At this point, the player has opened a tradeskill window, so it makes
-        -- sense to start tracking that character. Initialize the saved variables.
-        db_player = saved(CraftScan.DB.characters, playerNameWithRealm, {})
-        db_player.professions = db_player.professions or {}
+    cur.category = C_TradeSkillUI.GetCategoryInfo(cur.recipe.categoryID)
 
-        db_prof = saved(db_player.professions, cur.profession.professionID, {})
-        db_prof.parentProfID = cur.profession.parentProfessionID
+    CraftScan.STATE.professionID = cur.profession.parentProfessionID;
+    CraftScan.Frames.MainButton:UpdateIcon();
 
-        db_player.parent_professions = db_player.parent_professions or {}
-        db_parent_prof = saved(db_player.parent_professions, cur.profession.parentProfessionID, {
-            scanning_enabled = true,
-            visual_alert_enabled = true,
-            sound_alert_enabled = false,
-        })
+    ShowSchematicOptions();
+    if not menuInitialized then
+        initMenu()
 
-        db_recipes = saved(db_prof, "recipes", {})
+        menuInitialized = true
+    end
 
-        if not menuInitialized then
-            initMenu()
+    onSchematicChange()
+end
 
-            menuInitialized = true
-        end
 
-        onSchematicChange()
-    end)
+CraftScan_ScannerConfigButtonMixin = { isSelected = false, isEnabled = true }
+
+function CraftScan_ScannerConfigButtonMixin:SetDisabled()
+    self.isSelected = false;
+    self.isEnabled = false;
+    self:SetText(L(LID.SCANNER_CONFIG_DISABLED))
+    self:Show();
+end
+
+function CraftScan_ScannerConfigButtonMixin:OnClick(button)
+    if not self.isEnabled then
+        self.isEnabled = true;
+        self.isSelected = false;
+        db_parent_prof.character_disabled = false;
+        OnRecipeSelected();
+    else
+        self.isSelected = not self.isSelected;
+    end
+
+    if self.isSelected then
+        CraftScanFrame:Show()
+        onSchematicChange();
+        self:SetText(L(LID.SCANNER_CONFIG_HIDE));
+    else
+        self:SetText(L(LID.SCANNER_CONFIG_SHOW));
+        CraftScanFrame:Hide()
+    end
+end
+
+function CraftScan_ScannerConfigButtonMixin:UncheckAndHide()
+    self.isSelected = false;
+    self:SetText(L(LID.SCANNER_CONFIG_SHOW));
+    self:Hide()
+end
+
+function CraftScan_ScannerConfigButtonMixin:ResetEnabled()
+    if not self.isEnabled then
+        self.isEnabled = true;
+        self.isSelected = false;
+        self:SetText(L(LID.SCANNER_CONFIG_SHOW));
+    end
+end
+
+CraftScan_RecipeEnabledIndicatorMixin = {}
+
+function CraftScan_RecipeEnabledIndicatorMixin:OnEnter()
+    GameTooltip:SetOwner(self, "ANCHOR_TOP");
+    if scanEnabledCheckBox:GetChecked() then
+        GameTooltip:SetText(string.format(L(LID.SCANNING_ENABLED),
+            db_prof.all_enabled and L(LID.SCAN_ALL_RECIPES) or L(LID.ITEM_SCAN_CHECK)))
+    else
+        GameTooltip:SetText(L(cur.recipe.learned and LID.SCANNING_DISABLED or LID.RECIPE_NOT_LEARNED))
+    end
+    GameTooltip:Show()
+end
+
+function CraftScan_RecipeEnabledIndicatorMixin:OnLeave()
+    GameTooltip:Hide()
+end
+
+CraftScan.Utils.onLoad(function()
+    hooksecurefunc(ProfessionsFrame.CraftingPage, "SelectRecipe", OnRecipeSelected);
 end)

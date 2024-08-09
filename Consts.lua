@@ -72,6 +72,11 @@ CraftScan.CONST.TEXT = {
     DEFAULT_KEYWORDS_INSCRIPTION    = 63,
     ADDON_WHITELIST_LABEL           = 64,
     ADDON_WHITELIST_TOOLTIP         = 65,
+    SCANNER_CONFIG_DISABLED         = 66,
+    DELETE_CONFIG_TOOLTIP_TEXT      = 67,
+    DELETE_CONFIG_CONFIRM           = 68,
+    CLEANUP_CONFIG_TOOLTIP_TEXT     = 69,
+    CLEANUP_CONFIG_CONFIRM          = 70,
 
 
     -- Release notes have multiple lines that are sequential. Spaced out by hundreds to give more than enough room.
@@ -81,6 +86,7 @@ CraftScan.CONST.TEXT = {
     RN_MANAGING_CRAFTERS = 10300,
     RN_MANAGING_CUSTOMERS = 10400,
     RN_KEYBINDS = 10500,
+    RN_CLEANUP = 10600,
 }
 
 CraftScan.CONST.LOCALES = {

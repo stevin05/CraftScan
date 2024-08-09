@@ -444,10 +444,16 @@ end
 CraftScan_RecentUpdatesMixin = {}
 
 local function CompareVersions(version1, version2)
-    local v1, v2 = {}, {}
-    for i = 1, 3 do
-        v1[i], v2[i] = tonumber(version1:match("(%d+)", i + 1)), tonumber(version2:match("(%d+)", i + 1))
+    local function extractVersion(version)
+        local numbers = {}
+        for num in version:gmatch("%d+") do
+            table.insert(numbers, tonumber(num))
+        end
+        return numbers
     end
+
+    local v1 = extractVersion(version1);
+    local v2 = extractVersion(version2);
     for i = 1, 3 do
         if v1[i] < v2[i] then return -1 end
         if v1[i] > v2[i] then return 1 end
@@ -455,7 +461,7 @@ local function CompareVersions(version1, version2)
     return 0
 end
 
-local currentVersion = 'v1.0.0'
+local currentVersion = 'v1.0.10'
 
 function CraftScan_RecentUpdatesMixin:OnHide()
     CraftScan.DB.settings.last_loaded_version = currentVersion;
@@ -497,6 +503,10 @@ local function NotifyRecentChanges()
             version = 'v1.0.0',
             id = LID.RN_KEYBINDS,
         },
+        {
+            version = 'v1.0.10',
+            id = LID.RN_CLEANUP,
+        },
     };
 
     local anchor = AnchorUtil.CreateAnchor("TOP", CraftScanRecentUpdatesFrame.ScrollFrame.Content, "TOP");
@@ -513,7 +523,7 @@ local function NotifyRecentChanges()
         local body = L(section.id + 1);
         local i = 2;
         local b = L(section.id + i);
-        while b do
+        while b ~= section.id + i do
             body = body .. '\n\n' .. b;
             i = i + 1;
             b = L(section.id + i);

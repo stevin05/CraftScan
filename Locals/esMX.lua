@@ -11,16 +11,16 @@ function CraftScan.LOCAL_MX:GetData()
         [LID.RENABLE_ADDONS]                  = "Reactivar Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]          =
         "Guarda tu lista de addons y luego desactívalos, permitiendo un cambio rápido a un alter. Este botón puede ser pulsado de nuevo para reactivar los addons en cualquier momento.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "Puedo fabricar %s.",           -- ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "Puedo fabricar %s.",               -- ItemLink
         [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "Mi alter, %s, puede fabricar %s.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]            = "eso",
-        [LID.GREETING_I_HAVE_PROF]            = "Tengo %s.",                    -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]           = "Mi alter, %s, tiene %s.",      -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]            = "Tengo %s.",                        -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]           = "Mi alter, %s, tiene %s.",          -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]             = "Avísame si envías una orden para que pueda cambiar de personaje.",
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Alternar Página de Órdenes",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Saludar al Cliente del Banner",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Despedir al Cliente del Banner",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Alternar órdenes de chat%s",                                 -- Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Alternar órdenes de chat%s",                                     -- Keybind
         [LID.BANNER_TOOLTIP]                  = "Clic izquierdo: Saludar al cliente%s\nClic derecho: Despedir%s", -- Keybind, Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "Mostrar CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Ocultar CraftScan",
@@ -142,6 +142,20 @@ function CraftScan.LOCAL_MX:GetData()
         [LID.RN_KEYBINDS]                     = "Atajos de Teclado",
         [LID.RN_KEYBINDS + 1]                 =
         "Hay atajos de teclado disponibles para abrir la página de órdenes, responder al último cliente y despedir al último cliente. Busca 'CraftScan' para encontrar todas las configuraciones disponibles.",
+
+        [LID.RN_CLEANUP]                      = "Limpieza de Configuración",
+        [LID.RN_CLEANUP + 1]                  =
+        "Tus artesanos en el lado izquierdo de la página 'Órdenes de Chat' ahora tienen un menú contextual al hacer clic derecho. Usa este menú para mantener la lista limpia y eliminar personajes/profesiones obsoletos.",
+        ["Disable"]                           = "Desactivar",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "Elimina permanentemente cualquier dato %s guardado para %s.\n\nUn botón 'Habilitar CraftScan' estará presente en la página de la profesión para habilitarlo nuevamente con la configuración predeterminada.\n\nUsa esto si deseas continuar usando la profesión, pero sin la interacción de CraftScan (por ejemplo, cuando tienes Alquimia en todos los personajes secundarios para frascos largos).",                            -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "Escribe 'DELETE' para continuar:",
+        [LID.SCANNER_CONFIG_DISABLED]         = "Habilitar CraftScan",
+
+        ["Cleanup"]                           = "Limpiar",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "Elimina permanentemente cualquier dato %s guardado para %s.\n\nLa profesión quedará en un estado como si nunca hubiera sido configurada. Simplemente abrir la profesión nuevamente restaurará una configuración predeterminada.\n\nUsa esto si deseas restablecer completamente una profesión, has eliminado el personaje o has abandonado la profesión.",                             -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "Escribe 'CLEANUP' para continuar:",
 
     }
 end

@@ -15,16 +15,16 @@ function CraftScan.LOCAL_ES:GetData()
         [LID.RENABLE_ADDONS]                  = "Addons reaktivieren",
         [LID.DISABLE_ADDONS_TOOLTIP]          =
         "Speichern Sie Ihre Addon-Liste und deaktivieren Sie sie dann, um schnell zu einem anderen Charakter zu wechseln. Dieser Button kann erneut geklickt werden, um die Addons jederzeit wieder zu aktivieren.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "Ich kann %s herstellen.",     -- ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "Ich kann %s herstellen.",             -- ItemLink
         [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "Mein Twink, %s, kann %s herstellen.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]            = "das",
-        [LID.GREETING_I_HAVE_PROF]            = "Ich habe %s.",                -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]           = "Mein Twink, %s, hat %s.",     -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]            = "Ich habe %s.",                        -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]           = "Mein Twink, %s, hat %s.",             -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]             = "Lassen Sie es mich wissen, wenn Sie einen Auftrag senden, damit ich umloggen kann.",
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Auftragsseite umschalten",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Kunden begrüßen",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Kunden ablehnen",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Chat-Aufträge umschalten%s",                     -- Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Chat-Aufträge umschalten%s",                             -- Keybind
         [LID.BANNER_TOOLTIP]                  = "Linksklick: Kunden begrüßen%s\nRechtsklick: Ablehnen%s", -- Keybind, Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "CraftScan anzeigen",
         [LID.SCANNER_CONFIG_HIDE]             = "CraftScan ausblenden",
@@ -149,5 +149,19 @@ function CraftScan.LOCAL_ES:GetData()
         [LID.RN_KEYBINDS]                     = "Tastenkombinationen",
         [LID.RN_KEYBINDS + 1]                 =
         "Tastenkombinationen sind verfügbar, um die Auftragsseite zu öffnen, auf den neuesten Kunden zu antworten und den neuesten Kunden abzulehnen. Suchen Sie nach 'CraftScan', um alle verfügbaren Einstellungen zu finden.",
+        [LID.RN_CLEANUP]                      = "Limpieza de Configuración",
+        [LID.RN_CLEANUP + 1]                  =
+        "Tus artesanos en el lado izquierdo de la página 'Órdenes de Chat' ahora tienen un menú contextual al hacer clic derecho. Usa este menú para mantener la lista limpia y eliminar personajes/profesiones obsoletos.",
+        ["Disable"]                           = "Desactivar",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "Elimina permanentemente cualquier dato %s guardado para %s.\n\nUn botón 'Habilitar CraftScan' estará presente en la página de la profesión para habilitarlo nuevamente con la configuración predeterminada.\n\nUsa esto si deseas continuar usando la profesión, pero sin la interacción de CraftScan (por ejemplo, cuando tienes Alquimia en todos los personajes secundarios para frascos largos).",                            -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "Escribe 'DELETE' para continuar:",
+        [LID.SCANNER_CONFIG_DISABLED]         = "Habilitar CraftScan",
+
+        ["Cleanup"]                           = "Limpiar",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "Elimina permanentemente cualquier dato %s guardado para %s.\n\nLa profesión quedará en un estado como si nunca hubiera sido configurada. Simplemente abrir la profesión nuevamente restaurará una configuración predeterminada.\n\nUsa esto si deseas restablecer completamente una profesión, has eliminado el personaje o has abandonado la profesión.",                             -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "Escribe 'CLEANUP' para continuar:",
+
     }
 end

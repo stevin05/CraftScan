@@ -143,5 +143,20 @@ function CraftScan.LOCAL_PT:GetData()
         [LID.RN_KEYBINDS]                     = "Atalhos de Teclado",
         [LID.RN_KEYBINDS + 1]                 =
         "Atalhos de teclado estão disponíveis para abrir a página de pedidos, responder ao último cliente e dispensar o último cliente. Procure por 'CraftScan' para encontrar todas as configurações disponíveis.",
+
+        [LID.RN_CLEANUP]                      = "Limpeza de Configuração",
+        [LID.RN_CLEANUP + 1]                  =
+        "Seus artesãos no lado esquerdo da página 'Ordens de Chat' agora têm um menu de contexto ao clicar com o botão direito. Use este menu para manter a lista limpa e remover personagens/profissões desatualizados.",
+        ["Disable"]                           = "Desativar",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "Exclua permanentemente qualquer dado %s salvo para %s.\n\nUm botão 'Habilitar CraftScan' estará presente na página da profissão para habilitá-lo novamente com as configurações padrão.\n\nUse isso se você quiser continuar usando a profissão, mas sem a interação do CraftScan (por exemplo, quando você tem Alquimia em todos os alts para frascos longos).",                            -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "Digite 'DELETE' para continuar:",
+        [LID.SCANNER_CONFIG_DISABLED]         = "Habilitar CraftScan",
+
+        ["Cleanup"]                           = "Limpeza",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "Exclua permanentemente qualquer dado %s salvo para %s.\n\nA profissão será deixada em um estado como se nunca tivesse sido configurada. Simplesmente abrir a profissão novamente restaurará uma configuração padrão.\n\nUse isso se você quiser redefinir completamente uma profissão, excluiu o personagem ou abandonou a profissão.",                             -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "Digite 'CLEANUP' para continuar:",
+
     }
 end

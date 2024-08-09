@@ -271,7 +271,7 @@
 							<Anchor point="BOTTOMLEFT" y="5"/>
 						</Anchors>
 						<Scripts>
-							<OnLoad method="OnLoad"/>
+							<OnShow method="OnShow"/>
 						</Scripts>
 					</Frame>
 

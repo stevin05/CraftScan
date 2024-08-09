@@ -12,16 +12,16 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.RENABLE_ADDONS]                  = "Réactiver les addons",
         [LID.DISABLE_ADDONS_TOOLTIP]          =
         "Enregistrez votre liste d'addons, puis désactivez-les, permettant un changement rapide vers un personnage alternatif. Ce bouton peut être cliqué à nouveau pour réactiver les addons à tout moment.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "Je peux fabriquer %s.",         -- ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "Je peux fabriquer %s.",             -- ItemLink
         [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "Mon alter, %s, peut fabriquer %s.", -- Nom du fabriquant, ItemLink
         [LID.GREETING_LINK_BACKUP]            = "ça",
-        [LID.GREETING_I_HAVE_PROF]            = "J'ai %s.",                      -- Nom du métier
-        [LID.GREETING_ALT_HAS_PROF]           = "Mon alter, %s, a %s.",          -- Nom du fabriquant, Nom du métier
+        [LID.GREETING_I_HAVE_PROF]            = "J'ai %s.",                          -- Nom du métier
+        [LID.GREETING_ALT_HAS_PROF]           = "Mon alter, %s, a %s.",              -- Nom du fabriquant, Nom du métier
         [LID.GREETING_ALT_SUFFIX]             = "Faites-le moi savoir si vous envoyez une commande pour que je puisse me connecter.",
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Basculer la page de commande",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Saluer le client de la bannière",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Rejeter le client de la bannière",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Basculer les commandes de discussion%s",               -- Raccourci
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Basculer les commandes de discussion%s",                   -- Raccourci
         [LID.BANNER_TOOLTIP]                  = "Clic gauche : Saluer le client%s\nClic droit : Rejeter%s", -- Raccourci, Raccourci
         [LID.SCANNER_CONFIG_SHOW]             = "Afficher CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Masquer CraftScan",
@@ -146,5 +146,20 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.RN_KEYBINDS]                     = "Raccourcis clavier",
         [LID.RN_KEYBINDS + 1]                 =
         "Des raccourcis clavier sont disponibles pour ouvrir la page des commandes, répondre au dernier client et rejeter le dernier client. Recherchez 'CraftScan' pour trouver tous les paramètres disponibles.",
+
+        [LID.RN_CLEANUP]                      = "Nettoyage de la Configuration",
+        [LID.RN_CLEANUP + 1]                  =
+        "Vos artisans sur le côté gauche de la page 'Ordres de Chat' ont maintenant un menu contextuel lorsque vous faites un clic droit. Utilisez ce menu pour garder la liste propre et supprimer les personnages/métiers obsolètes.",
+        ["Disable"]                           = "Désactiver",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "Supprimez définitivement toutes les données %s enregistrées pour %s.\n\nUn bouton 'Activer CraftScan' sera présent sur la page du métier pour l'activer à nouveau avec les paramètres par défaut.\n\nUtilisez ceci si vous souhaitez continuer à utiliser le métier, mais sans l'interaction de CraftScan (par exemple, lorsque vous avez l'Alchimie sur tous les rerolls pour les flacons longs).",                            -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "Tapez 'DELETE' pour continuer :",
+        [LID.SCANNER_CONFIG_DISABLED]         = "Activer CraftScan",
+
+        ["Cleanup"]                           = "Nettoyer",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "Supprimez définitivement toutes les données %s enregistrées pour %s.\n\nLe métier sera laissé dans un état comme s'il n'avait jamais été configuré. Il suffit d'ouvrir à nouveau le métier pour restaurer une configuration par défaut.\n\nUtilisez ceci si vous souhaitez réinitialiser complètement un métier, avez supprimé le personnage ou avez abandonné un métier.",                             -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "Tapez 'CLEANUP' pour continuer :",
+
     }
 end

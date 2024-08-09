@@ -141,5 +141,19 @@ function CraftScan.LOCAL_TW:GetData()
         [LID.RN_KEYBINDS]                     = "快捷鍵",
         [LID.RN_KEYBINDS + 1]                 =
         "可用於打開訂單頁面、回覆最新客戶以及解散最新客戶的快捷鍵。搜索“CraftScan”以查找所有可用設置。",
+
+        [LID.RN_CLEANUP]                      = "配置清理",
+        [LID.RN_CLEANUP + 1]                  = "在'聊天訂單'頁面的左側，現在可以右鍵點擊您的工匠，會出現一個上下文選單。使用此選單保持列表整潔，並刪除過時的角色/職業。",
+        ["Disable"]                           = "禁用",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "永久刪除任何保存的 %s 的 %s 資料。\n\n在專業頁面上將有一個'啟用 CraftScan'按鈕，可以透過預設設置再次啟用它。\n\n如果您想繼續使用該專業但不想使用 CraftScan 互動（例如，當您在所有小號上都擁有煉金術用於長效藥劑時），請使用此功能。", -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "輸入 'DELETE' 以繼續:",
+        [LID.SCANNER_CONFIG_DISABLED]         = "啟用 CraftScan",
+
+        ["Cleanup"]                           = "清理",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "永久刪除任何保存的 %s 的 %s 資料。\n\n該專業將處於未配置的狀態。再次打開專業會恢復預設配置。\n\n如果您想完全重置一個專業，已刪除角色，或已放棄一個專業，請使用此功能。", -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "輸入 'CLEANUP' 以繼續:",
+
     }
 end

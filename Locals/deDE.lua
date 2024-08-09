@@ -110,6 +110,17 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.DEFAULT_KEYWORDS_JEWELCRAFTING]  = "JC, Juwelenschleifer",
         [LID.DEFAULT_KEYWORDS_INSCRIPTION]    = "Inschriftenkunde, Schreiber",
 
+        ["Disable"]                           = "Deaktivieren",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "Löschen Sie dauerhaft alle gespeicherten %s-Daten für %s.\n\nEine Schaltfläche 'CraftScan aktivieren' wird auf der Berufsseite angezeigt, um es wieder mit den Standardeinstellungen zu aktivieren.\n\nVerwenden Sie dies, wenn Sie den Beruf weiter nutzen möchten, aber ohne CraftScan-Interaktion (z.B. wenn Sie Alchemie auf jedem Twink für lange Fläschchen haben).",                            -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "Geben Sie 'DELETE' ein, um fortzufahren:",
+        [LID.SCANNER_CONFIG_DISABLED]         = "CraftScan aktivieren",
+
+        ["Cleanup"]                           = "Bereinigen",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "Löschen Sie dauerhaft alle gespeicherten %s-Daten für %s.\n\nDer Beruf wird in einem Zustand zurückgelassen, als wäre er nie konfiguriert worden. Einfaches Öffnen des Berufs wird eine Standardkonfiguration wiederherstellen.\n\nVerwenden Sie dies, wenn Sie einen Beruf komplett zurücksetzen möchten, den Charakter gelöscht haben oder den Beruf abgelegt haben.",                             -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "Geben Sie 'CLEANUP' ein, um fortzufahren:",
+
         -- Release notes
         [LID.RN_WELCOME]                      = "Willkommen bei CraftScan!",
         [LID.RN_WELCOME + 1]                  =
@@ -146,6 +157,10 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.RN_KEYBINDS]                     = "Tastenkombinationen",
         [LID.RN_KEYBINDS + 1]                 =
         "Tastenkombinationen sind verfügbar, um die Auftragsseite zu öffnen, auf den neuesten Kunden zu antworten und den neuesten Kunden abzulehnen. Suchen Sie nach 'CraftScan', um alle verfügbaren Einstellungen zu finden.",
+
+        [LID.RN_CLEANUP]                      = "Konfigurationsbereinigung",
+        [LID.RN_CLEANUP + 1]                  =
+        "Ihre Handwerker auf der linken Seite der 'Chat-Aufträge'-Seite haben jetzt ein Kontextmenü, wenn Sie mit der rechten Maustaste klicken. Verwenden Sie dieses Menü, um die Liste sauber zu halten und veraltete Charaktere/Berufe zu entfernen.",
 
     }
 end

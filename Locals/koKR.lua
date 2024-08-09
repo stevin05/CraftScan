@@ -142,5 +142,20 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.RN_KEYBINDS + 1]                 =
         "주문 페이지를 열고 최신 고객에게 응답하거나 최신 고객을 해체하는 키 설정이 있습니다. 사용 가능한 모든 설정을 찾으려면 'CraftScan'을 검색하세요.",
 
+        [LID.RN_CLEANUP]                      = "설정 정리",
+        [LID.RN_CLEANUP + 1]                  =
+        "'대화 주문' 페이지의 왼쪽에 있는 장인이 이제 오른쪽 클릭 시 컨텍스트 메뉴를 갖습니다. 이 메뉴를 사용하여 목록을 깨끗하게 유지하고 오래된 캐릭터/직업을 제거하세요.",
+        ["Disable"]                           = "비활성화",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "%s에 대한 모든 저장된 %s 데이터를 영구적으로 삭제합니다.\n\n'CraftScan 활성화' 버튼이 직업 페이지에 표시되어 기본 설정으로 다시 활성화할 수 있습니다.\n\n이 기능은 직업을 계속 사용하고 싶지만 CraftScan 상호작용 없이 사용하고 싶을 때 사용하세요 (예: 모든 부캐릭터에 연금술을 보유하여 긴 플라스크 사용).", -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "계속하려면 'DELETE'를 입력하세요:",
+        [LID.SCANNER_CONFIG_DISABLED]         = "CraftScan 활성화",
+
+        ["Cleanup"]                           = "정리",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "%s에 대한 모든 저장된 %s 데이터를 영구적으로 삭제합니다.\n\n직업이 설정되지 않은 상태로 남겨질 것입니다. 직업을 다시 열면 기본 구성이 복원됩니다.\n\n이 기능은 직업을 완전히 초기화하고 싶을 때, 캐릭터를 삭제했거나 직업을 버렸을 때 사용하세요.", -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "계속하려면 'CLEANUP'을 입력하세요:",
+
+
     }
 end

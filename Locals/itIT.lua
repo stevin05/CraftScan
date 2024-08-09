@@ -146,5 +146,20 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.RN_KEYBINDS]                     = "Tasti di scelta rapida",
         [LID.RN_KEYBINDS + 1]                 =
         "I tasti di scelta rapida sono disponibili per aprire la pagina degli ordini, rispondere all'ultimo cliente e rimuovere l'ultimo cliente. Cerca 'CraftScan' per trovare tutte le impostazioni disponibili.",
+
+        [LID.RN_CLEANUP]                      = "Pulizia della Configurazione",
+        [LID.RN_CLEANUP + 1]                  =
+        "I tuoi artigiani sul lato sinistro della pagina 'Ordini Chat' hanno ora un menu contestuale quando fai clic con il pulsante destro del mouse. Usa questo menu per mantenere pulita la lista e rimuovere personaggi/professioni obsolete.",
+        ["Disable"]                           = "Disabilita",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "Elimina permanentemente qualsiasi dato %s salvato per %s.\n\nUn pulsante 'Abilita CraftScan' sarà presente nella pagina della professione per abilitarlo nuovamente con le impostazioni predefinite.\n\nUsa questo se vuoi continuare a utilizzare la professione, ma senza l'interazione di CraftScan (ad esempio, quando hai l'Alchimia su tutti i personaggi secondari per le pozioni lunghe).",                            -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "Digita 'DELETE' per procedere:",
+        [LID.SCANNER_CONFIG_DISABLED]         = "Abilita CraftScan",
+
+        ["Cleanup"]                           = "Pulizia",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "Elimina permanentemente qualsiasi dato %s salvato per %s.\n\nLa professione verrà lasciata in uno stato come se non fosse mai stata configurata. Semplicemente aprendo di nuovo la professione verrà ripristinata una configurazione predefinita.\n\nUsa questo se vuoi resettare completamente una professione, hai eliminato il personaggio o hai abbandonato una professione.",                             -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "Digita 'CLEANUP' per procedere:",
+
     }
 end

@@ -140,5 +140,19 @@ function CraftScan.LOCAL_CN:GetData()
         [LID.RN_KEYBINDS]                     = "键位绑定",
         [LID.RN_KEYBINDS + 1]                 =
         "可以使用键位绑定来打开订单页面，回复最新顾客以及解雇最新顾客。搜索 'CraftScan' 以查找所有可用设置。",
+
+        [LID.RN_CLEANUP]                      = "配置清理",
+        [LID.RN_CLEANUP + 1]                  = "在'聊天订单'页面的左侧，现在可以右键单击您的工匠，会出现一个上下文菜单。使用此菜单保持列表整洁，并删除过时的角色/职业。",
+        ["Disable"]                           = "禁用",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        "永久删除任何保存的 %s 的 %s 数据。\n\n在职业页面上将有一个'启用 CraftScan'按钮，可以通过默认设置再次启用它。\n\n如果您想继续使用该职业但不想使用 CraftScan 互动（例如，当您在所有小号上都拥有炼金术用于长效药剂时），请使用此功能。", -- profession-name, character-name
+        [LID.DELETE_CONFIG_CONFIRM]           = "输入 'DELETE' 以继续:",
+        [LID.SCANNER_CONFIG_DISABLED]         = "启用 CraftScan",
+
+        ["Cleanup"]                           = "清理",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        "永久删除任何保存的 %s 的 %s 数据。\n\n该职业将处于未配置的状态。再次打开职业会恢复默认配置。\n\n如果您想完全重置一个职业，已删除角色，或已放弃一个职业，请使用此功能。", -- profession-name, character-name
+        [LID.CLEANUP_CONFIG_CONFIRM]          = "输入 'CLEANUP' 以继续:",
+
     }
 end

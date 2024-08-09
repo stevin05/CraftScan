@@ -401,7 +401,7 @@ end
 local function ForEachProfession(op, passthrough)
     for _, crafterConfig in pairs(CraftScan.DB.characters) do
         for _, ppConfig in pairs(crafterConfig.parent_professions) do
-            if not op(ppConfig) and passthrough then
+            if not ppConfig.character_disabled and not op(ppConfig) and passthrough then
                 return false;
             end
         end
@@ -473,68 +473,71 @@ end
 
 CraftScanCrafterListMixin = {}
 
-function CraftScanCrafterListMixin:OnLoad()
-    -- Using AzeriteEssenceUI as a guide
+function CraftScanCrafterListMixin:SetupCrafterList()
+    crafterListAll = CraftScanCraftingOrderPage.BrowseFrame.CrafterList.CrafterListAllButton;
 
-    CraftScan.Utils.onLoad(function()
-        crafterListAll = CraftScanCraftingOrderPage.BrowseFrame.CrafterList.CrafterListAllButton;
+    UpdateAllCheckBox(crafterListAll.EnabledCheckBox, 'scanning_enabled')
+    UpdateAllCheckBox(crafterListAll.SoundAlertCheckBox, 'sound_alert_enabled')
+    UpdateAllCheckBox(crafterListAll.VisualAlertCheckBox, 'visual_alert_enabled')
 
-        UpdateAllCheckBox(crafterListAll.EnabledCheckBox, 'scanning_enabled')
-        UpdateAllCheckBox(crafterListAll.SoundAlertCheckBox, 'sound_alert_enabled')
-        UpdateAllCheckBox(crafterListAll.VisualAlertCheckBox, 'visual_alert_enabled')
+    -- TODO Make this big and find a better texture
+    crafterListAll.CrafterName:SetText(L("All crafters"))
+    crafterListAll:Show();
 
-        -- TODO Make this big and find a better texture
-        crafterListAll.CrafterName:SetText(L("All crafters"))
-        crafterListAll:Show();
+    local topPadding = 3;
+    local leftPadding = 4;
+    local rightPadding = 2;
+    local spacing = 1;
+    local view = CreateScrollBoxListLinearView(topPadding, 0, leftPadding, rightPadding, spacing);
 
-        local topPadding = 3;
-        local leftPadding = 4;
-        local rightPadding = 2;
-        local spacing = 1;
-        local view = CreateScrollBoxListLinearView(topPadding, 0, leftPadding, rightPadding, spacing);
-
-        local function FrameInitializer(frame, crafterInfo)
-            local crafterName = CraftScan.NameAndRealmToName(crafterInfo.name)
-            if crafterName == UnitName("PLAYER") then
-                crafterName = '|cff00ff00' .. crafterName .. '|r'
-            end
-            frame.CrafterName:SetText(crafterName)
-            frame.crafterInfo = crafterInfo
-            frame.EnabledCheckBox:InitState()
-            frame.SoundAlertCheckBox:InitState()
-            frame.VisualAlertCheckBox:InitState()
-            frame.ProfessionIcon:SetTexture(C_TradeSkillUI.GetTradeSkillTexture(crafterInfo.parentProfessionID))
-
-            local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(crafterInfo.parentProfessionID);
-            frame.ProfessionName:SetText(CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
-                profInfo.professionName))
+    local function FrameInitializer(frame, crafterInfo)
+        local crafterName = CraftScan.NameAndRealmToName(crafterInfo.name)
+        if crafterName == UnitName("PLAYER") then
+            crafterName = '|cff00ff00' .. crafterName .. '|r'
         end
+        frame.CrafterName:SetText(crafterName)
+        frame.crafterInfo = crafterInfo
+        frame.EnabledCheckBox:InitState()
+        frame.SoundAlertCheckBox:InitState()
+        frame.VisualAlertCheckBox:InitState()
+        frame.ProfessionIcon:SetTexture(C_TradeSkillUI.GetTradeSkillTexture(crafterInfo.parentProfessionID))
+        frame:RegisterForClicks("AnyUp");
 
-        view:SetElementFactory(function(factory, essenceInfo)
-            factory("CraftScanCrafterListElementTemplate", FrameInitializer);
-        end);
+        local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(crafterInfo.parentProfessionID);
+        frame.ProfessionName:SetText(CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
+            profInfo.professionName))
+    end
 
-        ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view);
+    view:SetElementFactory(function(factory)
+        factory("CraftScanCrafterListElementTemplate", FrameInitializer);
+    end);
 
-        -- Highly unlikely to ever need a scroll bar, so hide it unless needed.
-        -- Tested one time with 20 dummy characters in the config and the scroll
-        -- bar did appear and was usable.
-        ScrollUtil.AddManagedScrollBarVisibilityBehavior(self.ScrollBox, self.ScrollBar, nil,
-            nil);
+    ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view);
+
+    -- Highly unlikely to ever need a scroll bar, so hide it unless needed.
+    -- Tested one time with 20 dummy characters in the config and the scroll
+    -- bar did appear and was usable.
+    ScrollUtil.AddManagedScrollBarVisibilityBehavior(self.ScrollBox, self.ScrollBar, nil,
+        nil);
 
 
-        local crafterRows = {}
-        for name, info in pairs(CraftScan.DB.characters) do
-            for parentProfessionID, _ in pairs(info.parent_professions) do
+    local crafterRows = {}
+    for name, info in pairs(CraftScan.DB.characters) do
+        for parentProfessionID, ppInfo in pairs(info.parent_professions) do
+            if not ppInfo.character_disabled then
                 table.insert(crafterRows, {
                     name = name,
                     parentProfessionID = parentProfessionID,
                 })
             end
         end
-        local dataProvider = CreateDataProvider(crafterRows)
-        self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
-    end)
+    end
+    local dataProvider = CreateDataProvider(crafterRows)
+    self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
+end
+
+function CraftScanCrafterListMixin:OnShow()
+    self:SetupCrafterList();
 end
 
 CraftScanCrafterListElementMixin = {}
@@ -547,9 +550,147 @@ function CraftScanCrafterListElementMixin:OnLeave()
     self.HoverBackground:Hide();
 end
 
-function CraftScanCrafterListElementMixin:OnClick()
-    self.EnabledCheckBox:SetChecked(not self.EnabledCheckBox:GetChecked())
-    self.EnabledCheckBox:OnClick()
+-- There is supposed to be an 'EasyMenu' global, but that's returning nil and
+-- all the references to it online are to dead links.
+--
+-- Create a popup context menu based on a table of items. See UIDropDownMenu.lua
+-- for a full list of potential properties for the items.
+local function MyEasyMenu(items, frame)
+    UIDropDownMenu_Initialize(frame, function(frame, level, menuList)
+            for _, item in ipairs(items) do
+                item.notCheckable = true;
+                UIDropDownMenu_AddButton(item);
+            end
+        end,
+        "MENU");
+    ToggleDropDownMenu(1, nil, frame, "cursor", 0, 0);
+end
+
+-- Provide common properties for our various confirmations.
+local function SetupPopupDialog(key, config)
+    local popup = {
+        text = config.text,
+        button1 = config.button1,
+        button2 = "Cancel",
+        OnAccept = config.OnAccept,
+        OnCancel = nil,
+        hasEditBox = true,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3, -- Avoid UI taint issues by using a higher index
+        EditBoxOnEnterPressed = function(self)
+            local parent = self:GetParent()
+            parent.button1:Click() -- Simulate a click on the Confirm button
+        end,
+        EditBoxOnEscapePressed = function(self)
+            local parent = self:GetParent()
+            parent.button2:Click() -- Simulate a click on the Cancel button
+        end,
+    };
+    StaticPopupDialogs[key] = popup;
+end
+
+-- The confirmation dialog to 'disable' a profession for a specific character.
+SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", {
+    text = L(LID.DELETE_CONFIG_TOOLTIP_TEXT) .. '\n\n' .. L(LID.DELETE_CONFIG_CONFIRM),
+    button1 = "Delete",
+    OnAccept = function(self, crafterInfo)
+        local userInput = self.editBox:GetText()
+        if string.lower(userInput) == "delete" then
+            local charConfig = CraftScan.DB.characters[crafterInfo.name];
+
+            -- Flag the profession as disabled. We don't fully delete it
+            -- because we want to remember that the user disabled it so
+            -- we don't keep re-enabling it when they open the
+            -- profession window.
+            local parentProfID = crafterInfo.parentProfessionID;
+            local ppConfig = charConfig.parent_professions[parentProfID];
+            ppConfig.character_disabled = true;
+
+            -- Delete all details about the expansion level professions.
+            local pConfigs = charConfig.professions;
+            for profID, config in pairs(pConfigs) do
+                if config.parentProfID == parentProfID then
+                    pConfigs[profID] = nil;
+                end
+            end
+
+            -- Refresh the list to remove what was just deleted.
+            CraftScanCraftingOrderPage.BrowseFrame.CrafterList:SetupCrafterList();
+        else
+            print("CraftScan confirmation failed.")
+        end
+    end
+})
+
+-- The confirmation dialog to 'cleanup' a profession for a specific character.
+SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", {
+    text = L(LID.CLEANUP_CONFIG_TOOLTIP_TEXT) .. '\n\n' .. L(LID.CLEANUP_CONFIG_CONFIRM),
+    button1 = "Cleanup",
+    OnAccept = function(self, crafterInfo)
+        local userInput = self.editBox:GetText()
+        if string.lower(userInput) == "cleanup" then
+            local charConfig = CraftScan.DB.characters[crafterInfo.name];
+
+            -- Fully delete the parent profession and all references to it
+            local parentProfID = crafterInfo.parentProfessionID;
+            charConfig.parent_professions[parentProfID] = nil;
+
+            local pConfigs = charConfig.professions;
+            for profID, config in pairs(pConfigs) do
+                if config.parentProfID == parentProfID then
+                    pConfigs[profID] = nil;
+                end
+            end
+
+            -- Refresh the list to remove what was just deleted.
+            CraftScanCraftingOrderPage.BrowseFrame.CrafterList:SetupCrafterList();
+        else
+            print("CraftScan confirmation failed.")
+        end
+    end
+})
+
+-- We only register for RightButton on the individual character rows, not the
+-- 'All Crafters' row, so we don't need to filter it out.
+function CraftScanCrafterListElementMixin:OnClick(button)
+    if button == 'LeftButton' then
+        self.EnabledCheckBox:SetChecked(not self.EnabledCheckBox:GetChecked())
+        self.EnabledCheckBox:OnClick()
+    else
+        -- Create a context menu to operate on the character's saved
+        -- configuration. This allows easily cleanup of an alt army. Any
+        -- destructive operations have confirmations since it is easy to
+        -- accidentally click something in a context menu.
+        local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(self.crafterInfo.parentProfessionID);
+        local profName = CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
+            profInfo.professionName);
+        local crafter = CraftScan.NameAndRealmToName(self.crafterInfo.name);
+
+        local menuItems = {
+            { isTitle = true, text = CraftScan.NameAndRealmToName(self.crafterInfo.name) },
+            {
+                text = L("Disable"),
+                tooltipTitle = L("Disable"),
+                tooltipText = string.format(L(LID.DELETE_CONFIG_TOOLTIP_TEXT), profName, crafter),
+                tooltipOnButton = 1,
+                func = function()
+                    StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", profName, crafter, self.crafterInfo)
+                end
+            },
+            {
+                text = L("Cleanup"),
+                tooltipTitle = L("Cleanup"),
+                tooltipText = string.format(L(LID.CLEANUP_CONFIG_TOOLTIP_TEXT), profName, crafter),
+                tooltipOnButton = 1,
+                func = function()
+                    StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", profName, crafter, self.crafterInfo)
+                end
+            },
+        }
+        MyEasyMenu(menuItems, CreateFrame("Frame", "ContextMenu", UIParent, "UIDropDownMenuTemplate"));
+    end
 end
 
 CraftScan_CrafterListAllButtonMixin = {}

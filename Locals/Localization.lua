@@ -52,7 +52,7 @@ function CraftScan.LOCAL:GetText(ID)
 
     if not localizedText then
         local englishtext = CraftScan.LOCAL.LOCAL_EN[ID]
-        return englishtext -- default to english
+        return englishtext or ID; -- default to english
     else
         return localizedText
     end
