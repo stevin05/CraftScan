@@ -141,6 +141,12 @@
 						<Anchor point="LEFT" relativePoint="LEFT" x="20"/>
 					</Anchors>
 				</FontString>
+				<Texture parentKey="PrimaryCrafterIcon" atlas="auctionhouse-icon-favorite" hidden="true">
+					<Size x="13" y="13"/>
+					<Anchors>
+						<Anchor relativeKey="$parent.CrafterName" point="LEFT" relativePoint="RIGHT" x="2"/>
+					</Anchors>
+				</Texture>
 				<FontString parentKey="ProfessionName" inherits="Number14FontWhite" justifyH="RIGHT" setAllPoints="true">
 					<Anchors>
 						<Anchor point="RIGHT" relativePoint="RIGHT" x="-60"/>

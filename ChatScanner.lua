@@ -149,24 +149,67 @@ function CraftScan.Scanner.LoadConfig()
     config.exclusions = ParseStringList(CraftScan.DB.settings.exclusions)
     config.inclusions = ParseStringList(CraftScan.DB.settings.inclusions)
 
+    -- Sort professions by 'primary_crafter' so that when we scan for generic
+    -- keyword matches, we find the primary crafter first. We also ignore
+    -- duplicate recipes from crafters that aren't the primary. These could be
+    -- considered a misconfig since the user has to enable scanning for the same
+    -- item on two characters, but that's bound to happen.
+    local parentProfessions = {};
+    for crafter, crafterConfig in pairs(CraftScan.DB.characters) do
+        for parentProfID, parentProf in pairs(crafterConfig.parent_professions) do
+            if not parentProf.character_disabled then
+                local professions = {};
+                for profID, prof in pairs(crafterConfig.professions) do
+                    if prof.parentProfID == parentProfID then
+                        table.insert(professions, {
+                            profID = profID,
+                            profession = prof,
+                        })
+                    end
+                end
+                table.insert(parentProfessions, {
+                    crafter = crafter,
+                    parentProfID = parentProfID,
+                    parentProfession = parentProf,
+                    professions = professions,
+                })
+            end
+        end
+    end
+
+    table.sort(parentProfessions, function(lhs, rhs)
+        if lhs.parentProfession.primary_crafter then
+            if rhs.parentProfession.primary_crafter then
+                return false;
+            end
+            return true;
+        end
+        return false;
+    end)
+
     -- Flatten the keywords, storing the path back to their source so we can
     -- find the greeting after getting a match.
     --
     -- Convert recipeIDs to itemIDs, which is what we will find in chat message
     -- links.
-    for crafter, crafterConfig in pairs(CraftScan.DB.characters) do
-        for parentProfID, parentProf in pairs(crafterConfig.parent_professions) do
-            local keywords = parentProf.keywords or L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[parentProfID])
-            table.insert(config.prof_keywords, {
-                keywords = ParseStringList(keywords),
-                exclusions = ParseStringList(parentProf.exclusions or ''),
-                crafter = crafter,
-                parentProfID = parentProfID,
-            })
-        end
+    for _, entry in ipairs(parentProfessions) do
+        local crafter = entry.crafter;
+        local parentProf = entry.parentProfession;
+        local parentProfID = entry.parentProfID;
+        local professions = entry.professions;
 
-        for profID, prof in pairs(crafterConfig.professions) do
+        local keywords = parentProf.keywords or L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[parentProfID])
+        table.insert(config.prof_keywords, {
+            keywords = ParseStringList(keywords),
+            exclusions = ParseStringList(parentProf.exclusions or ''),
+            crafter = crafter,
+            parentProfID = parentProfID,
+        })
+
+        for _, pEntry in ipairs(professions) do
+            local prof = pEntry.profession;
             if prof.recipes then
+                local profID = pEntry.profID;
                 for recipeID, recipe in pairs(prof.recipes) do
                     if prof.all_enabled or recipe.enabled then
                         -- Look up the itemIDs associated with the recipe
@@ -174,11 +217,13 @@ function CraftScan.Scanner.LoadConfig()
                         local itemIDs = CraftScan.Utils.GetOutputItems(recipeInfo)
                         if itemIDs then
                             for _, itemID in ipairs(itemIDs) do
-                                config.items[itemID] = {
-                                    crafter = crafter,
-                                    profID = profID,
-                                    recipeID = recipeID
-                                }
+                                if not config.items[itemID] then
+                                    config.items[itemID] = {
+                                        crafter = crafter,
+                                        profID = profID,
+                                        recipeID = recipeID
+                                    }
+                                end
                             end
                         end
                     end
@@ -261,7 +306,7 @@ local function getCrafterForMessage(message)
             -- presumable refers to the latest expansion.
             local crafterConfig = CraftScan.DB.characters[crafterInfo.crafter];
             local ppConfig = crafterConfig.parent_professions[crafterInfo.parentProfID];
-            if ppConfig.scanning_enabled and not ppConfig.character_disabled then
+            if ppConfig.scanning_enabled then
                 local maxProfID = 0;
                 for pID, pConfig in pairs(crafterConfig.professions) do
                     if pConfig.parentProfID == crafterInfo.parentProfID then
@@ -283,13 +328,13 @@ local function getCrafterForMessage(message)
                 end
 
                 if profID ~= nil then
-                    return { crafter = crafterInfo.crafter, profID = profID }
+                    return { crafter = crafterInfo.crafter, profID = profID };
                 end -- Else keep looking for other crafters
             end
         end
     end
 
-    return nil
+    return nil;
 end
 
 local function concatGreetings(lhs, rhs)

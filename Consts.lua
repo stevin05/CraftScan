@@ -77,6 +77,7 @@ CraftScan.CONST.TEXT = {
     DELETE_CONFIG_CONFIRM           = 68,
     CLEANUP_CONFIG_TOOLTIP_TEXT     = 69,
     CLEANUP_CONFIG_CONFIRM          = 70,
+    PRIMARY_CRAFTER_TOOLTIP         = 71,
 
 
     -- Release notes have multiple lines that are sequential. Spaced out by hundreds to give more than enough room.

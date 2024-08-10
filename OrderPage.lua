@@ -78,24 +78,40 @@ function CraftScanCrafterOrderListElementMixin:OnClick(button)
     CraftScan.GreetCustomer(button, self.order)
 end
 
+local chatTooltip = CraftScan.Utils.ChatHistoryTooltip:new();
 function CraftScanCrafterOrderListElementMixin:OnLineEnter()
     self.HighlightTexture:Show();
 
-    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-
+    -- If the request has a specific item, toss up the item tooltip just like
+    -- the real crafting order page.
     local response = CraftScan.OrderToResponse(self.order)
     if response.recipeID then
         local reagents = {};
         local qualityIDs = C_TradeSkillUI.GetQualitiesForRecipe(response.recipeID);
         local qualityIdx = #qualityIDs; -- self.option.minQuality or 1;
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
         GameTooltip:SetRecipeResultItem(response.recipeID, reagents, nil, nil, qualityIDs and qualityIDs[qualityIdx]);
     end
+
+    -- In addition, pop up a tooltip that looks like the chat window. We copy
+    -- the chat window width (up to a limit that fits over the crafting window),
+    -- and the primary chat window's font settings. This seems to make the text
+    -- wrapping match and overall it looks pretty close to the real chat window
+    -- to give an easy refresher on prior interactions without popping out the
+    -- dedicated chat frame.
+    chatTooltip:Show("CraftScanChatHistoryTooltip", self, self.order,
+        function(tooltip)
+            GameTooltip_SetTitle(tooltip,
+                string.format(L("Chat History"), CraftScan.NameAndRealmToName(self.order.customerName),
+                    response.greeting_sent and L("Chat Help") or L("Greet Help")));
+        end)
 end
 
 function CraftScanCrafterOrderListElementMixin:OnLineLeave()
     self.HighlightTexture:Hide();
 
     GameTooltip:Hide();
+    chatTooltip:Hide();
     ResetCursor();
 end
 
@@ -506,6 +522,10 @@ function CraftScanCrafterListMixin:SetupCrafterList()
         local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(crafterInfo.parentProfessionID);
         frame.ProfessionName:SetText(CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
             profInfo.professionName))
+
+        if CraftScan.DB.characters[crafterInfo.name].parent_professions[crafterInfo.parentProfessionID].primary_crafter then
+            frame.PrimaryCrafterIcon:Show();
+        end
     end
 
     view:SetElementFactory(function(factory)
@@ -520,7 +540,6 @@ function CraftScanCrafterListMixin:SetupCrafterList()
     ScrollUtil.AddManagedScrollBarVisibilityBehavior(self.ScrollBox, self.ScrollBar, nil,
         nil);
 
-
     local crafterRows = {}
     for name, info in pairs(CraftScan.DB.characters) do
         for parentProfessionID, ppInfo in pairs(info.parent_professions) do
@@ -532,6 +551,37 @@ function CraftScanCrafterListMixin:SetupCrafterList()
             end
         end
     end
+
+    -- Sort characters so all primary crafters appear first, then alphabetically within the two groups.
+    table.sort(crafterRows, function(lhs, rhs)
+        local lhsPpConfig = CraftScan.DB.characters[lhs.name].parent_professions[lhs.parentProfessionID];
+        local rhsPpConfig = CraftScan.DB.characters[rhs.name].parent_professions[rhs.parentProfessionID];
+
+        local secondarySort = function()
+            if lhs.name ~= rhs.name then
+                return lhs.name < rhs.name
+            end
+
+            local lhsProfInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(lhs.parentProfessionID);
+            local rhsProfInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(rhs.parentProfessionID);
+
+            return lhsProfInfo.professionName < rhsProfInfo.professionName
+        end
+
+        if lhsPpConfig.primary_crafter then
+            if rhsPpConfig.primary_crafter then
+                return secondarySort()
+            end
+            return true;
+        end
+
+        if rhsPpConfig.primary_crafter then
+            return false;
+        end
+
+        return secondarySort()
+    end)
+
     local dataProvider = CreateDataProvider(crafterRows)
     self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
 end
@@ -550,6 +600,14 @@ function CraftScanCrafterListElementMixin:OnLeave()
     self.HoverBackground:Hide();
 end
 
+local function OnCrafterListModified()
+    -- Refresh the list to display the change.
+    CraftScanCraftingOrderPage.BrowseFrame.CrafterList:SetupCrafterList();
+
+    -- Reload the scanner data to apply the change.
+    CraftScan.Scanner.LoadConfig()
+end
+
 -- There is supposed to be an 'EasyMenu' global, but that's returning nil and
 -- all the references to it online are to dead links.
 --
@@ -558,7 +616,6 @@ end
 local function MyEasyMenu(items, frame)
     UIDropDownMenu_Initialize(frame, function(frame, level, menuList)
             for _, item in ipairs(items) do
-                item.notCheckable = true;
                 UIDropDownMenu_AddButton(item);
             end
         end,
@@ -616,8 +673,7 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", {
                 end
             end
 
-            -- Refresh the list to remove what was just deleted.
-            CraftScanCraftingOrderPage.BrowseFrame.CrafterList:SetupCrafterList();
+            OnCrafterListModified();
         else
             print("CraftScan confirmation failed.")
         end
@@ -644,13 +700,31 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", {
                 end
             end
 
-            -- Refresh the list to remove what was just deleted.
-            CraftScanCraftingOrderPage.BrowseFrame.CrafterList:SetupCrafterList();
+            OnCrafterListModified();
         else
             print("CraftScan confirmation failed.")
         end
     end
 })
+
+local function MarkPrimaryCrafter(crafterInfo, ppConfig, value)
+    ppConfig.primary_crafter = value;
+
+    -- We can only have one primary crafter for a given profession, so walk the
+    -- list and turn off the others.
+    if value then
+        for char, charConfig in pairs(CraftScan.DB.characters) do
+            if char ~= crafterInfo.name then
+                for parentProfID, parentProfConfig in pairs(charConfig.parent_professions) do
+                    if parentProfID == crafterInfo.parentProfessionID and parentProfConfig.primary_crafter then
+                        parentProfConfig.primary_crafter = false;
+                        return; -- There can only be one.
+                    end
+                end
+            end
+        end
+    end
+end
 
 -- We only register for RightButton on the individual character rows, not the
 -- 'All Crafters' row, so we don't need to filter it out.
@@ -658,39 +732,59 @@ function CraftScanCrafterListElementMixin:OnClick(button)
     if button == 'LeftButton' then
         self.EnabledCheckBox:SetChecked(not self.EnabledCheckBox:GetChecked())
         self.EnabledCheckBox:OnClick()
-    else
-        -- Create a context menu to operate on the character's saved
-        -- configuration. This allows easily cleanup of an alt army. Any
-        -- destructive operations have confirmations since it is easy to
-        -- accidentally click something in a context menu.
-        local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(self.crafterInfo.parentProfessionID);
-        local profName = CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
-            profInfo.professionName);
-        local crafter = CraftScan.NameAndRealmToName(self.crafterInfo.name);
-
-        local menuItems = {
-            { isTitle = true, text = CraftScan.NameAndRealmToName(self.crafterInfo.name) },
-            {
-                text = L("Disable"),
-                tooltipTitle = L("Disable"),
-                tooltipText = string.format(L(LID.DELETE_CONFIG_TOOLTIP_TEXT), profName, crafter),
-                tooltipOnButton = 1,
-                func = function()
-                    StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", profName, crafter, self.crafterInfo)
-                end
-            },
-            {
-                text = L("Cleanup"),
-                tooltipTitle = L("Cleanup"),
-                tooltipText = string.format(L(LID.CLEANUP_CONFIG_TOOLTIP_TEXT), profName, crafter),
-                tooltipOnButton = 1,
-                func = function()
-                    StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", profName, crafter, self.crafterInfo)
-                end
-            },
-        }
-        MyEasyMenu(menuItems, CreateFrame("Frame", "ContextMenu", UIParent, "UIDropDownMenuTemplate"));
+        return
     end
+
+    -- Create a context menu to operate on the character's saved
+    -- configuration. This allows easily cleanup of an alt army. Any
+    -- destructive operations have confirmations since it is easy to
+    -- accidentally click something in a context menu.
+    local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(self.crafterInfo.parentProfessionID);
+    local profName = CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
+        profInfo.professionName);
+    local crafter = CraftScan.NameAndRealmToName(self.crafterInfo.name);
+
+    local charConfig = CraftScan.DB.characters[self.crafterInfo.name];
+    local ppConfig = charConfig.parent_professions[self.crafterInfo.parentProfessionID];
+
+    local menuItems = {
+        { isTitle = true, text = CraftScan.NameAndRealmToName(self.crafterInfo.name) },
+        {
+            text = L("Disable"),
+            tooltipTitle = L("Disable"),
+            tooltipText = string.format(L(LID.DELETE_CONFIG_TOOLTIP_TEXT), profName, crafter),
+            tooltipOnButton = 1,
+            notCheckable = true,
+            func = function()
+                StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", profName, crafter, self.crafterInfo)
+            end
+        },
+        {
+            text = L("Cleanup"),
+            tooltipTitle = L("Cleanup"),
+            tooltipText = string.format(L(LID.CLEANUP_CONFIG_TOOLTIP_TEXT), profName, crafter),
+            tooltipOnButton = 1,
+            notCheckable = true,
+            func = function()
+                StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", profName, crafter, self.crafterInfo)
+            end
+        },
+        {
+            text = L("Primary Crafter"),
+            tooltipTitle = L("Primary Crafter"),
+            tooltipText = string.format(L(LID.PRIMARY_CRAFTER_TOOLTIP), crafter, profName),
+            tooltipOnButton = 1,
+            isNotRadio = true,
+            checked = ppConfig.primary_crafter,
+            func = function(item)
+                item.checked = not item.checked;
+                MarkPrimaryCrafter(self.crafterInfo, ppConfig, item.checked)
+
+                OnCrafterListModified();
+            end
+        },
+    }
+    MyEasyMenu(menuItems, CreateFrame("Frame", "ContextMenu", UIParent, "UIDropDownMenuTemplate"));
 end
 
 CraftScan_CrafterListAllButtonMixin = {}

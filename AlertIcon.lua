@@ -186,17 +186,27 @@ function CraftScanBannerMixin:OnClick(button)
     end
 end
 
+local bannerTooltip = CraftScan.Utils.ChatHistoryTooltip:new();
 function CraftScanBannerMixin:OnEnter()
-    GameTooltip:SetOwner(self, "ANCHOR_TOP");
-    GameTooltip:SetText(ToolTipText(LID.BANNER_TOOLTIP, "CRAFT_SCAN_GREET_CURRENT_CUSTOMER",
-        "CRAFT_SCAN_DISMISS_CURRENT_CUSTOMER"), 1, 1, 1);
-    GameTooltip:Show();
+    local tooltipHeader =
+        ToolTipText(LID.BANNER_TOOLTIP, "CRAFT_SCAN_GREET_CURRENT_CUSTOMER",
+            "CRAFT_SCAN_DISMISS_CURRENT_CUSTOMER");
+
     if activeOrder then
+        bannerTooltip:Show("CraftScanChatHistoryBannerTooltip", self,
+            activeOrder, function(tooltip)
+                GameTooltip_SetTitle(tooltip, tooltipHeader);
+            end)
         self.HighlightTexture:Show()
+    else
+        GameTooltip:SetOwner(self, "ANCHOR_TOP");
+        GameTooltip:SetText(tooltipHeader, 1, 1, 1);
+        GameTooltip:Show();
     end
 end
 
 function CraftScanBannerMixin:OnLeave()
+    bannerTooltip:Hide();
     GameTooltip:Hide();
     self.HighlightTexture:Hide()
 end

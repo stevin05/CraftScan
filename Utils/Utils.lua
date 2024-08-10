@@ -667,3 +667,69 @@ function CraftScan.Utils.onLoad(onLoad)
         end
     end
 end
+
+local function GetMaxTextLeftWidth(tooltipName)
+    local tooltip = _G[tooltipName]
+    if not tooltip then
+        print("Tooltip not found: " .. tooltipName)
+        return nil
+    end
+
+    local maxWidth = 0
+
+    for i = 1, tooltip:GetNumRegions() do
+        local region = select(i, tooltip:GetRegions())
+        if region and region:GetObjectType() == "FontString" and region:GetName() and region:GetName():match("TextLeft") then
+            local width = region:GetStringWidth()
+            if width > maxWidth then
+                maxWidth = width
+            end
+        end
+    end
+
+    return maxWidth
+end
+
+CraftScan.Utils.ChatHistoryTooltip = {}
+CraftScan.Utils.ChatHistoryTooltip.__index = CraftScan.Utils.ChatHistoryTooltip;
+
+function CraftScan.Utils.ChatHistoryTooltip:new()
+    local instance = setmetatable({}, CraftScan.Utils.ChatHistoryTooltip);
+    instance.tooltip = nil;
+    return instance;
+end
+
+function CraftScan.Utils.ChatHistoryTooltip:Hide()
+    if self.tooltip then self.tooltip:Hide() end
+end
+
+function CraftScan.Utils.ChatHistoryTooltip:Show(name, anchor, order, headerCallback)
+    if not self.tooltip then
+        self.tooltip = CreateFrame("GameTooltip", name, UIParent, "GameTooltipTemplate");
+        self.tooltip.TextLeft2:SetFontObject(ChatFrame1:GetFontObject());
+    end
+
+    local tooltip = self.tooltip;
+    tooltip:ClearLines();
+
+    tooltip:SetOwner(anchor, "ANCHOR_TOPLEFT");
+    headerCallback(tooltip);
+
+    GameTooltip_AddBlankLineToTooltip(tooltip);
+
+    local customerInfo = CraftScan.OrderToCustomerInfo(order)
+    for _, chat in ipairs(customerInfo.chat_history) do
+        if chat.args then
+            local r, g, b = unpack(chat.args);
+            tooltip:AddLine(chat.message, r, g, b, true, 0);
+        else
+            tooltip:AddLine(chat.message, 1, 1, 1, true, 0);
+        end
+    end
+
+    -- Find the maximum text width so we can make the tooltip look sane. If it's
+    -- super long, cap at the chat frame width to match its text wrapping.
+    tooltip:SetMinimumWidth(math.min(GetMaxTextLeftWidth(name), ChatFrame1:GetWidth()));
+
+    tooltip:Show();
+end

@@ -237,30 +237,6 @@ function CraftScanCrafterTableCellTimeMixin:Populate(rowData, dataIndex)
     UpdateAge(self, response)
 end
 
-function CraftScanCrafterTableCellTimeMixin:OnEnter()
-    --[[
-    print("Kevin1")
-    self:GetParent().HighlightTexture:Show();
-
-    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-    local noSeconds = true;
-    GameTooltip_AddNormalLine(GameTooltip, AUCTION_HOUSE_TOOLTIP_DURATION_FORMAT:format(
-        SecondsToTime(self.remainingTime, noSeconds)));
-    if self.remainingTime <= Constants.ProfessionConsts.PUBLIC_CRAFTING_ORDER_STALE_THRESHOLD and
-        self.rowData.option.orderType == Enum.CraftingOrderType.Public then
-        GameTooltip_AddBlankLineToTooltip(GameTooltip);
-        GameTooltip_AddNormalLine(GameTooltip, PROFESSIONS_ORDER_ABOUT_TO_EXPIRE);
-    end
-    GameTooltip:Show();
- ]]
-end
-
-function CraftScanCrafterTableCellTimeMixin:OnLeave()
-    self:GetParent().HighlightTexture:Hide();
-
-    GameTooltip:Hide();
-end
-
 CraftScanCrafterTableCellCustomerNameMixin = CreateFromMixins(TableBuilderCellMixin);
 
 function CraftScanCrafterTableCellCustomerNameMixin:Populate(rowData, dataIndex)
