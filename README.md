@@ -3,11 +3,12 @@
 #### Remember recent crafting requests, even after swapping characters:
 ![Screenshot](Media/README/ChatHistoryItemLinkMatch.png)
 
-#### Pop up and sound notifications can be enabled when a new request is detected:
+If the request includes an item link, CraftScan makes sure your crafter can make the item.
+
+#### Pop up and sound notifications can be enabled when a new request is detected. 
 ![Screenshot](Media/README/BannerRequestTooltip.png)
 
-#### Keyword matching can be configured per item, category, or profession:
-![Screenshot](Media/README/ChatHistoryKeywordMatch.png)
+For requests without an item link, keywords can be configured per item, category, or profession. If an item keyword is detected, CraftScan responds with an item link.
 
 #### Overview
 
