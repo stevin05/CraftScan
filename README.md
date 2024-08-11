@@ -1,12 +1,15 @@
-### Disclaimer
-
-This is my first WoW addon and first project in Lua. I am sure to have done many things the wrong way. I haven't seen any glaring issues, but I've also been standing in Valdrakken for 99% of my testing. I intentionally did not use any external libraries to better learn how the basic environment works. Got a fair amount of inspiration from CraftSim (obviously...), but mostly just the Blizzard interface files.
-
-Localization provided by ChatGPT. I have no idea how correct it is. If something doesn't make sense, compare Locals/enUS.lua to your locale and let me know the correct translation in an issue.
-
-Feel free to open issues if you find a problem.
-
 ### Welcome to CraftScan!
+
+#### Remember recent crafting requests, even after swapping characters:
+![Screenshot](Media/README/ChatHistoryItemLinkMatch.JPG)
+
+#### Pop up and sound notifications can be enabled when a new request is detected:
+![Screenshot](Media/README/BannerRequestTooltip.JPG)
+
+#### Keyword matching can be configured per item, category, or profession:
+![Screenshot](Media/README/ChatHistoryKeywordMatch.JPG)
+
+#### Overview
 
 This addon scans chat for messages that look like requests for crafting. If the configuration indicates you can craft the requested item, a notification will be triggered and the customer information stored to facilitate communication.
 
