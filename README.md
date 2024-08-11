@@ -45,6 +45,8 @@ Duplicate notifications are suppressed unless they have already been dismissed, 
 
 The left-hand side of the orders window lists your crafters. This list will be populated as you log in to your various characters and configure their professions. You can select which characters should be actively scanned at any time, as well as whether the visual and auditory notifications are enabled for each of your crafters.
 
+Right click a crafter to disable it or remove a stale character (such as after you have deleted a profession). You can also mark a crafter as your primary, giving priority to that crafter if you have multiple characters that can fulfill the same request.
+
 ### Managing Customers
 
 The right-hand side of the orders window will populate with crafting orders detected in chat. Left-click a row to send the greeting if you did not already do so from the pop-up banner. Left-click again to open a whisper to the customer. Right-click to dismiss the row.
