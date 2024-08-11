@@ -4,7 +4,7 @@
 
 	<Script file="OrderPage.lua"/>
 
-	<Button name="CraftScanCrafterOrderListElementTemplate" mixin="CraftScanCrafterOrderListElementMixin" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
+	<Button name="CraftScanCrafterOrderListElementTemplate" mixin="CraftScanCrafterOrderListElementMixin" registerForClicks="LeftButtonUp, RightButtonUp, MiddleButtonUp" virtual="true">
 		<Size y="20"/>
 		<Layers>
 			<Layer level="OVERLAY">
@@ -93,6 +93,7 @@
 					<KeyValue key="ppconfig_key" value="scanning_enabled" type="string"/>
 					<KeyValue key="enabled_tooltip" value="Scanning is enabled." type="string"/>
 					<KeyValue key="disabled_tooltip" value="Scanning is disabled." type="string"/>
+					<KeyValue key="indeterminate_atlas" value="glues-characterSelect-icon-minus-hover" type="string"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="LEFT"/>
@@ -107,6 +108,7 @@
 					<KeyValue key="ppconfig_key" value="visual_alert_enabled" type="string"/>
 					<KeyValue key="enabled_tooltip" value="Visual alerts are enabled." type="string"/>
 					<KeyValue key="disabled_tooltip" value="Visual alerts are disabled." type="string"/>
+					<KeyValue key="indeterminate_atlas" value="UI-HUD-MicroMenu-Questlog-Down" type="string"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="RIGHT" x="-18"/>
@@ -120,6 +122,7 @@
 					<KeyValue key="ppconfig_key" value="sound_alert_enabled" type="string"/>
 					<KeyValue key="enabled_tooltip" value="Sound alerts are enabled (the WeakAuras sound library is required)." type="string"/>
 					<KeyValue key="disabled_tooltip" value="Sound alerts are muted." type="string"/>
+					<KeyValue key="indeterminate_atlas" value="glues-characterSelect-icon-minus-hover" type="string"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="RIGHT" x="0"/>

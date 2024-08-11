@@ -192,7 +192,7 @@
                 <HighlightTexture alphaMode="ADD" atlas="Soulbinds_Tree_Ring" useAtlasSize="true" />
             </Button>
 
-            <Button name="AlertBGButton" parentKey="AlertBGButton" mixin="CraftScanBannerMixin" registerForClicks="LeftButtonUp, RightButtonUp" hidden="true">
+            <Button name="AlertBGButton" parentKey="AlertBGButton" mixin="CraftScanBannerMixin" registerForClicks="LeftButtonUp, RightButtonUp, MiddleButtonUp" hidden="true">
                 <Size x="250" y="45"/>
                 <Layers>
                     <Layer level="BACKGROUND">

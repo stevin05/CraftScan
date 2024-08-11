@@ -35,22 +35,9 @@ function CraftScanScannerMenuMixin:UnregisterEventCallback(event, callback)
     end
 end
 
-local function ToolTipText(lid, ...)
-    local binds = { ... };
-    for i, bind in ipairs(binds) do
-        local b = GetBindingKey(bind);
-        if b then
-            binds[i] = ' |cffffd100(' .. b .. ')|r';
-        else
-            binds[i] = '';
-        end
-    end
-    return string.format(L(lid), unpack(binds));
-end
-
 function CraftScanPageButtonMixin:OnEnter()
     GameTooltip:SetOwner(self, "ANCHOR_TOP");
-    GameTooltip:SetText(ToolTipText(LID.TOGGLE_CHAT_TOOLTIP, "CRAFT_SCAN_TOGGLE"), 1, 1, 1);
+    GameTooltip:SetText(CraftScan.Utils.PopulateBinds(LID.TOGGLE_CHAT_TOOLTIP, "CRAFT_SCAN_TOGGLE"), 1, 1, 1);
     GameTooltip:Show();
     self.PortraitBorder:SetAtlas("Soulbinds_Tree_Ring");
     self.GlowUp:Show()
@@ -188,26 +175,15 @@ end
 
 local bannerTooltip = CraftScan.Utils.ChatHistoryTooltip:new();
 function CraftScanBannerMixin:OnEnter()
-    local tooltipHeader =
-        ToolTipText(LID.BANNER_TOOLTIP, "CRAFT_SCAN_GREET_CURRENT_CUSTOMER",
-            "CRAFT_SCAN_DISMISS_CURRENT_CUSTOMER");
-
     if activeOrder then
-        bannerTooltip:Show("CraftScanChatHistoryBannerTooltip", self,
-            activeOrder, function(tooltip)
-                GameTooltip_SetTitle(tooltip, tooltipHeader);
-            end)
+        bannerTooltip:Show("CraftScanChatHistoryBannerTooltip", self, activeOrder,
+            string.format(L("Customer Request"), CraftScan.NameAndRealmToName(activeOrder.customerName)), true);
         self.HighlightTexture:Show()
-    else
-        GameTooltip:SetOwner(self, "ANCHOR_TOP");
-        GameTooltip:SetText(tooltipHeader, 1, 1, 1);
-        GameTooltip:Show();
     end
 end
 
 function CraftScanBannerMixin:OnLeave()
     bannerTooltip:Hide();
-    GameTooltip:Hide();
     self.HighlightTexture:Hide()
 end
 

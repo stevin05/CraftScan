@@ -22,7 +22,6 @@ function CraftScan.LOCAL_CN:GetData()
         [LID.GREET_BUTTON_BINDING_NAME]       = "打招呼横幅顾客",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "解雇横幅顾客",
         [LID.TOGGLE_CHAT_TOOLTIP]             = "切换聊天订单%s", -- Keybind
-        [LID.BANNER_TOOLTIP]                  = "左键单击：打招呼顾客%s\n右键单击：解雇%s", -- Keybind, Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "显示CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "隐藏CraftScan",
         [LID.CRAFT_SCAN_OPTIONS]              = "CraftScan 选项",
@@ -153,6 +152,16 @@ function CraftScan.LOCAL_CN:GetData()
         [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
         "永久删除任何保存的 %s 的 %s 数据。\n\n该职业将处于未配置的状态。再次打开职业会恢复默认配置。\n\n如果您想完全重置一个职业，已删除角色，或已放弃一个职业，请使用此功能。", -- profession-name, character-name
         [LID.CLEANUP_CONFIG_CONFIRM]          = "输入 'CLEANUP' 以继续:",
+        ["Primary Crafter"]                   = "主工匠",
+        [LID.PRIMARY_CRAFTER_TOOLTIP]         = "将 %s 标记为 %s 的主工匠。如果有多个匹配的请求，该工匠将优先于其他工匠。",
+        ["Chat History"]                      = "与 %s 的聊天记录", -- customer, left-click-help
+        ["Greet Help"]                        = "|cffffd100左键点击: 问候客户%s|r",
+        ["Chat Help"]                         = "|cffffd100左键点击: 打开密语|r",
+        ["Chat Override"]                     = "|cffffd100中键点击: 打开密语%s|r",
+        ["Dismiss"]                           = "|cffffd100右键点击: 关闭%s|r",
+        ["Proposed Greeting"]                 = "建议的问候:",
+        [LID.CHAT_BUTTON_BINDING_NAME]        = "密语横幅客户",
+        ["Customer Request"]                  = "%s的请求",
 
     }
 end

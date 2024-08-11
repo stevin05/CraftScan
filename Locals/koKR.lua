@@ -22,7 +22,6 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.GREET_BUTTON_BINDING_NAME]       = "인사 배너 고객",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "배너 고객 닫기",
         [LID.TOGGLE_CHAT_TOOLTIP]             = "채팅 주문 전환%s", -- Keybind
-        [LID.BANNER_TOOLTIP]                  = "왼쪽 클릭: 고객 인사%s\n오른쪽 클릭: 해체%s", -- Keybind, Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "CraftScan 표시",
         [LID.SCANNER_CONFIG_HIDE]             = "CraftScan 숨기기",
         [LID.CRAFT_SCAN_OPTIONS]              = "CraftScan 옵션",
@@ -155,6 +154,16 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
         "%s에 대한 모든 저장된 %s 데이터를 영구적으로 삭제합니다.\n\n직업이 설정되지 않은 상태로 남겨질 것입니다. 직업을 다시 열면 기본 구성이 복원됩니다.\n\n이 기능은 직업을 완전히 초기화하고 싶을 때, 캐릭터를 삭제했거나 직업을 버렸을 때 사용하세요.", -- profession-name, character-name
         [LID.CLEANUP_CONFIG_CONFIRM]          = "계속하려면 'CLEANUP'을 입력하세요:",
+        ["Primary Crafter"]                   = "주요 제작자",
+        [LID.PRIMARY_CRAFTER_TOOLTIP]         = "이 %s를 %s의 주요 제작자로 설정합니다. 동일한 요청에 여러 매치가 있는 경우 이 제작자가 우선됩니다.",
+        ["Chat History"]                      = "%s와의 채팅 기록", -- customer, left-click-help
+        ["Greet Help"]                        = "|cffffd100왼쪽 클릭: 고객에게 인사%s|r",
+        ["Chat Help"]                         = "|cffffd100왼쪽 클릭: 귓말 열기|r",
+        ["Chat Override"]                     = "|cffffd100가운데 클릭: 귓말 열기%s|r",
+        ["Dismiss"]                           = "|cffffd100오른쪽 클릭: 닫기%s|r",
+        ["Proposed Greeting"]                 = "제안된 인사말:",
+        [LID.CHAT_BUTTON_BINDING_NAME]        = "귓말 배너 고객",
+        ["Customer Request"]                  = "%s의 요청",
 
 
     }

@@ -21,8 +21,7 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Auftragsseite umschalten",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Kunden begrüßen",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Kunden ablehnen",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Chat-Aufträge umschalten%s",                             -- Keybind
-        [LID.BANNER_TOOLTIP]                  = "Linksklick: Kunden begrüßen%s\nRechtsklick: Ablehnen%s", -- Keybind, Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Chat-Aufträge umschalten%s", -- Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "CraftScan anzeigen",
         [LID.SCANNER_CONFIG_HIDE]             = "CraftScan ausblenden",
         [LID.CRAFT_SCAN_OPTIONS]              = "CraftScan-Optionen",
@@ -153,14 +152,26 @@ function CraftScan.LOCAL_DE:GetData()
 
         ["Disable"]                           = "Deaktivieren",
         [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
-        "Löschen Sie dauerhaft alle gespeicherten %s-Daten für %s.\n\nEine Schaltfläche 'CraftScan aktivieren' wird auf der Berufsseite angezeigt, um es wieder mit den Standardeinstellungen zu aktivieren.\n\nVerwenden Sie dies, wenn Sie den Beruf weiter nutzen möchten, aber ohne CraftScan-Interaktion (z.B. wenn Sie Alchemie auf jedem Twink für lange Fläschchen haben).",                            -- profession-name, character-name
+        "Löschen Sie dauerhaft alle gespeicherten %s-Daten für %s.\n\nEine Schaltfläche 'CraftScan aktivieren' wird auf der Berufsseite angezeigt, um es wieder mit den Standardeinstellungen zu aktivieren.\n\nVerwenden Sie dies, wenn Sie den Beruf weiter nutzen möchten, aber ohne CraftScan-Interaktion (z.B. wenn Sie Alchemie auf jedem Twink für lange Fläschchen haben).", -- profession-name, character-name
         [LID.DELETE_CONFIG_CONFIRM]           = "Geben Sie 'DELETE' ein, um fortzufahren:",
         [LID.SCANNER_CONFIG_DISABLED]         = "CraftScan aktivieren",
 
         ["Cleanup"]                           = "Bereinigen",
         [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
-        "Löschen Sie dauerhaft alle gespeicherten %s-Daten für %s.\n\nDer Beruf wird in einem Zustand zurückgelassen, als wäre er nie konfiguriert worden. Einfaches Öffnen des Berufs wird eine Standardkonfiguration wiederherstellen.\n\nVerwenden Sie dies, wenn Sie einen Beruf komplett zurücksetzen möchten, den Charakter gelöscht haben oder den Beruf abgelegt haben.",                             -- profession-name, character-name
+        "Löschen Sie dauerhaft alle gespeicherten %s-Daten für %s.\n\nDer Beruf wird in einem Zustand zurückgelassen, als wäre er nie konfiguriert worden. Einfaches Öffnen des Berufs wird eine Standardkonfiguration wiederherstellen.\n\nVerwenden Sie dies, wenn Sie einen Beruf komplett zurücksetzen möchten, den Charakter gelöscht haben oder den Beruf abgelegt haben.", -- profession-name, character-name
         [LID.CLEANUP_CONFIG_CONFIRM]          = "Geben Sie 'CLEANUP' ein, um fortzufahren:",
+
+        ["Primary Crafter"]                   = "Haupt-Handwerker",
+        [LID.PRIMARY_CRAFTER_TOOLTIP]         =
+        "Markiere %s als deinen Haupt-Handwerker für %s. Dieser Handwerker wird Vorrang vor anderen haben, wenn es mehrere Übereinstimmungen mit derselben Anfrage gibt.",
+        ["Chat History"]                      = "Chatverlauf mit %s", -- customer, left-click-help
+        ["Greet Help"]                        = "|cffffd100Linksklick: Kunde begrüßen%s|r",
+        ["Chat Help"]                         = "|cffffd100Linksklick: Flüstern öffnen|r",
+        ["Chat Override"]                     = "|cffffd100Mittelklick: Flüstern öffnen%s|r",
+        ["Dismiss"]                           = "|cffffd100Rechtsklick: Verwerfen%s|r",
+        ["Proposed Greeting"]                 = "Vorgeschlagene Begrüßung:",
+        [LID.CHAT_BUTTON_BINDING_NAME]        = "Flüster-Banner-Kunde",
+        ["Customer Request"]                  = "Anfrage von %s",
 
 
     }

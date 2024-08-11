@@ -22,7 +22,6 @@ function CraftScan.LOCAL_TW:GetData()
         [LID.GREET_BUTTON_BINDING_NAME]       = "問候橫幅客戶",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "解散橫幅客戶",
         [LID.TOGGLE_CHAT_TOOLTIP]             = "切換聊天訂單%s", -- 快捷鍵
-        [LID.BANNER_TOOLTIP]                  = "左鍵點擊：問候客戶%s\n右鍵點擊：解散%s", -- 快捷鍵，快捷鍵
         [LID.SCANNER_CONFIG_SHOW]             = "顯示製造掃描",
         [LID.SCANNER_CONFIG_HIDE]             = "隱藏製造掃描",
         [LID.CRAFT_SCAN_OPTIONS]              = "製造掃描選項",
@@ -154,6 +153,16 @@ function CraftScan.LOCAL_TW:GetData()
         [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
         "永久刪除任何保存的 %s 的 %s 資料。\n\n該專業將處於未配置的狀態。再次打開專業會恢復預設配置。\n\n如果您想完全重置一個專業，已刪除角色，或已放棄一個專業，請使用此功能。", -- profession-name, character-name
         [LID.CLEANUP_CONFIG_CONFIRM]          = "輸入 'CLEANUP' 以繼續:",
+        ["Primary Crafter"]                   = "主要工匠",
+        [LID.PRIMARY_CRAFTER_TOOLTIP]         = "將 %s 標記為 %s 的主要工匠。如果有多個匹配的請求，該工匠將優先於其他工匠。",
+        ["Chat History"]                      = "與 %s 的聊天記錄", -- customer, left-click-help
+        ["Greet Help"]                        = "|cffffd100左鍵點擊: 問候顧客%s|r",
+        ["Chat Help"]                         = "|cffffd100左鍵點擊: 打開悄悄話|r",
+        ["Chat Override"]                     = "|cffffd100中鍵點擊: 打開悄悄話%s|r",
+        ["Dismiss"]                           = "|cffffd100右鍵點擊: 關閉%s|r",
+        ["Proposed Greeting"]                 = "建議的問候語:",
+        [LID.CHAT_BUTTON_BINDING_NAME]        = "悄悄話橫幅顧客",
+        ["Customer Request"]                  = "%s 的請求",
 
     }
 end

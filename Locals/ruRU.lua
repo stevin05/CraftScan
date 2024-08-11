@@ -22,7 +22,6 @@ function CraftScan.LOCAL_RU:GetData()
         [LID.GREET_BUTTON_BINDING_NAME]       = "Приветствовать клиента",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Отклонить клиента",
         [LID.TOGGLE_CHAT_TOOLTIP]             = "Переключить чат заказов%s", -- Keybind
-        [LID.BANNER_TOOLTIP]                  = "Левый клик: Приветствовать клиента%s\nПравый клик: Отклонить%s", -- Keybind, Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "Показать CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Скрыть CraftScan",
         [LID.CRAFT_SCAN_OPTIONS]              = "Опции CraftScan",
@@ -155,6 +154,18 @@ function CraftScan.LOCAL_RU:GetData()
         [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
         "Постоянно удалите любые сохраненные данные %s для %s.\n\nПрофессия останется в состоянии, как если бы она никогда не была настроена. Простое открытие профессии снова восстановит стандартную конфигурацию.\n\nИспользуйте это, если хотите полностью сбросить профессию, удалили персонажа или отказались от профессии.", -- profession-name, character-name
         [LID.CLEANUP_CONFIG_CONFIRM]          = "Введите 'CLEANUP', чтобы продолжить:",
+
+        ["Primary Crafter"]                   = "Основной ремесленник",
+        [LID.PRIMARY_CRAFTER_TOOLTIP]         =
+        "Отметьте %s как вашего основного ремесленника для %s. Этот ремесленник будет иметь приоритет перед другими, если есть несколько совпадений с той же просьбой.",
+        ["Chat History"]                      = "История чата с %s", -- customer, left-click-help
+        ["Greet Help"]                        = "|cffffd100ЛКМ: Поздороваться с клиентом%s|r",
+        ["Chat Help"]                         = "|cffffd100ЛКМ: Открыть шёпот|r",
+        ["Chat Override"]                     = "|cffffd100СКМ: Открыть шёпот%s|r",
+        ["Dismiss"]                           = "|cffffd100ПКМ: Закрыть%s|r",
+        ["Proposed Greeting"]                 = "Предлагаемое приветствие:",
+        [LID.CHAT_BUTTON_BINDING_NAME]        = "Шёпот баннера клиента",
+        ["Customer Request"]                  = "Запрос от %s",
 
     }
 end

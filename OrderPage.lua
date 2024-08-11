@@ -68,6 +68,10 @@ function CraftScan.GreetCustomer(button, order)
             -- After sending the initial greeting, subsequent clicks open a chat with the customer.
             ChatFrame_SendTell(order.customerName, DEFAULT_CHAT_FRAME)
         end
+    elseif button == "MiddleButton" then
+        -- Middle button to begin chat without the generated greeting
+        response.greeting_sent = true
+        ChatFrame_SendTell(order.customerName, DEFAULT_CHAT_FRAME)
     elseif button == "RightButton" then
         removeOrder(CraftScan.DB.listed_orders, order)
         CraftScanCraftingOrderPage:ShowGeneric()
@@ -100,11 +104,7 @@ function CraftScanCrafterOrderListElementMixin:OnLineEnter()
     -- to give an easy refresher on prior interactions without popping out the
     -- dedicated chat frame.
     chatTooltip:Show("CraftScanChatHistoryTooltip", self, self.order,
-        function(tooltip)
-            GameTooltip_SetTitle(tooltip,
-                string.format(L("Chat History"), CraftScan.NameAndRealmToName(self.order.customerName),
-                    response.greeting_sent and L("Chat Help") or L("Greet Help")));
-        end)
+        string.format(L("Chat History"), CraftScan.NameAndRealmToName(self.order.customerName)));
 end
 
 function CraftScanCrafterOrderListElementMixin:OnLineLeave()
@@ -414,15 +414,26 @@ local function ParentProfessionConfig(crafterInfo)
     return CraftScan.DB.characters[crafterInfo.name].parent_professions[crafterInfo.parentProfessionID];
 end
 
-local function ForEachProfession(op, passthrough)
+-- States: 0 - all unchecked
+--         1 - all checked
+--         2 - indeterminate
+
+local function ForEachProfession(op)
+    local allTrue = true;
+    local allFalse = true;
     for _, crafterConfig in pairs(CraftScan.DB.characters) do
         for _, ppConfig in pairs(crafterConfig.parent_professions) do
-            if not ppConfig.character_disabled and not op(ppConfig) and passthrough then
-                return false;
+            if not ppConfig.character_disabled then
+                local result = op(ppConfig);
+                if result then
+                    allFalse = false;
+                else
+                    allTrue = false;
+                end
             end
         end
     end
-    return true;
+    return allTrue and 1 or allFalse and 0 or 2;
 end
 
 local function ForEachCrafterFrame(op)
@@ -438,26 +449,100 @@ local function IsAll(self)
     return self:GetParent() == crafterListAll
 end
 
-local function UpdateAllCheckBox(checkbox, ppconfig_key)
-    checkbox:SetChecked(
+local function UpdateAllCheckBox(checkbox)
+    local stateBefore = checkbox.state;
+    checkbox.state =
         ForEachProfession(function(ppConfig)
-            return ppConfig[ppconfig_key];
-        end, true))
+            return ppConfig[checkbox.ppconfig_key];
+        end);
+    checkbox:UpdateAllCheckBoxDisplay();
+    if stateBefore == 2 and checkbox.state ~= 2 then
+        checkbox:RememberAllUserState();
+    end
+end
+
+local function InitAllCheckBox(checkbox)
+    if not checkbox.checked_texture then
+        checkbox.indeterminate_texture = checkbox:CreateTexture();
+        checkbox.indeterminate_texture:SetSize(12, 12);
+        checkbox.indeterminate_texture:SetAllPoints(checkbox);
+        checkbox.indeterminate_texture:SetAtlas(checkbox.indeterminate_atlas);
+        checkbox.indeterminate_texture:Hide();
+
+        checkbox.checked_texture = checkbox:GetCheckedTexture();
+    end
+
+    UpdateAllCheckBox(checkbox);
 end
 
 CraftScan_CrafterToggleMixin = {}
 
+function CraftScan_CrafterToggleMixin:UpdateAllCheckBoxDisplay()
+    self.indeterminate_texture:Hide();
+    if self.state == 0 then
+        self:SetChecked(false);
+    elseif self.state == 1 then
+        self:SetCheckedTexture(self.checked_texture);
+        self:SetChecked(true);
+    else
+        self.indeterminate_texture:Show();
+        self:SetCheckedTexture(self.indeterminate_texture);
+        self:SetChecked(true);
+    end
+end
+
+function CraftScan_CrafterToggleMixin:RememberAllUserState()
+    -- Remember the most recent user specified state so we can restore it when
+    -- clicking through to the indeterminate state.
+    ForEachProfession(function(ppConfig)
+        ppConfig[self.ppconfig_key .. "_last"] = ppConfig[self.ppconfig_key];
+    end)
+end
+
 function CraftScan_CrafterToggleMixin:OnClick(button)
     if IsAll(self) then
-        ForEachProfession(function(ppConfig)
-            ppConfig[self.ppconfig_key] = self:GetChecked();
-        end)
-        ForEachCrafterFrame(function(frame)
-            frame[self:GetName()]:SetChecked(self:GetChecked());
-        end)
+        if self.state == 2 then
+            -- Moving from indeterminate to all disabled. Remember the user
+            -- configured states of each box so we can click back to
+            -- indeterminate to restore it.
+            self:RememberAllUserState();
+            self.state = 0;
+        elseif self.state == ForEachProfession(function(ppConfig) return ppConfig[self.ppconfig_key .. "_last"]; end) then
+            -- If the last saved state is the same as the current state, we're
+            -- just flipping between all on/off until the user clicks an
+            -- individual box again.
+            self.state = (self.state + 1) % 2;
+        else
+            self.state = self.state + 1;
+        end
+
+        if self.state ~= 2 then
+            -- Manually moving everything to all on or all off.
+            local checked = self.state == 1;
+            ForEachProfession(function(ppConfig)
+                ppConfig[self.ppconfig_key] = checked;
+            end)
+
+            ForEachCrafterFrame(function(frame)
+                frame[self:GetName()]:SetChecked(checked);
+            end)
+        else
+            -- When moving to the indeterminate state manually, reapply the last
+            -- user state.
+            ForEachProfession(function(ppConfig)
+                ppConfig[self.ppconfig_key] = ppConfig[self.ppconfig_key .. "_last"];
+            end)
+
+            -- And update the display to match the saved config.
+            ForEachCrafterFrame(function(frame)
+                frame[self:GetName()]:InitState();
+            end)
+        end
+
+        self:UpdateAllCheckBoxDisplay();
     else
         ParentProfessionConfig(self:GetParent().crafterInfo)[self.ppconfig_key] = self:GetChecked();
-        UpdateAllCheckBox(crafterListAll[self:GetName()], self.ppconfig_key)
+        UpdateAllCheckBox(crafterListAll[self:GetName()])
     end
     if GameTooltip:IsShown() then
         self:SetTooltip();
@@ -492,9 +577,9 @@ CraftScanCrafterListMixin = {}
 function CraftScanCrafterListMixin:SetupCrafterList()
     crafterListAll = CraftScanCraftingOrderPage.BrowseFrame.CrafterList.CrafterListAllButton;
 
-    UpdateAllCheckBox(crafterListAll.EnabledCheckBox, 'scanning_enabled')
-    UpdateAllCheckBox(crafterListAll.SoundAlertCheckBox, 'sound_alert_enabled')
-    UpdateAllCheckBox(crafterListAll.VisualAlertCheckBox, 'visual_alert_enabled')
+    InitAllCheckBox(crafterListAll.EnabledCheckBox)
+    InitAllCheckBox(crafterListAll.SoundAlertCheckBox)
+    InitAllCheckBox(crafterListAll.VisualAlertCheckBox)
 
     -- TODO Make this big and find a better texture
     crafterListAll.CrafterName:SetText(L("All crafters"))

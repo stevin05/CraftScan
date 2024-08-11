@@ -22,7 +22,6 @@ CraftScan.CONST.TEXT = {
     GREET_BUTTON_BINDING_NAME       = 12,
     DISMISS_BUTTON_BINDING_NAME     = 13,
     TOGGLE_CHAT_TOOLTIP             = 14,
-    BANNER_TOOLTIP                  = 15,
     SCANNER_CONFIG_SHOW             = 16,
     SCANNER_CONFIG_HIDE             = 17,
     CRAFT_SCAN_OPTIONS              = 18,
@@ -78,6 +77,7 @@ CraftScan.CONST.TEXT = {
     CLEANUP_CONFIG_TOOLTIP_TEXT     = 69,
     CLEANUP_CONFIG_CONFIRM          = 70,
     PRIMARY_CRAFTER_TOOLTIP         = 71,
+    CHAT_BUTTON_BINDING_NAME        = 72,
 
 
     -- Release notes have multiple lines that are sequential. Spaced out by hundreds to give more than enough room.

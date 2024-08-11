@@ -558,6 +558,8 @@ local function doOnce()
         L(LID.CRAFT_SCAN));
     BINDING_NAME_CRAFT_SCAN_GREET_CURRENT_CUSTOMER   = string.format("%s - %s", L(LID.GREET_BUTTON_BINDING_NAME),
         L(LID.CRAFT_SCAN));
+    BINDING_NAME_CRAFT_SCAN_CHAT_CURRENT_CUSTOMER    = string.format("%s - %s", L(LID.CHAT_BUTTON_BINDING_NAME),
+        L(LID.CRAFT_SCAN));
     BINDING_NAME_CRAFT_SCAN_DISMISS_CURRENT_CUSTOMER = string.format("%s - %s", L(LID.DISMISS_BUTTON_BINDING_NAME),
         L(LID.CRAFT_SCAN));
 
@@ -669,25 +671,64 @@ function CraftScan.Utils.onLoad(onLoad)
 end
 
 local function GetMaxTextLeftWidth(tooltipName)
-    local tooltip = _G[tooltipName]
+    local tooltip = _G[tooltipName];
     if not tooltip then
-        print("Tooltip not found: " .. tooltipName)
-        return nil
+        return nil;
     end
 
-    local maxWidth = 0
+    local maxWidth = 0;
 
     for i = 1, tooltip:GetNumRegions() do
-        local region = select(i, tooltip:GetRegions())
+        local region = select(i, tooltip:GetRegions());
         if region and region:GetObjectType() == "FontString" and region:GetName() and region:GetName():match("TextLeft") then
-            local width = region:GetStringWidth()
+            local width = region:GetStringWidth();
             if width > maxWidth then
-                maxWidth = width
+                maxWidth = width;
             end
         end
     end
 
-    return maxWidth
+    return maxWidth;
+end
+
+-- I want the help text in the top right corner of the tooltip, which uses
+-- TextRight. With no TextLeft associated with them, they were vertically
+-- overlapping. This method walks the right text of a tooltip and manually
+-- spaces it out to look nice.
+local function SpaceOutRightText(tooltipName)
+    local tooltip = _G[tooltipName];
+    if not tooltip then
+        return;
+    end
+
+    local lastRegion = nil;
+    for i = 1, tooltip:GetNumRegions() do
+        local region = select(i, tooltip:GetRegions())
+        if region and region:GetObjectType() == "FontString" and region:GetName() and region:GetName():match("TextRight") then
+            if lastRegion then
+                region:SetPoint("TOPRIGHT", lastRegion, "BOTTOMRIGHT", 0, -1);
+            end
+            lastRegion = region;
+        end
+    end
+end
+
+-- This method is a bit of mess now that we're only ever populating a single %s,
+-- but too lazy to fix atm.
+CraftScan.Utils.PopulateBinds = function(lid, ...)
+    local binds = { ... };
+    for i, bind in ipairs(binds) do
+        local b = GetBindingKey(bind);
+        if b then
+            binds[i] = ' |cffffd100(' .. b .. ')|r';
+        else
+            binds[i] = '';
+        end
+    end
+    if not next(binds) then
+        return string.format(L(lid), '');
+    end
+    return string.format(L(lid), unpack(binds));
 end
 
 CraftScan.Utils.ChatHistoryTooltip = {}
@@ -703,19 +744,41 @@ function CraftScan.Utils.ChatHistoryTooltip:Hide()
     if self.tooltip then self.tooltip:Hide() end
 end
 
-function CraftScan.Utils.ChatHistoryTooltip:Show(name, anchor, order, headerCallback)
+function CraftScan.Utils.ChatHistoryTooltip:Show(name, anchor, order, header, includeBinds)
     if not self.tooltip then
         self.tooltip = CreateFrame("GameTooltip", name, UIParent, "GameTooltipTemplate");
         self.tooltip.TextLeft2:SetFontObject(ChatFrame1:GetFontObject());
+        self.tooltip.TextRight1:SetFontObject(self.tooltip.TextRight2:GetFontObject());
     end
 
     local tooltip = self.tooltip;
     tooltip:ClearLines();
 
     tooltip:SetOwner(anchor, "ANCHOR_TOPLEFT");
-    headerCallback(tooltip);
+
+    local response = CraftScan.OrderToResponse(order)
+    if response.greeting_sent then
+        tooltip:AddDoubleLine(header, L("Chat Help"), 1, 1, 1);
+    else
+        tooltip:AddDoubleLine(header,
+            CraftScan.Utils.PopulateBinds(L("Greet Help"), includeBinds and "CRAFT_SCAN_GREET_CURRENT_CUSTOMER"), 1, 1, 1);
+        tooltip:AddDoubleLine("",
+            CraftScan.Utils.PopulateBinds(L("Chat Override"), includeBinds and "CRAFT_SCAN_CHAT_CURRENT_CUSTOMER"));
+    end
+    tooltip:AddDoubleLine("",
+        CraftScan.Utils.PopulateBinds(L("Dismiss"), includeBinds and "CRAFT_SCAN_DISMISS_CURRENT_CUSTOMER"));
 
     GameTooltip_AddBlankLineToTooltip(tooltip);
+
+    if not response.greeting_sent then
+        tooltip:AddLine(L("Proposed Greeting"), 1, 1, 1);
+        local wc = ChatTypeInfo["WHISPER"]
+        for _, line in ipairs(response.message) do
+            tooltip:AddLine(line, wc.r, wc.g, wc.b, true, 0);
+        end
+
+        GameTooltip_AddBlankLineToTooltip(tooltip);
+    end
 
     local customerInfo = CraftScan.OrderToCustomerInfo(order)
     for _, chat in ipairs(customerInfo.chat_history) do
@@ -726,6 +789,8 @@ function CraftScan.Utils.ChatHistoryTooltip:Show(name, anchor, order, headerCall
             tooltip:AddLine(chat.message, 1, 1, 1, true, 0);
         end
     end
+
+    SpaceOutRightText(name);
 
     -- Find the maximum text width so we can make the tooltip look sane. If it's
     -- super long, cap at the chat frame width to match its text wrapping.

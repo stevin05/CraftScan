@@ -21,8 +21,7 @@ function CraftScan.LOCAL_PT:GetData()
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Alternar Página de Pedido",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Saudar Cliente com Banner",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Dispensar Cliente com Banner",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Alternar ordens no chat%s",                                      -- Keybind
-        [LID.BANNER_TOOLTIP]                  = "Clique esquerdo: Saudar cliente%s\nClique direito: Dispensar%s", -- Keybind, Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Alternar ordens no chat%s", -- Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "Mostrar CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Esconder CraftScan",
         [LID.CRAFT_SCAN_OPTIONS]              = "Opções do CraftScan",
@@ -149,14 +148,26 @@ function CraftScan.LOCAL_PT:GetData()
         "Seus artesãos no lado esquerdo da página 'Ordens de Chat' agora têm um menu de contexto ao clicar com o botão direito. Use este menu para manter a lista limpa e remover personagens/profissões desatualizados.",
         ["Disable"]                           = "Desativar",
         [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
-        "Exclua permanentemente qualquer dado %s salvo para %s.\n\nUm botão 'Habilitar CraftScan' estará presente na página da profissão para habilitá-lo novamente com as configurações padrão.\n\nUse isso se você quiser continuar usando a profissão, mas sem a interação do CraftScan (por exemplo, quando você tem Alquimia em todos os alts para frascos longos).",                            -- profession-name, character-name
+        "Exclua permanentemente qualquer dado %s salvo para %s.\n\nUm botão 'Habilitar CraftScan' estará presente na página da profissão para habilitá-lo novamente com as configurações padrão.\n\nUse isso se você quiser continuar usando a profissão, mas sem a interação do CraftScan (por exemplo, quando você tem Alquimia em todos os alts para frascos longos).", -- profession-name, character-name
         [LID.DELETE_CONFIG_CONFIRM]           = "Digite 'DELETE' para continuar:",
         [LID.SCANNER_CONFIG_DISABLED]         = "Habilitar CraftScan",
 
         ["Cleanup"]                           = "Limpeza",
         [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
-        "Exclua permanentemente qualquer dado %s salvo para %s.\n\nA profissão será deixada em um estado como se nunca tivesse sido configurada. Simplesmente abrir a profissão novamente restaurará uma configuração padrão.\n\nUse isso se você quiser redefinir completamente uma profissão, excluiu o personagem ou abandonou a profissão.",                             -- profession-name, character-name
+        "Exclua permanentemente qualquer dado %s salvo para %s.\n\nA profissão será deixada em um estado como se nunca tivesse sido configurada. Simplesmente abrir a profissão novamente restaurará uma configuração padrão.\n\nUse isso se você quiser redefinir completamente uma profissão, excluiu o personagem ou abandonou a profissão.", -- profession-name, character-name
         [LID.CLEANUP_CONFIG_CONFIRM]          = "Digite 'CLEANUP' para continuar:",
+        ["Primary Crafter"]                   = "Artesão Principal",
+        [LID.PRIMARY_CRAFTER_TOOLTIP]         =
+        "Marque %s como seu artesão principal para %s. Este artesão terá prioridade sobre os outros se houver várias correspondências com a mesma solicitação.",
+        ["Chat History"]                      = "Histórico de bate-papo com %s", -- customer, left-click-help
+        ["Greet Help"]                        = "|cffffd100Clique esquerdo: Cumprimentar o cliente%s|r",
+        ["Chat Help"]                         = "|cffffd100Clique esquerdo: Abrir sussurro|r",
+        ["Chat Override"]                     = "|cffffd100Clique do meio: Abrir sussurro%s|r",
+        ["Dismiss"]                           = "|cffffd100Clique direito: Dispensar%s|r",
+        ["Proposed Greeting"]                 = "Cumprimento proposto:",
+        [LID.CHAT_BUTTON_BINDING_NAME]        = "Cliente do Banner Sussurro",
+        ["Customer Request"]                  = "Pedido de %s",
+
 
     }
 end

@@ -21,8 +21,7 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Basculer la page de commande",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Saluer le client de la bannière",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Rejeter le client de la bannière",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Basculer les commandes de discussion%s",                   -- Raccourci
-        [LID.BANNER_TOOLTIP]                  = "Clic gauche : Saluer le client%s\nClic droit : Rejeter%s", -- Raccourci, Raccourci
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Basculer les commandes de discussion%s", -- Raccourci
         [LID.SCANNER_CONFIG_SHOW]             = "Afficher CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Masquer CraftScan",
         [LID.CRAFT_SCAN_OPTIONS]              = "Options de CraftScan",
@@ -152,14 +151,25 @@ function CraftScan.LOCAL_FR:GetData()
         "Vos artisans sur le côté gauche de la page 'Ordres de Chat' ont maintenant un menu contextuel lorsque vous faites un clic droit. Utilisez ce menu pour garder la liste propre et supprimer les personnages/métiers obsolètes.",
         ["Disable"]                           = "Désactiver",
         [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
-        "Supprimez définitivement toutes les données %s enregistrées pour %s.\n\nUn bouton 'Activer CraftScan' sera présent sur la page du métier pour l'activer à nouveau avec les paramètres par défaut.\n\nUtilisez ceci si vous souhaitez continuer à utiliser le métier, mais sans l'interaction de CraftScan (par exemple, lorsque vous avez l'Alchimie sur tous les rerolls pour les flacons longs).",                            -- profession-name, character-name
+        "Supprimez définitivement toutes les données %s enregistrées pour %s.\n\nUn bouton 'Activer CraftScan' sera présent sur la page du métier pour l'activer à nouveau avec les paramètres par défaut.\n\nUtilisez ceci si vous souhaitez continuer à utiliser le métier, mais sans l'interaction de CraftScan (par exemple, lorsque vous avez l'Alchimie sur tous les rerolls pour les flacons longs).", -- profession-name, character-name
         [LID.DELETE_CONFIG_CONFIRM]           = "Tapez 'DELETE' pour continuer :",
         [LID.SCANNER_CONFIG_DISABLED]         = "Activer CraftScan",
 
         ["Cleanup"]                           = "Nettoyer",
         [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
-        "Supprimez définitivement toutes les données %s enregistrées pour %s.\n\nLe métier sera laissé dans un état comme s'il n'avait jamais été configuré. Il suffit d'ouvrir à nouveau le métier pour restaurer une configuration par défaut.\n\nUtilisez ceci si vous souhaitez réinitialiser complètement un métier, avez supprimé le personnage ou avez abandonné un métier.",                             -- profession-name, character-name
+        "Supprimez définitivement toutes les données %s enregistrées pour %s.\n\nLe métier sera laissé dans un état comme s'il n'avait jamais été configuré. Il suffit d'ouvrir à nouveau le métier pour restaurer une configuration par défaut.\n\nUtilisez ceci si vous souhaitez réinitialiser complètement un métier, avez supprimé le personnage ou avez abandonné un métier.", -- profession-name, character-name
         [LID.CLEANUP_CONFIG_CONFIRM]          = "Tapez 'CLEANUP' pour continuer :",
+        ["Primary Crafter"]                   = "Artisan Principal",
+        [LID.PRIMARY_CRAFTER_TOOLTIP]         =
+        "Marquez %s comme votre artisan principal pour %s. Cet artisan sera priorisé sur les autres s'il y a plusieurs correspondances avec la même demande.",
+        ["Chat History"]                      = "Historique de chat avec %s", -- customer, left-click-help
+        ["Greet Help"]                        = "|cffffd100Clic gauche : Saluer le client%s|r",
+        ["Chat Help"]                         = "|cffffd100Clic gauche : Ouvrir un chuchotement|r",
+        ["Chat Override"]                     = "|cffffd100Clic du milieu : Ouvrir un chuchotement%s|r",
+        ["Dismiss"]                           = "|cffffd100Clic droit : Ignorer%s|r",
+        ["Proposed Greeting"]                 = "Salutation proposée :",
+        [LID.CHAT_BUTTON_BINDING_NAME]        = "Client Bannière Chuchotement",
+        ["Customer Request"]                  = "Demande de %s",
 
     }
 end

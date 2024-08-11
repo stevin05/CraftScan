@@ -15,17 +15,16 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.RENABLE_ADDONS]                  = "Re-enable Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]          =
         "Save your list of addons, and then disable them, allowing for a quick swap to an alt. This button can be clicked again to re-enable the addons at any time.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft %s.",          -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, %s can craft %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft %s.",           -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, %s, can craft %s.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]            = "that",
-        [LID.GREETING_I_HAVE_PROF]            = "I have %s.",               -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]           = "My alt, %s, has %s.",      -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]            = "I have %s.",                -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]           = "My alt, %s, has %s.",       -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]             = "Let me know if you send an order so I can log over.",
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Toggle Order Page",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Greet Banner Customer",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Dismiss Banner Customer",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Toggle chat orders%s",                                 -- Keybind
-        [LID.BANNER_TOOLTIP]                  = "Left click: Greet customer%s\nRight click: Dismiss%s", -- Keybind, Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Toggle chat orders%s",                                                               -- Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "Show CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Hide CraftScan",
         [LID.CRAFT_SCAN_OPTIONS]              = "CraftScan Options",
@@ -167,9 +166,14 @@ function CraftScan.LOCAL_EN:GetData()
         ["Primary Crafter"]                   = "Primary Crafter",
         [LID.PRIMARY_CRAFTER_TOOLTIP]         =
         "Flag %s as your primary crafter for %s. This crafter will be given priority over others if there are multiple matches to the same request.",
-        ["Chat History"]                      = "Chat history with %s |cffffd100(%s)|r", -- customer, left-click-help
-        ["Greet Help"]                        = "Left click to send a greeting",
-        ["Chat Help"]                         = "Left click to message",
+        ["Chat History"]                      = "Chat history with %s", -- customer
+        ["Greet Help"]                        = "|cffffd100Left click: Greet customer%s|r",
+        ["Chat Help"]                         = "|cffffd100Left click: Open whisper|r",
+        ["Chat Override"]                     = "|cffffd100Middle click: Open whisper%s|r",
+        ["Dismiss"]                           = "|cffffd100Right click: Dismiss%s|r",
+        ["Proposed Greeting"]                 = "Proposed greeting:",
+        [LID.CHAT_BUTTON_BINDING_NAME]        = "Whisper Banner Customer",
+        ["Customer Request"]                  = "Request from %s",
 
 
 
