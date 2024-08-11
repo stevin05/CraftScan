@@ -1,13 +1,13 @@
 ### Welcome to CraftScan!
 
 #### Remember recent crafting requests, even after swapping characters:
-![Screenshot](Media/README/ChatHistoryItemLinkMatch.JPG)
+![Screenshot](Media/README/ChatHistoryItemLinkMatch.png)
 
 #### Pop up and sound notifications can be enabled when a new request is detected:
-![Screenshot](Media/README/BannerRequestTooltip.JPG)
+![Screenshot](Media/README/BannerRequestTooltip.png)
 
 #### Keyword matching can be configured per item, category, or profession:
-![Screenshot](Media/README/ChatHistoryKeywordMatch.JPG)
+![Screenshot](Media/README/ChatHistoryKeywordMatch.png)
 
 #### Overview
 
