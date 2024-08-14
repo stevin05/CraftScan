@@ -93,9 +93,10 @@ local function CreateSlider(category, variable, name, options, tooltip)
 end
 
 CraftScan.Utils.onLoad(function()
-    local category, layout = Settings.RegisterVerticalLayoutCategory(L("CraftScan"));
+    local category, layout = Settings.RegisterVerticalLayoutCategory(L("CraftScan") .. " **Settings Temporarily Disabled**");
     Settings.RegisterAddOnCategory(category);
 
+    --[[
     do
         local function GetOptions()
             local container = Settings.CreateControlTextContainer();
@@ -165,4 +166,5 @@ CraftScan.Utils.onLoad(function()
             L(LID.ADDON_WHITELIST_TOOLTIP), default
         );
     end
+    ]]
 end)

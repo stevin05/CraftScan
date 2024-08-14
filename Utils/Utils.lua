@@ -331,7 +331,7 @@ end
 function CraftScan.Utils.ToggleSavedAddons()
     if CraftScan_DB.saved_addons then
         for _, name in ipairs(CraftScan_DB.saved_addons) do
-            EnableAddOn(name)
+            C_AddOns.EnableAddOn(name)
         end
 
         print("Addons enabled. Reload UI.")
@@ -348,9 +348,9 @@ function CraftScan.Utils.ToggleSavedAddons()
     end
 
     CraftScan_DB.saved_addons = {}
-    local numAddOns = GetNumAddOns()
+    local numAddOns = C_AddOns.GetNumAddOns()
     for i = 1, numAddOns do
-        local name, _, _, enabled = GetAddOnInfo(i)
+        local name, _, _, enabled = C_AddOns.GetAddOnInfo(i)
         if enabled and not whitelist[name] then
             table.insert(CraftScan_DB.saved_addons, name)
         end
@@ -358,7 +358,7 @@ function CraftScan.Utils.ToggleSavedAddons()
 
     -- Step 2: Disable all addons
     for _, name in ipairs(CraftScan_DB.saved_addons) do
-        DisableAddOn(name)
+        C_AddOns.DisableAddOn(name)
     end
 end
 
@@ -626,8 +626,8 @@ local loginFrame = CreateFrame("Frame")
 local loadOnLogin = {}
 local requiredAddons = { "CraftScan", "Blizzard_Professions" }
 function CraftScan.Utils.onLoad(onLoad)
-    if not IsAddOnLoaded("Blizzard_Professions") then
-        LoadAddOn("Blizzard_Professions")
+    if not C_AddOns.IsAddOnLoaded("Blizzard_Professions") then
+        C_AddOns.LoadAddOn("Blizzard_Professions")
     end
 
     local count = 0
@@ -659,7 +659,7 @@ function CraftScan.Utils.onLoad(onLoad)
     end
 
     for _, entry in ipairs(requiredAddons) do
-        local loaded, fullyLoaded = IsAddOnLoaded(entry)
+        local loaded, fullyLoaded = C_AddOns.IsAddOnLoaded(entry)
         if fullyLoaded then
             doLoad()
         else
