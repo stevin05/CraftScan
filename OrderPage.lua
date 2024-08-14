@@ -631,19 +631,33 @@ function CraftScanAnalyticsTableListElementMixin:OnClick(button)
                     profession.ppID);
             end
 
-            local resetData = rootDescription:CreateButton("Reset Data");
-            resetData:CreateTitle(L("The most recent"))
-            local function ClearItem(timeout)
-                CraftScan.Analytics:ClearRecentAnalyticsForItem(owner.item.itemID, timeout);
-                CraftScanCraftingOrderPage:UpdateAnalytics()
+            local intervals = {
+                { "10 seconds",  10 },
+                { "15 minutes ", 15 * 60 },
+                { "1 hour",      60 * 60 },
+                { "1 day",       24 * 60 * 60 },
+                { "1 week ",     7 * 24 * 60 * 60 },
+                { "30 days",     30 * 24 * 60 * 60 },
+            };
+
+            local recentData = rootDescription:CreateButton("Clear recent data");
+            recentData:CreateTitle(L("newer than"))
+            recentData:QueueDivider();
+            local function ClearItem(clearInfo)
+                if CraftScan.Analytics:ClearAnalyticsForItem(owner.item.itemID, clearInfo) then
+                    CraftScanCraftingOrderPage:UpdateAnalytics()
+                end
             end
-            resetData:CreateButton("30 Seconds", ClearItem, 30);
-            resetData:CreateButton("15 Minutes", ClearItem, 15 * 60);
-            resetData:CreateButton("1 Hour", ClearItem, 60 * 60);
-            resetData:CreateButton("1 Day", ClearItem, 24 * 60 * 60);
-            resetData:CreateButton("1 Week", ClearItem, 7 * 24 * 60 * 60);
-            resetData:CreateButton("30 Days", ClearItem, 30 * 24 * 60 * 60);
-            resetData:CreateButton("All Data", ClearItem, nil);
+            for _, interval in ipairs(intervals) do
+                recentData:CreateButton(interval[1], ClearItem, { seconds = interval[2], recent = true });
+            end
+
+            local oldData = rootDescription:CreateButton("Clear old data");
+            oldData:CreateTitle(L("older than"))
+            oldData:QueueDivider();
+            for _, interval in ipairs(intervals) do
+                oldData:CreateButton(interval[1], ClearItem, { seconds = interval[2], recent = false });
+            end
         end);
     end
 end

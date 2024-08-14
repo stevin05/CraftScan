@@ -309,6 +309,12 @@ local function RemoveFront(array, n)
     return result;
 end
 
+local function RemoveBack(array, n)
+    for _ = 1, n do
+        table.remove(array);
+    end
+end
+
 CraftScan.Analytics = {};
 
 function CraftScan.Analytics:GetTimeStamp(timeEntry)
@@ -317,48 +323,51 @@ function CraftScan.Analytics:GetTimeStamp(timeEntry)
 end
 
 -- Remove entries older than timeout for the given itemID.
-function CraftScan.Analytics:ClearRecentAnalyticsForItem(itemID, timeout)
-
-    local test1 = { 1, 2 };
-    CraftScan.Utils.printTable("test1 before", test1);
-    RemoveFront(test1, 1);
-    CraftScan.Utils.printTable("test1 after", test1);
-
-    local test1 = { 1 };
-    CraftScan.Utils.printTable("test2 before", test2);
-    RemoveFront(test1, 1);
-    CraftScan.Utils.printTable("test2 after", test2);
+function CraftScan.Analytics:ClearAnalyticsForItem(itemID, range)
+    local timeout = range.seconds;
 
     local items = CraftScan.DB.analytics.seen_items;
     if timeout == nil then
         items[itemID] = nil;
     else
+        local recent = range.recent;
         local itemInfo = items[itemID];
         local now = time();
         for i, timeInfo in ipairs(itemInfo.times) do
             if CraftScan.Analytics:GetTimeStamp(timeInfo) + timeout > now then
-                CraftScan.Utils.printTable("Before", itemInfo.times);
-                print(i);
-                -- TODO: BUG HERE Somewhere in RemoveFront logic
-                itemInfo.times = RemoveFront(itemInfo.times, i);
-                CraftScan.Utils.printTable("After", itemInfo.times);
+                if recent then
+                    local count = #itemInfo.times - i + 1;
+                    if count == 0 then
+                        -- Don't need to refresh the display
+                        return false;
+                    end
+
+                    RemoveBack(itemInfo.times, count);
+                else
+                    local count = i - 1;
+                    if count == 0 then
+                        -- Don't need to refresh the display
+                        return false;
+                    end
+
+                    itemInfo.times = RemoveFront(itemInfo.times, i - 1);
+                end
                 if #itemInfo.times == 0 then items[itemID] = nil; end;
-                CraftScan.Utils.printTable("After again", items[itemID]);
-                return;
-            else
-                print("now", now)
-                print("timestamp", CraftScan.Analytics:GetTimeStamp(timeInfo))
-                print("timestamp + timeout",
-                    CraftScan.Analytics:GetTimeStamp(timeInfo) + timeout);
+                return true;
             end
         end
+        if not recent then
+            items[itemID] = nil;
+            return true;
+        end
     end
+    return false;
 end
 
 local function CleanRecentAnalytics()
     if not CraftScan.DB.analytics.seen_items then return end
 
-    local timeout = 30; -- TODO 3600
+    local timeout = 10; -- TODO 3600
     local now = time();
     for _, itemInfo in pairs(CraftScan.DB.analytics.seen_items) do
         for i, timeInfo in ipairs(itemInfo.times) do
@@ -387,7 +396,7 @@ local function AddTimeToAnalytics(customer, item)
 
     --  Track repeat requests for up to an hour. This aligns with our 'peak per
     --  hour', so duplicate requests don't artificially inflate the peak requests.
-    local timeout = 30; -- TODO 3600
+    local timeout = 10; -- TODO 3600
     local now = time();
     for i = #times, 1, -1 do
         local entry = times[i]
@@ -421,8 +430,6 @@ local function AddMessageToAnalytics(message)
     for _, itemID in ipairs(itemIDs) do
         local item = saved(seen, itemID, { times = {} });
         AddTimeToAnalytics(customer, item);
-
-        CraftScan.Utils.printTable("item", item);
     end
 end
 
@@ -431,8 +438,6 @@ local function AddItemToAnalytics(customer, itemID, parentProfID)
     local item = saved(seen, itemID, { times = {}, ppID = parentProfID });
     AddTimeToAnalytics(customer, item);
     if not item.ppID then item.ppID = parentProfID end
-
-    CraftScan.Utils.printTable("item", item);
 end
 
 -- Because we can't reverse look up from item link to crafting profession, we do
