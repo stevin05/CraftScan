@@ -318,6 +318,17 @@ end
 
 -- Remove entries older than timeout for the given itemID.
 function CraftScan.Analytics:ClearRecentAnalyticsForItem(itemID, timeout)
+
+    local test1 = { 1, 2 };
+    CraftScan.Utils.printTable("test1 before", test1);
+    RemoveFront(test1, 1);
+    CraftScan.Utils.printTable("test1 after", test1);
+
+    local test1 = { 1 };
+    CraftScan.Utils.printTable("test2 before", test2);
+    RemoveFront(test1, 1);
+    CraftScan.Utils.printTable("test2 after", test2);
+
     local items = CraftScan.DB.analytics.seen_items;
     if timeout == nil then
         items[itemID] = nil;
