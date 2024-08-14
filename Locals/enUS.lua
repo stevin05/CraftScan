@@ -24,7 +24,7 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Toggle Order Page",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Greet Banner Customer",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Dismiss Banner Customer",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Toggle chat orders%s",                                                               -- Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Toggle chat orders%s", -- Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "Show CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Hide CraftScan",
         [LID.CRAFT_SCAN_OPTIONS]              = "CraftScan Options",
@@ -174,6 +174,11 @@ function CraftScan.LOCAL_EN:GetData()
         ["Proposed Greeting"]                 = "Proposed greeting:",
         [LID.CHAT_BUTTON_BINDING_NAME]        = "Whisper Banner Customer",
         ["Customer Request"]                  = "Request from %s",
+
+        ["Total Seen"]                        = "Total Seen",
+        ["Avg Per Day"]                       = "Avg/Day",
+        ["Peak Per Hour"]                     = "Peak/Hour",
+
 
 
 

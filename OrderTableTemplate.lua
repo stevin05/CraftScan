@@ -64,24 +64,6 @@ CraftScanCrafterListTableConstants.CrafterName = {
     RightCellPadding = CraftScanCrafterListTableConstants.NoPadding
 }
 
-local function GetHeaderNameFromSortOrder(sortOrder)
-    if sortOrder == CraftScan.ChatOrderSortOrder.ItemName then
-        return PROFESSIONS_COLUMN_HEADER_ITEM;
-    elseif sortOrder == CraftScan.ChatOrderSortOrder.CrafterName then
-        return L("Crafter Name");
-    elseif sortOrder == CraftScan.ChatOrderSortOrder.ProfessionName then
-        return L("Profession");
-        -- elseif sortOrder == CraftScanSortOrder.Time then
-        -- return CreateAtlasMarkup("auctionhouse-icon-clock", 16, 16, 2, -2);
-        -- elseif sortOrder == CraftScanSortOrder.ItemName then
-        -- return AUCTION_HOUSE_BROWSE_HEADER_NAME;
-    elseif sortOrder == CraftScan.ChatOrderSortOrder.CustomerName then
-        return L("Customer Name");
-    elseif sortOrder == CraftScan.ChatOrderSortOrder.Time then
-        return CreateAtlasMarkup("auctionhouse-icon-clock", 16, 16, 2, -2);
-    end
-end
-
 CraftScanCrafterTableHeaderStringMixin = CreateFromMixins(TableBuilderElementMixin);
 
 function CraftScanCrafterTableHeaderStringMixin:OnClick()
@@ -121,7 +103,7 @@ function CraftScanTableBuilderMixin:AddColumnInternal(owner, sortOrder, cellTemp
     local column = self:AddColumn();
 
     if sortOrder then
-        local headerName = GetHeaderNameFromSortOrder(sortOrder);
+        local headerName = self:GetHeaderNameFromSortOrder(sortOrder);
         column:ConstructHeader("BUTTON", "CraftScanCrafterTableHeaderStringTemplate", owner, headerName,
             sortOrder);
     end
@@ -169,6 +151,26 @@ function CraftScanTableBuilderMixin:AddUnsortableFillColumn(owner, padding, fill
     column:SetFillConstraints(fillCoefficient, padding);
     column:SetCellPadding(leftCellPadding, rightCellPadding);
     return column;
+end
+
+CraftScanOrderTableBuilderMixin = CreateFromMixins(CraftScanTableBuilderMixin);
+
+function CraftScanOrderTableBuilderMixin:GetHeaderNameFromSortOrder(sortOrder)
+    if sortOrder == CraftScan.ChatOrderSortOrder.ItemName then
+        return PROFESSIONS_COLUMN_HEADER_ITEM;
+    elseif sortOrder == CraftScan.ChatOrderSortOrder.CrafterName then
+        return L("Crafter Name");
+    elseif sortOrder == CraftScan.ChatOrderSortOrder.ProfessionName then
+        return L("Profession");
+        -- elseif sortOrder == CraftScanSortOrder.Time then
+        -- return CreateAtlasMarkup("auctionhouse-icon-clock", 16, 16, 2, -2);
+        -- elseif sortOrder == CraftScanSortOrder.ItemName then
+        -- return AUCTION_HOUSE_BROWSE_HEADER_NAME;
+    elseif sortOrder == CraftScan.ChatOrderSortOrder.CustomerName then
+        return L("Customer Name");
+    elseif sortOrder == CraftScan.ChatOrderSortOrder.Time then
+        return CreateAtlasMarkup("auctionhouse-icon-clock", 16, 16, 2, -2);
+    end
 end
 
 CraftScanTableCellTextMixin = CreateFromMixins(TableBuilderCellMixin);

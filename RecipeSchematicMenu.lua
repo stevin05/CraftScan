@@ -489,6 +489,7 @@ local function ShowSchematicOptions()
     end
 end
 
+local seen_profs = {};
 local function OnRecipeSelected()
     cur.recipe = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
     if not cur.recipe then
@@ -497,6 +498,11 @@ local function OnRecipeSelected()
     end
 
     cur.profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(cur.recipe.recipeID)
+
+    if not seen_profs[cur.profession.parentProfessionID] then
+        seen_profs[cur.profession.parentProfessionID] = true;
+        CraftScan.Scanner.UpdateAnalyticsProfIDs(cur.profession.parentProfessionID);
+    end
 
     if not cur.profession.isPrimaryProfession or not cur.profession.parentProfessionID or not CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID] then
         -- Ignore Cooking, Fishing, gathering professions (we don't have

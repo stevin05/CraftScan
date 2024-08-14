@@ -7,6 +7,9 @@
 ## SavedVariables: CraftScan_DB
 ## IconTexture: Interface\Icons\Trade_blacksmithing
 
+Libs/LibDeflate.lua
+Libs/LibSerialize.lua
+
 Consts.lua
 
 Locals/enUS.lua
@@ -31,6 +34,8 @@ AlertIcon.xml
 ChatScanner.lua
 
 OrderTableTemplate.xml
+
+AnalyticsTableTemplate.xml
 
 OrderPage.xml
 

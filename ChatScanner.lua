@@ -79,7 +79,7 @@ local function resetConfig()
         exclusions = {},
         inclusions = {},
         prof_keywords = {},
-        items = {}
+        items = {},
     }
 end
 
@@ -273,7 +273,190 @@ local function getRequestIDs(message, crafterInfo, profConfig)
     return nil, categoryID
 end
 
-local function getCrafterForMessage(message)
+-- There does not appear to be any reverse look up from itemID to whether the
+-- item is crafted or not. The onyl option I've found is the reverse direction,
+-- but then we'd need a mapping of every craftable item in the game to determine
+-- if a given itemID is crafted. Instead, we're going to depend on the fact that
+-- players don't really have easy access to item links that don't have a
+-- crafting 'quality' embedded in the link itself. (We generate such links, but
+-- without an addon all items clicked from a profession or the order page have a
+-- quality.)
+local function GetItemIDsFromQualityLinks(inputString)
+    local itemIDs = nil;
+
+    local pattern = "item:(%d+)"
+    local qualityPattern = "professions%-chaticon%-quality%-tier"
+    for itemLink in string.gmatch(inputString, "item:%d+%:%S+") do
+        if string.find(itemLink, qualityPattern) then
+            local itemID = itemLink:match(pattern)
+            if itemID then
+                if not itemIDs then itemIDs = {}; end
+                table.insert(itemIDs, tonumber(itemID))
+            end
+        end
+    end
+
+    return itemIDs
+end
+
+-- Return array with the front n elements removed.
+local function RemoveFront(array, n)
+    local result = {};
+    for i = n + 1, #array, 1 do
+        print("Copying element", n, #array, i)
+        table.insert(result, array[i]);
+    end
+    return result;
+end
+
+CraftScan.Analytics = {};
+
+function CraftScan.Analytics:GetTimeStamp(timeEntry)
+    if type(timeEntry) == "table" then return timeEntry.t end
+    return timeEntry;
+end
+
+-- Remove entries older than timeout for the given itemID.
+function CraftScan.Analytics:ClearRecentAnalyticsForItem(itemID, timeout)
+    local items = CraftScan.DB.analytics.seen_items;
+    if timeout == nil then
+        items[itemID] = nil;
+    else
+        local itemInfo = items[itemID];
+        local now = time();
+        for i, timeInfo in ipairs(itemInfo.times) do
+            if CraftScan.Analytics:GetTimeStamp(timeInfo) + timeout > now then
+                CraftScan.Utils.printTable("Before", itemInfo.times);
+                print(i);
+                -- TODO: BUG HERE Somewhere in RemoveFront logic
+                itemInfo.times = RemoveFront(itemInfo.times, i);
+                CraftScan.Utils.printTable("After", itemInfo.times);
+                if #itemInfo.times == 0 then items[itemID] = nil; end;
+                CraftScan.Utils.printTable("After again", items[itemID]);
+                return;
+            else
+                print("now", now)
+                print("timestamp", CraftScan.Analytics:GetTimeStamp(timeInfo))
+                print("timestamp + timeout",
+                    CraftScan.Analytics:GetTimeStamp(timeInfo) + timeout);
+            end
+        end
+    end
+end
+
+local function CleanRecentAnalytics()
+    if not CraftScan.DB.analytics.seen_items then return end
+
+    local timeout = 30; -- TODO 3600
+    local now = time();
+    for _, itemInfo in pairs(CraftScan.DB.analytics.seen_items) do
+        for i, timeInfo in ipairs(itemInfo.times) do
+            if type(timeInfo) == "table" and timeInfo.t + timeout < now then
+                if timeInfo.c ~= nil then
+                    -- Save the count, but erase the customer to save some space.
+                    timeInfo['customer'] = nil;
+                else
+                    -- No duplicates from this customer, so replace the dictionary with the raw time.
+                    itemInfo.times[i] = timeInfo.t;
+                end
+            end
+        end
+    end
+
+    -- On login and every hour after that, clean up any recent records to save space.
+    C_Timer.After(timeout, CleanRecentAnalytics);
+end
+
+local function AddTimeToAnalytics(customer, item)
+    -- For recent requests, we track the customer, allowing us to detect
+    -- duplicate requests for the same item from the same person. This helps us
+    -- find items that are difficult to get crafted, which might indicate a good
+    -- item to invest in learning to craft.
+    local times = item.times;
+
+    --  Track repeat requests for up to an hour. This aligns with our 'peak per
+    --  hour', so duplicate requests don't artificially inflate the peak requests.
+    local timeout = 30; -- TODO 3600
+    local now = time();
+    for i = #times, 1, -1 do
+        local entry = times[i]
+        if type(entry) == "table" then
+            if entry.t + timeout < now then
+                break;
+            end
+
+            if entry.customer == customer then
+                entry.c = (entry.c or 1) + 1;
+                return;
+            end
+        else
+            -- After an hour, a garbage collector converts entries from
+            -- dictionaries to values if they don't contain a duplicate request
+            -- count, so hitting a non-dictionary value means we are done
+            -- looking for recent orders.
+            break
+        end
+    end
+    table.insert(item.times, { t = time(), customer = customer });
+
+    CraftScanCraftingOrderPage:UpdateAnalytics()
+end
+
+local function AddMessageToAnalytics(message)
+    local itemIDs = GetItemIDsFromQualityLinks(message);
+    if not itemIDs then return; end
+
+    local seen = saved(CraftScan.DB.analytics, "seen_items", {});
+    for _, itemID in ipairs(itemIDs) do
+        local item = saved(seen, itemID, { times = {} });
+        AddTimeToAnalytics(customer, item);
+
+        CraftScan.Utils.printTable("item", item);
+    end
+end
+
+local function AddItemToAnalytics(customer, itemID, parentProfID)
+    local seen = saved(CraftScan.DB.analytics, "seen_items", {});
+    local item = saved(seen, itemID, { times = {}, ppID = parentProfID });
+    AddTimeToAnalytics(customer, item);
+    if not item.ppID then item.ppID = parentProfID end
+
+    CraftScan.Utils.printTable("item", item);
+end
+
+-- Because we can't reverse look up from item link to crafting profession, we do
+-- the translation when a profession is opened scan any saved items and see if
+-- they are related to this profession.
+function CraftScan.Scanner.UpdateAnalyticsProfIDs(customer, parentProfID)
+    if not CraftScan.DB.analytics.seen_items then return end
+
+    local itemIDs = nil;
+    for itemID, itemInfo in pairs(CraftScan.DB.analytics.seen_items) do
+        if not itemInfo.ppID then
+            if not itemIDs then
+                itemIDs = {};
+                -- On the first analytics item without profession info, grab the
+                -- full list, convert it to all itemIDs created by the
+                -- profession, then check if we have a match.
+                for _, id in pairs(C_TradeSkillUI.GetAllRecipeIDs()) do
+                    local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
+                    local itemIDs = CraftScan.Utils.GetOutputItems(recipeInfo)
+                    if itemIDs then
+                        for _, itemID in ipairs(itemIDs) do
+                            itemIDs[itemID] = true;
+                        end
+                    end
+                end
+            end
+
+            if itemIDs[itemID] then
+                itemInfo.ppID = parentProfID;
+            end
+        end
+    end
+end
+
+local function getCrafterForMessage(customer, message)
     message = string.lower(message)
     if HasMatch(message, config.exclusions) then
         return nil
@@ -289,11 +472,18 @@ local function getCrafterForMessage(message)
     if itemFound then
         itemID = tonumber(itemID)
         local crafterInfo = config.items[itemID];
-        if crafterInfo and IsScanningEnabled(crafterInfo) then
+        if crafterInfo then
             local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[crafterInfo.profID];
-            local recipeInfo, categoryID = getRequestIDs(message, crafterInfo, profConfig);
-            return crafterInfo, itemID, recipeInfo, categoryID;
-        end -- Else we can't craft itemID
+            AddItemToAnalytics(customer, itemID, profConfig.parentProfID);
+            if IsScanningEnabled(crafterInfo) then
+                local recipeInfo, categoryID = getRequestIDs(message, crafterInfo, profConfig);
+                return crafterInfo, itemID, recipeInfo, categoryID;
+            end
+        else
+            -- We can't craft this item, but save that some one requested it for future analysis
+            AddMessageToAnalytics(customer, message);
+        end
+
         return nil
     end
 
@@ -607,7 +797,7 @@ local function OnMessage(self, event, ...)
         return false
     end
 
-    local crafterInfo, itemID, recipeInfo, categoryID = getCrafterForMessage(message)
+    local crafterInfo, itemID, recipeInfo, categoryID = getCrafterForMessage(customer, message)
     if not crafterInfo then
         return false
     end
@@ -693,4 +883,6 @@ CraftScan.Utils.onLoad(function()
     CraftScan.Utils.RegisterEnableDisableCallback(UpdateScannerEventRegistry)
     hooksecurefunc(_G.ChatFrame1, "AddMessage", CaptureChatMessage);
     UpdateScannerEventRegistry();
+
+    CleanRecentAnalytics();
 end)

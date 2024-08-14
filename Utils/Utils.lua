@@ -9,12 +9,16 @@ CraftScan.Frames = {}
 CraftScan.Utils = {}
 CraftScan.Utils.DIAG_PRINT_ENABLED = true
 
+function CraftScan.Utils.ColorizeText(text, colorCode)
+    if colorCode then
+        return string.format("|%s%s|r", colorCode, text);
+    end
+    return text;
+end
+
 function CraftScan.Utils.ColorizeProfessionName(profID, professionName)
     local color = CraftScan.CONST.PROFESSION_COLORS[profID];
-    if color then
-        return string.format("|%s%s|r", color, professionName)
-    end
-    return professionName
+    return CraftScan.Utils.ColorizeText(professionName, color);
 end
 
 function CraftScan.Utils.SendResponses(responses, customer)
@@ -331,7 +335,7 @@ end
 function CraftScan.Utils.ToggleSavedAddons()
     if CraftScan_DB.saved_addons then
         for _, name in ipairs(CraftScan_DB.saved_addons) do
-            EnableAddOn(name)
+            C_AddOns.EnableAddOn(name)
         end
 
         print("Addons enabled. Reload UI.")
@@ -348,9 +352,9 @@ function CraftScan.Utils.ToggleSavedAddons()
     end
 
     CraftScan_DB.saved_addons = {}
-    local numAddOns = GetNumAddOns()
+    local numAddOns = C_AddOns.GetNumAddOns()
     for i = 1, numAddOns do
-        local name, _, _, enabled = GetAddOnInfo(i)
+        local name, _, _, enabled = C_AddOns.GetAddOnInfo(i)
         if enabled and not whitelist[name] then
             table.insert(CraftScan_DB.saved_addons, name)
         end
@@ -358,7 +362,7 @@ function CraftScan.Utils.ToggleSavedAddons()
 
     -- Step 2: Disable all addons
     for _, name in ipairs(CraftScan_DB.saved_addons) do
-        DisableAddOn(name)
+        C_AddOns.DisableAddOn(name)
     end
 end
 
@@ -577,6 +581,7 @@ local function doOnce()
         CraftScan.DB.characters = CraftScan.Utils.saved(realmDB, 'characters', {})
         CraftScan.DB.listed_orders = CraftScan.Utils.saved(realmDB, 'listed_orders', {})
         CraftScan.DB.customers = CraftScan.Utils.saved(realmDB, 'customers', {})
+        CraftScan.DB.analytics = CraftScan.Utils.saved(realmDB, 'analytics', {})
 
         UpgradePersistentConfig()
     else
@@ -586,6 +591,7 @@ local function doOnce()
         CraftScan.DB.characters = {}
         CraftScan.DB.listed_orders = {}
         CraftScan.DB.customers = {}
+        CraftScan.DB.analytics = {}
     end
 
     CraftScan.STATE = {};
@@ -626,8 +632,8 @@ local loginFrame = CreateFrame("Frame")
 local loadOnLogin = {}
 local requiredAddons = { "CraftScan", "Blizzard_Professions" }
 function CraftScan.Utils.onLoad(onLoad)
-    if not IsAddOnLoaded("Blizzard_Professions") then
-        LoadAddOn("Blizzard_Professions")
+    if not C_AddOns.IsAddOnLoaded("Blizzard_Professions") then
+        C_AddOns.LoadAddOn("Blizzard_Professions")
     end
 
     local count = 0
@@ -659,7 +665,7 @@ function CraftScan.Utils.onLoad(onLoad)
     end
 
     for _, entry in ipairs(requiredAddons) do
-        local loaded, fullyLoaded = IsAddOnLoaded(entry)
+        local loaded, fullyLoaded = C_AddOns.IsAddOnLoaded(entry)
         if fullyLoaded then
             doLoad()
         else
@@ -797,4 +803,22 @@ function CraftScan.Utils.ChatHistoryTooltip:Show(name, anchor, order, header, in
     tooltip:SetMinimumWidth(math.min(GetMaxTextLeftWidth(name), ChatFrame1:GetWidth()));
 
     tooltip:Show();
+end
+
+local LibSerialize = LibStub("LibSerialize")
+local LibDeflate = LibStub("LibDeflate")
+
+-- With compression (recommended):
+function CraftScan.Utils:Transmit(data)
+    local serialized = LibSerialize:Serialize(data)
+    local compressed = LibDeflate:CompressDeflate(serialized)
+    return compressed;
+end
+
+function CraftScan.Utils:OnCommReceived(compressed)
+    local decompressed = LibDeflate:DecompressDeflate(compressed)
+    if not decompressed then return end
+    local success, data = LibSerialize:Deserialize(decompressed)
+    if not success then return end
+    return data;
 end
