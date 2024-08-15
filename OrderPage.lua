@@ -693,21 +693,6 @@ local function OnCrafterListModified()
     CraftScan.Scanner.LoadConfig()
 end
 
--- There is supposed to be an 'EasyMenu' global, but that's returning nil and
--- all the references to it online are to dead links.
---
--- Create a popup context menu based on a table of items. See UIDropDownMenu.lua
--- for a full list of potential properties for the items.
-local function MyEasyMenu(items, frame)
-    UIDropDownMenu_Initialize(frame, function(frame, level, menuList)
-            for _, item in ipairs(items) do
-                UIDropDownMenu_AddButton(item);
-            end
-        end,
-        "MENU");
-    ToggleDropDownMenu(1, nil, frame, "cursor", 0, 0);
-end
-
 -- Provide common properties for our various confirmations.
 local function SetupPopupDialog(key, config)
     local popup = {
@@ -792,24 +777,31 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", {
     end
 })
 
-local function MarkPrimaryCrafter(crafterInfo, ppConfig, value)
-    ppConfig.primary_crafter = value;
-
+local function ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig)
     -- We can only have one primary crafter for a given profession, so walk the
     -- list and turn off the others.
-    if value then
-        for char, charConfig in pairs(CraftScan.DB.characters) do
-            if char ~= crafterInfo.name then
-                for parentProfID, parentProfConfig in pairs(charConfig.parent_professions) do
-                    if parentProfID == crafterInfo.parentProfessionID and parentProfConfig.primary_crafter then
-                        parentProfConfig.primary_crafter = false;
-                        return; -- There can only be one.
-                    end
+    if not ppConfig.primary_crafter then
+        return
+    end
+
+    for char, charConfig in pairs(CraftScan.DB.characters) do
+        if char ~= crafterInfo.name then
+            for parentProfID, parentProfConfig in pairs(charConfig.parent_professions) do
+                if parentProfID == crafterInfo.parentProfessionID and parentProfConfig.primary_crafter then
+                    parentProfConfig.primary_crafter = false;
+                    return; -- There can only be one.
                 end
             end
         end
     end
 end
+
+local function SetTooltipWithTitle(tooltip, elementDescription)
+    local data = elementDescription:GetData();
+    GameTooltip_SetTitle(tooltip, data.tooltipTitle or MenuUtil.GetElementText(elementDescription));
+    GameTooltip_AddNormalLine(tooltip, data.tooltipText);
+end;
+
 
 -- We only register for RightButton on the individual character rows, not the
 -- 'All Crafters' row, so we don't need to filter it out.
@@ -832,44 +824,49 @@ function CraftScanCrafterListElementMixin:OnClick(button)
     local charConfig = CraftScan.DB.characters[self.crafterInfo.name];
     local ppConfig = charConfig.parent_professions[self.crafterInfo.parentProfessionID];
 
-    local menuItems = {
-        { isTitle = true, text = CraftScan.NameAndRealmToName(self.crafterInfo.name) },
-        {
-            text = L("Disable"),
-            tooltipTitle = L("Disable"),
-            tooltipText = string.format(L(LID.DELETE_CONFIG_TOOLTIP_TEXT), profName, crafter),
-            tooltipOnButton = 1,
-            notCheckable = true,
-            func = function()
+    MenuUtil.CreateContextMenu(owner, function(owner, rootDescription)
+        rootDescription:CreateTitle(CraftScan.NameAndRealmToName(self.crafterInfo.name));
+
+        do
+            local onClick = function()
                 StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", profName, crafter, self.crafterInfo)
             end
-        },
-        {
-            text = L("Cleanup"),
-            tooltipTitle = L("Cleanup"),
-            tooltipText = string.format(L(LID.CLEANUP_CONFIG_TOOLTIP_TEXT), profName, crafter),
-            tooltipOnButton = 1,
-            notCheckable = true,
-            func = function()
+            local data = {
+                tooltipText = string.format(L(LID.DELETE_CONFIG_TOOLTIP_TEXT), profName, crafter),
+            };
+            local button = rootDescription:CreateButton(L("Disable"), onClick, data)
+            button:SetTooltip(SetTooltipWithTitle);
+        end
+        do
+            local onClick = function()
                 StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", profName, crafter, self.crafterInfo)
             end
-        },
-        {
-            text = L("Primary Crafter"),
-            tooltipTitle = L("Primary Crafter"),
-            tooltipText = string.format(L(LID.PRIMARY_CRAFTER_TOOLTIP), crafter, profName),
-            tooltipOnButton = 1,
-            isNotRadio = true,
-            checked = ppConfig.primary_crafter,
-            func = function(item)
-                item.checked = not item.checked;
-                MarkPrimaryCrafter(self.crafterInfo, ppConfig, item.checked)
-
+            local data = {
+                tooltipText = string.format(L(LID.CLEANUP_CONFIG_TOOLTIP_TEXT), profName, crafter),
+            };
+            local button = rootDescription:CreateButton(L("Cleanup"), onClick, data)
+            button:SetTooltip(SetTooltipWithTitle);
+        end
+        do
+            local IsSelected = function()
+                return ppConfig.primary_crafter;
+            end
+            local SetSelected = function()
+                if not ppConfig.primary_crafter then
+                    ppConfig.primary_crafter = true;
+                else
+                    ppConfig.primary_crafter = not ppConfig.primary_crafter;
+                end
+                ProcessPrimaryCrafterUpdate(self.crafterInfo, ppConfig)
                 OnCrafterListModified();
             end
-        },
-    }
-    MyEasyMenu(menuItems, CreateFrame("Frame", "ContextMenu", UIParent, "UIDropDownMenuTemplate"));
+            local data = {
+                tooltipText = string.format(L(LID.PRIMARY_CRAFTER_TOOLTIP), crafter, profName),
+            };
+            local button = rootDescription:CreateCheckbox(L("Primary Crafter"), IsSelected, SetSelected, data)
+            button:SetTooltip(SetTooltipWithTitle);
+        end
+    end);
 end
 
 CraftScan_CrafterListAllButtonMixin = {}
