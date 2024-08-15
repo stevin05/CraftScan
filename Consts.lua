@@ -78,6 +78,8 @@ CraftScan.CONST.TEXT = {
     CLEANUP_CONFIG_CONFIRM          = 70,
     PRIMARY_CRAFTER_TOOLTIP         = 71,
     CHAT_BUTTON_BINDING_NAME        = 72,
+    MULTI_SELECT_BUTTON_TEXT        = 73,
+
 
 
     -- Release notes have multiple lines that are sequential. Spaced out by hundreds to give more than enough room.
