@@ -106,9 +106,6 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.DEFAULT_KEYWORDS_ENCHANTING]     = "Enchanter, Crest",
         [LID.DEFAULT_KEYWORDS_JEWELCRAFTING]  = "JC, Jewelcrafter",
         [LID.DEFAULT_KEYWORDS_INSCRIPTION]    = "Inscription, Inscriptionist, Scribe",
-        [LID.ADDON_WHITELIST_LABEL]           = "Whitelist addon",
-        [LID.ADDON_WHITELIST_TOOLTIP]         =
-        "When you hit the button to temporarily disable all addons, keep this one enabled. To remove an addon, set it back to 'None'. CraftScan will always stay enabled. Keep only what you need to craft effectively. XXX: This is a little bugged - a new 'None' should pop up after making a selection. If it doesn't go to a different menu tab then come back and it should be there.",
 
         -- Release notes
         [LID.RN_WELCOME]                      = "Welcome to CraftScan!",
@@ -162,7 +159,6 @@ function CraftScan.LOCAL_EN:GetData()
         "Permanently delete any saved %s data for %s.\n\nThe profession will be left in a state as if it was never configured. Simply opening the profession again will restore a default configuration.\n\nUse this if you want to completely reset a profession, have deleted the character, or have dropped a profession.", -- profession-name, character-name
         [LID.CLEANUP_CONFIG_CONFIRM]          = "Type 'CLEANUP' to proceed:",
 
-        -- Translations complete above this line
         ["Primary Crafter"]                   = "Primary Crafter",
         [LID.PRIMARY_CRAFTER_TOOLTIP]         =
         "Flag %s as your primary crafter for %s. This crafter will be given priority over others if there are multiple matches to the same request.",
@@ -175,12 +171,13 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.CHAT_BUTTON_BINDING_NAME]        = "Whisper Banner Customer",
         ["Customer Request"]                  = "Request from %s",
 
+        -- Translations complete above this line
+        [LID.ADDON_WHITELIST_LABEL]           = "Addon whitelist",
+        [LID.ADDON_WHITELIST_TOOLTIP]         =
+        "When you hit the button to temporarily disable all addons, keep the addons selected here enabled. CraftScan will always stay enabled. Keep only what you need to craft effectively.",
+        [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d selected", -- Count
         ["Total Seen"]                        = "Total Seen",
         ["Avg Per Day"]                       = "Avg/Day",
         ["Peak Per Hour"]                     = "Peak/Hour",
-
-
-
-
     }
 end

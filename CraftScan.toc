@@ -39,4 +39,4 @@ AnalyticsTableTemplate.xml
 
 OrderPage.xml
 
-Settings.lua
+Settings.xml

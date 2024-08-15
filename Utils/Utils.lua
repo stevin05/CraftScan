@@ -436,6 +436,19 @@ local function UpgradePersistentConfig()
     -- Now located at CraftScan_DB.settings.{inclusions,exclusions}
     CraftScan_DB['inclusions'] = nil;
     CraftScan_DB['exclusions'] = nil;
+
+    -- Now that we have a proper addon whitelist control, erase all the
+    -- 'None's that might have snuck into the list.
+    do
+        local whitelist = CraftScan.DB.settings.disabled_addon_whitelist;
+        if whitelist then
+            for i = #whitelist, 1, -1 do
+                if whitelist[i] == "None" then
+                    table.remove(whitelist, i)
+                end
+            end
+        end
+    end
 end
 
 function CraftScan.Utils.GetSetting(key)

@@ -1,12 +1,12 @@
 ### Welcome to CraftScan!
 
 #### Remember recent crafting requests, even after swapping characters:
-![Screenshot](Media/README/ChatHistoryItemLinkMatch.png)
+![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/ChatHistoryItemLinkMatch.png)
 
 If the request includes an item link, CraftScan makes sure your crafter can make the item.
 
 #### Pop up and sound notifications can be enabled when a new request is detected. 
-![Screenshot](Media/README/BannerRequestTooltip.png)
+![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/BannerRequestTooltip.png)
 
 For requests without an item link, keywords can be configured per item, category, or profession. If an item keyword is detected, CraftScan responds with an item link.
 
@@ -25,10 +25,10 @@ Scroll to the bottom of this new window and work your way up. The things you nee
 Click the help icon in the top left corner of the window if you need an explanation of any input.
 
 #### The menu:
-![Screenshot](Media/README/RecipePage.JPG)
+![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/RecipePage.JPG)
 
 #### Help is available:
-![Screenshot](Media/README/Help.JPG)
+![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/Help.JPG)
 
 ### Initial Testing
 
@@ -39,7 +39,7 @@ Click the notification to immediately send a response, right-click it to dismiss
 Duplicate notifications are suppressed unless they have already been dismissed, so right-click your test notification to dismiss it if you want to try again.
 
 #### A notification:
-![Screenshot](Media/README/NotificationBanner.JPG)
+![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/NotificationBanner.JPG)
 
 ### Managing Your Crafters
 
@@ -56,14 +56,14 @@ Rows in this table will persist across all characters, so you can log over to an
 Hopefully, most of the table is self-explanatory. The 'Replies' column has 3 icons. The left X or check mark is whether you have sent a message to the customer. The right X or check mark is whether the customer has replied. The chat bubble is a button that will open a temporary whisper window with the customer, and populate it with your chat history.
 
 #### The order page:
-![Screenshot](Media/README/OrderPage.JPG)
+![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/OrderPage.JPG)
 
 ### Keybinds
 
 Keybinds are available for opening the orders page, responding to the latest customer, and dismissing the latest customer. Search for 'CraftScan' to find all available settings.
 
 #### Available options:
-![Screenshot](Media/README/Options.JPG)
+![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/Options.JPG)
 
 ### Donations
 

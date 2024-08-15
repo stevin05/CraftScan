@@ -5,98 +5,145 @@ local function L(id)
     return CraftScan.LOCAL:GetText(id);
 end
 
-local function CreateDropdown(category, variable, name, options, tooltip, onChange)
-    local default = CraftScan.CONST.DEFAULT_SETTINGS[variable];
-    local setting = Settings.RegisterAddOnSetting(category, name, variable, type(default), default);
+local function CreateDropdown(category, variable, key, name, options, tooltip, onChange)
+    local default = CraftScan.CONST.DEFAULT_SETTINGS[key];
 
-    setting:SetValue(CraftScan.Utils.GetSetting(variable));
-    Settings.SetOnValueChangedCallback(variable, function(event)
-        local value = setting:GetValue();
-        CraftScan.DB.settings[variable] = value;
-        if onChange then onChange(value) end
-    end);
+    local setting = Settings.RegisterAddOnSetting(category, variable, key, CraftScan.DB.settings, type(default), name,
+        default);
+
+    if onChange then
+        setting:SetValueChangedCallback(function(setting, value)
+            onChange(value)
+        end);
+    end
     local initializer = Settings.CreateDropdown(category, setting, options, tooltip);
     initializer:AddSearchTags(L(LID.CRAFT_SCAN));
 end
 
--- No built in support for a multiple selection drop down, and I want to keep
--- everything in Blizzard style, so as you select one, generate another and the
--- multiple-ness is spread across multiple drop downs. The user can select the
--- same thing multiple times, but we'll dedupe it here ever reload.
--- 'variable' in this case is an array. We register a separate drop down for
--- each entry in the array, using the variable named 'variable<N>', where N is
--- the index in the array. Don't see a way to clean up a setting in real time, so
--- we just leave around extra defaults until a reload.
-local function CreateMultiSelectDropdown(category, variable, name, options, tooltip, default)
-    local db = CraftScan.Utils.saved(CraftScan.DB.settings, variable, {})
-    local displayed = {};
-
-    local seen = {}
-    for i, value in ipairs(db) do
-        if seen[value] then
-            db[i] = default;
-        end
-        seen[value] = true;
-    end
-
-    local function FirstAvailableSequentialSetting()
-        for i, value in ipairs(db) do
-            if value == default then return i end
-        end
-        return #db + 1;
-    end
-
-    local function VariableNToN(variableN)
-        return tonumber(string.sub(variableN, #variable + 1));
-    end
-
-    -- Create a new drop down. When its value changes to a non-default value,
-    -- create another one if no non-default value boxes are already present.
-    local function CreateOneDropdown(index, value)
-        displayed[index] = true;
-        local variableN = variable .. index;
-        local setting = Settings.RegisterAddOnSetting(category, name, variableN, type(default), default);
-
-        setting:SetValue(value);
-        Settings.SetOnValueChangedCallback(variableN, function(event)
-            local value = setting:GetValue();
-            db[VariableNToN(variableN)] = value;
-
-            local available = FirstAvailableSequentialSetting();
-            if value ~= default and not displayed[available] then
-                CreateOneDropdown(available, default);
+local function SetupMultiSelectDropdown(dropdown, setting, options, width, initTooltip)
+    local function Inserter(rootDescription, isSelected, setSelected)
+        -- Instead of the default dropdown buttons, we use checkboxes, and
+        -- convert the checked ones into a list that gets saved into the
+        -- specified variableKey in the settings DB.
+        local function IsSelected(value)
+            local values = CraftScan.DB.settings[setting.variableKey];
+            if values == nil then return false; end
+            for _, entry in ipairs(values) do
+                if entry == value then return true; end
             end
-        end);
-        local initializer = Settings.CreateDropdown(category, setting, options, tooltip);
-        initializer:AddSearchTags(L(LID.CRAFT_SCAN));
+            return false;
+        end
+
+        local function SetSelected(value)
+            local values = CraftScan.Utils.saved(CraftScan.DB.settings, setting.variableKey, {})
+            for i, entry in ipairs(values) do
+                if entry == value then
+                    table.remove(values, i)
+                    return;
+                end
+            end
+            table.insert(values, value);
+        end
+
+        local options = options();
+        for _, option in ipairs(options) do
+            rootDescription:CreateCheckbox(option.label, IsSelected, SetSelected, option.text);
+        end
+
+        -- TODO: Scrolling is bugged or I'm doing something wrong. If you select
+        -- an entry before scrolling to the bottom of the list, you get an error
+        -- from bliz scroll code. If you scroll to the bottom, then change
+        -- selections, it works fine.
+        --
+        -- With four columns, it's unlikely anyone will need scrolling anyway,
+        -- so not having scrolling is likely better..
+        --
+        --local extent = 20;
+        --local maxEntries = 32;
+        --local maxScrollExtent = extent * maxEntries;
+        --rootDescription:SetScrollMode(maxScrollExtent);
     end
 
-    for i, value in ipairs(db) do
-        if value ~= default then
-            CreateOneDropdown(i, value)
-        end
+    Settings.InitDropdown(dropdown, setting, Inserter, initTooltip);
+end
+
+-- SettingsDropdownButtonTemplate inherited in XML.
+CraftScanSettingsMultiSelectDropDownMixin = {}
+
+function CraftScanSettingsMultiSelectDropDownMixin:SetupDropdownMenu(button, setting, options, initTooltip)
+    -- Override the default SetupDropdownMenu behavior so we can use checkboxes instead of buttons.
+    SetupMultiSelectDropdown(self.Control.Dropdown, setting, options, initTooltip);
+    self.Control.Dropdown:SetSelectionText(function(selection)
+        -- Override the button text to indicate the number of selected items
+        -- instead of the comma separated list.
+        local values = CraftScan.DB.settings[setting.variableKey];
+        local count = values and #values or 0;
+        return  string.format(L(LID.MULTI_SELECT_BUTTON_TEXT), count);
+    end);
+    self.Control.Dropdown:GenerateMenu(); -- Apply our custom selection text immediately.
+    self.Control.IncrementButton:Hide();
+    self.Control.DecrementButton:Hide();
+end
+
+local function CreateMultiSelectDropdown(category, variable, key, name, options, tooltip)
+    local function GetValue()
+        -- No-op. It's done by the menu checkbox get/sets
+        return nil;
     end
-    CreateOneDropdown(FirstAvailableSequentialSetting(), default)
+
+    local function SetValue(value)
+        -- No-op. It's done by the menu checkbox get/sets
+    end
+
+    local default = "";
+    local setting = Settings.RegisterProxySetting(category, variable, Settings.VarType.String,
+        name, default, GetValue, SetValue)
+    local initializer = Settings.CreateControlInitializer("CraftScanSettingsMultiSelectDropDownTemplate", setting,
+        options, tooltip);
+
+    initializer.data.setting.variableKey = key;
+
+    local layout = SettingsPanel:GetLayout(category);
+    layout:AddInitializer(initializer);
+
+    initializer:AddSearchTags(L(LID.CRAFT_SCAN));
 end
 
 local function CreateSlider(category, variable, name, options, tooltip)
     local default = CraftScan.CONST.DEFAULT_SETTINGS[variable];
-    local setting = Settings.RegisterAddOnSetting(category, name, variable, type(default), default);
-
-    setting:SetValue(CraftScan.Utils.GetSetting(variable));
-    Settings.SetOnValueChangedCallback(variable, function(event)
-        local value = setting:GetValue();
-        CraftScan.DB.settings[variable] = value;
-    end);
+    local setting = Settings.RegisterAddOnSetting(category, variable, variable, CraftScan.DB.settings, type(default),
+        name, default);
     local initializer = Settings.CreateSlider(category, setting, options, tooltip);
     initializer:AddSearchTags(L(LID.CRAFT_SCAN));
 end
 
+local craftScanCategory = nil;
 CraftScan.Utils.onLoad(function()
-    local category, layout = Settings.RegisterVerticalLayoutCategory(L("CraftScan") .. " **Settings Temporarily Disabled**");
-    Settings.RegisterAddOnCategory(category);
+    local category, layout = Settings.RegisterVerticalLayoutCategory(L("CraftScan"));
+    craftScanCategory = category;
 
-    --[[
+    do
+        -- The addon list is likely to be large, so we list this option first so
+        -- it expandss downward instead of overlapping on top of the button.
+        local function GetOptions()
+            local container = Settings.CreateControlTextContainer();
+
+            local numAddOns = C_AddOns.GetNumAddOns()
+            for i = 1, numAddOns do
+                local name, _, _, enabled = C_AddOns.GetAddOnInfo(i)
+                if name ~= 'CraftScan' then
+                    container:Add(name, name);
+                end
+            end
+            return container:GetData();
+        end
+
+        CreateMultiSelectDropdown(category, "CRAFT_SCAN_ADDON_WHITELIST", 'disabled_addon_whitelist',
+            L(LID.ADDON_WHITELIST_LABEL), GetOptions,
+            L(LID.ADDON_WHITELIST_TOOLTIP)
+        );
+    end
+
     do
         local function GetOptions()
             local container = Settings.CreateControlTextContainer();
@@ -106,7 +153,8 @@ CraftScan.Utils.onLoad(function()
             return container:GetData();
         end
 
-        CreateDropdown(category, "ping_sound", L(LID.PING_SOUND_LABEL), GetOptions, L(LID.PING_SOUND_TOOLTIP),
+        CreateDropdown(category, "CRAFT_SCAN_PING_SOUND", "ping_sound", L(LID.PING_SOUND_LABEL), GetOptions,
+            L(LID.PING_SOUND_TOOLTIP),
             function(path)
                 PlaySoundFile(path, "Master");
             end
@@ -120,7 +168,8 @@ CraftScan.Utils.onLoad(function()
             return container:GetData();
         end
 
-        CreateDropdown(category, "banner_direction", L(LID.BANNER_SIDE_LABEL), GetOptions, L(LID.BANNER_SIDE_TOOLTIP));
+        CreateDropdown(category, "CRAFT_SCAN_BANNER_DIRECTION", "banner_direction", L(LID.BANNER_SIDE_LABEL), GetOptions,
+            L(LID.BANNER_SIDE_TOOLTIP));
     end
     do
         local options = Settings.CreateSliderOptions(1, 10, 1);
@@ -144,27 +193,11 @@ CraftScan.Utils.onLoad(function()
             "When auto replies are enabled, wait this long before replying to make youself seem a little less bot-like.");
     end
 
-    do
-        local variable = 'disabled_addon_whitelist';
-        local default = CraftScan.CONST.DEFAULT_SETTINGS[variable];
-
-        local function GetOptions()
-            local container = Settings.CreateControlTextContainer();
-            container:Add(default, default);
-
-            local numAddOns = GetNumAddOns()
-            for i = 1, numAddOns do
-                local name, _, _, enabled = GetAddOnInfo(i)
-                if name ~= 'CraftScan' then
-                    container:Add(name, name);
-                end
-            end
-            return container:GetData();
-        end
-
-        CreateMultiSelectDropdown(category, variable, L(LID.ADDON_WHITELIST_LABEL), GetOptions,
-            L(LID.ADDON_WHITELIST_TOOLTIP), default
-        );
-    end
-    ]]
+    Settings.RegisterAddOnCategory(category);
 end)
+
+CraftScan.Settings = {}
+
+function CraftScan.Settings:Open()
+    Settings.OpenToCategory(craftScanCategory:GetID());
+end
