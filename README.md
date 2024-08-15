@@ -1,7 +1,7 @@
 ### Welcome to CraftScan!
 
 #### Remember recent crafting requests, even after swapping characters:
-![Screenshot](Media/README/ChatHistoryItemLinkMatch.png)
+![Screenshot](https://media.forgecdn.net/attachments/938/204/chathistoryitemlinkmatch.png)
 
 If the request includes an item link, CraftScan makes sure your crafter can make the item.
 
