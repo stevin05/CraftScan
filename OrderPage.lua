@@ -1154,6 +1154,16 @@ function CraftScan_AutoReplyButtonMixin:OnLeave()
     GameTooltip:Hide()
 end
 
+CraftScan_OpenSettingsButtonMixin = {}
+
+function CraftScan_OpenSettingsButtonMixin:OnLoad()
+    self:SetText(L("Open Settings"))
+end
+
+function CraftScan_OpenSettingsButtonMixin:OnClick()
+    CraftScan.Settings:Open();
+end
+
 CraftScan.Utils.onLoad(function()
     local frame = CraftScanCraftingOrderPage
     CraftScan.Frames.OrdersPage = frame

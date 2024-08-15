@@ -5,16 +5,17 @@ local function L(id)
     return CraftScan.LOCAL:GetText(id);
 end
 
-local function CreateDropdown(category, variable, name, options, tooltip, onChange)
-    local default = CraftScan.CONST.DEFAULT_SETTINGS[variable];
-    local setting = Settings.RegisterAddOnSetting(category, name, variable, type(default), default);
+local function CreateDropdown(category, variable, key, name, options, tooltip, onChange)
+    local default = CraftScan.CONST.DEFAULT_SETTINGS[key];
 
-    setting:SetValue(CraftScan.Utils.GetSetting(variable));
-    Settings.SetOnValueChangedCallback(variable, function(event)
-        local value = setting:GetValue();
-        CraftScan.DB.settings[variable] = value;
-        if onChange then onChange(value) end
-    end);
+    local setting = Settings.RegisterAddOnSetting(category, variable, key, CraftScan.DB.settings, type(default), name,
+        default);
+
+    if onChange then
+        setting:SetValueChangedCallback(function(setting, value)
+            onChange(value)
+        end);
+    end
     local initializer = Settings.CreateDropdown(category, setting, options, tooltip);
     initializer:AddSearchTags(L(LID.CRAFT_SCAN));
 end
@@ -55,13 +56,10 @@ local function CreateMultiSelectDropdown(category, variable, name, options, tool
     local function CreateOneDropdown(index, value)
         displayed[index] = true;
         local variableN = variable .. index;
-        local setting = Settings.RegisterAddOnSetting(category, name, variableN, type(default), default);
+        local setting = Settings.RegisterAddOnSetting(category, variableN, VariableNToN(variableN), db, type(default),
+            name, default);
 
-        setting:SetValue(value);
-        Settings.SetOnValueChangedCallback(variableN, function(event)
-            local value = setting:GetValue();
-            db[VariableNToN(variableN)] = value;
-
+        setting:SetValueChangedCallback(function(setting, value)
             local available = FirstAvailableSequentialSetting();
             if value ~= default and not displayed[available] then
                 CreateOneDropdown(available, default);
@@ -81,22 +79,17 @@ end
 
 local function CreateSlider(category, variable, name, options, tooltip)
     local default = CraftScan.CONST.DEFAULT_SETTINGS[variable];
-    local setting = Settings.RegisterAddOnSetting(category, name, variable, type(default), default);
-
-    setting:SetValue(CraftScan.Utils.GetSetting(variable));
-    Settings.SetOnValueChangedCallback(variable, function(event)
-        local value = setting:GetValue();
-        CraftScan.DB.settings[variable] = value;
-    end);
+    local setting = Settings.RegisterAddOnSetting(category, variable, variable, CraftScan.DB.settings, type(default),
+        name, default);
     local initializer = Settings.CreateSlider(category, setting, options, tooltip);
     initializer:AddSearchTags(L(LID.CRAFT_SCAN));
 end
 
+local craftScanCategory = nil;
 CraftScan.Utils.onLoad(function()
-    local category, layout = Settings.RegisterVerticalLayoutCategory(L("CraftScan") .. " **Settings Temporarily Disabled**");
-    Settings.RegisterAddOnCategory(category);
+    local category, layout = Settings.RegisterVerticalLayoutCategory(L("CraftScan"));
+    craftScanCategory = category;
 
-    --[[
     do
         local function GetOptions()
             local container = Settings.CreateControlTextContainer();
@@ -106,7 +99,8 @@ CraftScan.Utils.onLoad(function()
             return container:GetData();
         end
 
-        CreateDropdown(category, "ping_sound", L(LID.PING_SOUND_LABEL), GetOptions, L(LID.PING_SOUND_TOOLTIP),
+        CreateDropdown(category, "CRAFT_SCAN_PING_SOUND", "ping_sound", L(LID.PING_SOUND_LABEL), GetOptions,
+            L(LID.PING_SOUND_TOOLTIP),
             function(path)
                 PlaySoundFile(path, "Master");
             end
@@ -120,7 +114,8 @@ CraftScan.Utils.onLoad(function()
             return container:GetData();
         end
 
-        CreateDropdown(category, "banner_direction", L(LID.BANNER_SIDE_LABEL), GetOptions, L(LID.BANNER_SIDE_TOOLTIP));
+        CreateDropdown(category, "CRAFT_SCAN_BANNER_DIRECTION", "banner_direction", L(LID.BANNER_SIDE_LABEL), GetOptions,
+            L(LID.BANNER_SIDE_TOOLTIP));
     end
     do
         local options = Settings.CreateSliderOptions(1, 10, 1);
@@ -152,9 +147,9 @@ CraftScan.Utils.onLoad(function()
             local container = Settings.CreateControlTextContainer();
             container:Add(default, default);
 
-            local numAddOns = GetNumAddOns()
+            local numAddOns = C_AddOns.GetNumAddOns()
             for i = 1, numAddOns do
-                local name, _, _, enabled = GetAddOnInfo(i)
+                local name, _, _, enabled = C_AddOns.GetAddOnInfo(i)
                 if name ~= 'CraftScan' then
                     container:Add(name, name);
                 end
@@ -166,5 +161,12 @@ CraftScan.Utils.onLoad(function()
             L(LID.ADDON_WHITELIST_TOOLTIP), default
         );
     end
-    ]]
+
+    Settings.RegisterAddOnCategory(category);
 end)
+
+CraftScan.Settings = {}
+
+function CraftScan.Settings:Open()
+    Settings.OpenToCategory(craftScanCategory:GetID());
+end

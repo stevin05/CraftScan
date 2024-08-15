@@ -187,6 +187,18 @@
 
 			<Button parentKey="CloseButton" inherits="UIPanelCloseButtonDefaultAnchors"/>
 
+			<Button parentKey="SettingsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_OpenSettingsButtonMixin" frameLevel="510">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="CraftScanCraftingOrderPage" relativePoint="TOPRIGHT" x="-32" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+
+
 			<Frame parentKey="BrowseFrame" setAllPoints="true">
 				<Size x="1105" y="658"/>
 				<Frames>
@@ -283,8 +295,6 @@
 							<OnShow method="OnShow"/>
 						</Scripts>
 					</Frame>
-
-
 
 					<Frame parentKey="OrderList">
 						<Anchors>
