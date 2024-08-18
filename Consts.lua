@@ -79,6 +79,15 @@ CraftScan.CONST.TEXT = {
     PRIMARY_CRAFTER_TOOLTIP         = 71,
     CHAT_BUTTON_BINDING_NAME        = 72,
     MULTI_SELECT_BUTTON_TEXT        = 73,
+    ACCOUNT_LINK_DESC               = 74,
+    ACCOUNT_LINK_PROMPT_CHARACTER   = 75,
+    ACCOUNT_LINK_PROMPT_NICKNAME    = 76,
+    ACCOUNT_LINK_ACCEPT_SRC_INFO    = 77,
+    ACCOUNT_LINK_ACCEPT_SRC_LABEL   = 78,
+    ACCOUNT_LINK_ACCEPT_DST_INFO    = 79,
+    ACCOUNT_LINK_ACCEPT_DST_LABEL   = 80,
+    VERSION_MISMATCH                = 81,
+    REMOTE_CRAFTER_TOOLTIP          = 83,
 
 
 
@@ -250,3 +259,9 @@ CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS = {
     [755] = CraftScan.CONST.TEXT.DEFAULT_KEYWORDS_JEWELCRAFTING,
     [773] = CraftScan.CONST.TEXT.DEFAULT_KEYWORDS_INSCRIPTION,
 }
+
+CraftScan.CONST.DEFAULT_PPCONFIG = {
+    scanning_enabled = true,
+    visual_alert_enabled = true,
+    sound_alert_enabled = false,
+};

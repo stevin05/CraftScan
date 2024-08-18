@@ -15,16 +15,16 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.RENABLE_ADDONS]                  = "Re-enable Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]          =
         "Save your list of addons, and then disable them, allowing for a quick swap to an alt. This button can be clicked again to re-enable the addons at any time.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft %s.",           -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, %s, can craft %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft %s.",            -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, %s, can craft %s.",  -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]            = "that",
-        [LID.GREETING_I_HAVE_PROF]            = "I have %s.",                -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]           = "My alt, %s, has %s.",       -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]            = "I have %s.",                 -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]           = "My alt, %s, has %s.",        -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]             = "Let me know if you send an order so I can log over.",
         [LID.MAIN_BUTTON_BINDING_NAME]        = "Toggle Order Page",
         [LID.GREET_BUTTON_BINDING_NAME]       = "Greet Banner Customer",
         [LID.DISMISS_BUTTON_BINDING_NAME]     = "Dismiss Banner Customer",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Toggle chat orders%s", -- Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]             = "Toggle chat orders%s",  -- Keybind
         [LID.SCANNER_CONFIG_SHOW]             = "Show CraftScan",
         [LID.SCANNER_CONFIG_HIDE]             = "Hide CraftScan",
         [LID.CRAFT_SCAN_OPTIONS]              = "CraftScan Options",
@@ -51,7 +51,7 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.HELP_GLOBAL_KEYWORDS]            = "A message must include one of these terms.",
         [LID.HELP_GLOBAL_EXCLUSIONS]          = "A message will be ignored if it contains one of these terms.",
         [LID.SCAN_ALL_RECIPES]                = 'Scan all recipes',
-        [LID.SCANNING_ENABLED]                = "Scanning is enabled because '%s' is checked.", -- SCAN_ALL_RECIPES or ITEM_SCAN_CHECK
+        [LID.SCANNING_ENABLED]                = "Scanning is enabled because '%s' is checked.",  -- SCAN_ALL_RECIPES or ITEM_SCAN_CHECK
         [LID.SCANNING_DISABLED]               = "Scanning is disabled.",
         [LID.PRIMARY_KEYWORDS]                = "Primary Keywords",
         [LID.HELP_PRIMARY_KEYWORDS]           =
@@ -162,7 +162,7 @@ function CraftScan.LOCAL_EN:GetData()
         ["Primary Crafter"]                   = "Primary Crafter",
         [LID.PRIMARY_CRAFTER_TOOLTIP]         =
         "Flag %s as your primary crafter for %s. This crafter will be given priority over others if there are multiple matches to the same request.",
-        ["Chat History"]                      = "Chat history with %s", -- customer
+        ["Chat History"]                      = "Chat history with %s",  -- customer
         ["Greet Help"]                        = "|cffffd100Left click: Greet customer%s|r",
         ["Chat Help"]                         = "|cffffd100Left click: Open whisper|r",
         ["Chat Override"]                     = "|cffffd100Middle click: Open whisper%s|r",
@@ -175,7 +175,28 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.ADDON_WHITELIST_LABEL]           = "Addon whitelist",
         [LID.ADDON_WHITELIST_TOOLTIP]         =
         "When you hit the button to temporarily disable all addons, keep the addons selected here enabled. CraftScan will always stay enabled. Keep only what you need to craft effectively.",
-        [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d selected", -- Count
+        [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d selected",  -- Count
+
+        [LID.ACCOUNT_LINK_DESC]               =
+        "Share crafters between multiple accounts.\n\nAt login or after a configuration change, CraftScan will propagate the latest information to and from crafters that have been configured on either account to ensure both sides of a linked account are always in sync.",
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "Enter the name of an online character on your other account:",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "Enter a nickname for the other account:",
+        ["Link Account"]                      = "Link Account",
+        ["Accept Linked Account"]             = "Accept Linked Account",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    =
+        "'%s' has sent a request to link accounts.\n\nDO NOT ACCEPT THIS IF YOU DID NOT SEND IT.\n\nEnter a nickname for the other account:",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   =
+        "|cFF00FF00You have a pending request to link accounts with %s. Click here to accept it.|r",
+        ["OK"]                                = "OK",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    =
+        "To complete the account link, you must accept the request on the other account. The 'Link Account' button will be replaced with an 'Accept Linked Account' button to complete the operation. If there is an error, it will be displayed next to the 'Link Account' button.",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   =
+        "|cFFFFA500Waiting for %s to accept the account link request.|r",
+        [LID.VERSION_MISMATCH]                =
+        "|cFFFF0000Error: The other account is running a different version of CraftScan. Their version: %s, your version: %s.|r",
+
+        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        "This character belongs to a linked account. It can only be disabled on the account that owns the character. You can completely remove this character via 'Cleanup', but will need to do so manually on all linked accounts, or it will be restored by a linked account on login.",
 
     }
 end

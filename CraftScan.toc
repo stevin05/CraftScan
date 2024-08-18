@@ -7,6 +7,11 @@
 ## SavedVariables: CraftScan_DB
 ## IconTexture: Interface\Icons\Trade_blacksmithing
 
+embeds.xml
+
+Libs/LibSerialize.lua
+Libs/LibDeflate.lua
+
 Consts.lua
 
 Locals/enUS.lua
@@ -23,6 +28,8 @@ Locals/zhCN.lua
 Locals/Localization.lua
 
 Utils/Utils.xml
+Utils/Comm.lua
+Utils/Dialog.xml
 
 RecipeSchematicMenu.xml
 

@@ -198,6 +198,27 @@
 				</Scripts>
 			</Button>
 
+			<Button parentKey="PeerButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_PeerButtonMixin">
+				<Size x="140" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="CraftScanCraftingOrderPage" relativePoint="TOPRIGHT" x="-6" y="-26"/>
+				</Anchors>
+				<Scripts>
+					<OnShow method="OnShow"/>
+					<OnLoad method="OnLoad"/>
+					<OnClick method="OnClick"/>
+				</Scripts>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString parentKey="PendingAlert" inherits="GameFontNormal" hidden="true">
+							<Size y="22"/>
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="-4" y="0"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Button>
 
 			<Frame parentKey="BrowseFrame" setAllPoints="true">
 				<Size x="1105" y="658"/>

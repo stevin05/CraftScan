@@ -7,7 +7,25 @@ end
 
 CraftScan.Frames = {}
 CraftScan.Utils = {}
-CraftScan.Utils.DIAG_PRINT_ENABLED = true
+CraftScan.Utils.DIAG_PRINT_ENABLED = false
+
+local function DeepCopy_(original)
+    local copy
+    if type(original) == 'table' then
+        copy = {}
+        for key, value in next, original, nil do
+            copy[DeepCopy_(key)] = DeepCopy_(value)
+        end
+        setmetatable(copy, DeepCopy_(getmetatable(original)))
+    else -- number, string, boolean, etc.
+        copy = original
+    end
+    return copy
+end
+
+function CraftScan.Utils.DeepCopy(original)
+    return DeepCopy_(original);
+end
 
 function CraftScan.Utils.ColorizeProfessionName(profID, professionName)
     local color = CraftScan.CONST.PROFESSION_COLORS[profID];
@@ -133,7 +151,7 @@ function CraftScan.Utils.printTable(label, tbl, indent)
         innerPrint(tbl, indent + 1)
         diagText = diagText .. '}' .. '\n'
     else
-        diagText = diagText .. "Not a table:" .. tostring(tbl) .. '\n'
+        diagText = diagText .. tostring(tbl) .. '\n'
     end
 
     if not diagPrint then
@@ -389,11 +407,8 @@ local function UpgradePersistentConfig()
                     end
                 else
                     local parentProfConfigs = CraftScan.Utils.saved(charConfig, 'parent_professions', {});
-                    local parentProfConfig = CraftScan.Utils.saved(parentProfConfigs, profInfo.parentProfessionID, {
-                        scanning_enabled = true,
-                        visual_alert_enabled = true,
-                        sound_alert_enabled = false,
-                    })
+                    local parentProfConfig = CraftScan.Utils.saved(parentProfConfigs, profInfo.parentProfessionID,
+                        CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG));
                     profConfig.parentProfID = profInfo.parentProfessionID;
                     profConfig['scanning_enabled'] = nil
                     profConfig['auto_reply'] = nil
@@ -474,10 +489,10 @@ local function CompareVersions(version1, version2)
     return 0
 end
 
-local currentVersion = 'v1.0.10'
+CraftScan.CONST.CURRENT_VERSION = 'v1.0.10';
 
 function CraftScan_RecentUpdatesMixin:OnHide()
-    CraftScan.DB.settings.last_loaded_version = currentVersion;
+    CraftScan.DB.settings.last_loaded_version = CraftScan.CONST.CURRENT_VERSION;
     CraftScanRecentUpdatesFrame = nil;
 end
 
@@ -487,7 +502,7 @@ local function NotifyRecentChanges()
         lastLoadedVersion = 'v0.0.0';
     end
 
-    if CompareVersions(currentVersion, lastLoadedVersion) <= 0 then
+    if CompareVersions(CraftScan.CONST.CURRENT_VERSION, lastLoadedVersion) <= 0 then
         return;
     end
 
@@ -617,6 +632,8 @@ local function doOnce()
     end
 
     NotifyRecentChanges();
+
+    CraftScanComm:ShareCharacterData();
 
     once = true
 end

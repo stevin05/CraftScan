@@ -1,0 +1,49 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+    <Script file="Dialog.lua"/>
+
+    <Frame name="CraftScanDialogTemplate" mixin="CraftScanDialogMixin" inherits="DefaultPanelFlatTemplate" parent="UIParent" movable="true" enableMouse="true" frameStrata="DIALOG" virtual="true">
+        <Size x="300" y="150" />
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+
+        <Frames>
+            <Button parentKey="ClosePanelButton" inherits="UIPanelCloseButtonDefaultAnchors" />
+
+            <Button parentKey="SubmitButton" mixin="CraftScanDialogSubmitMixin" registerForClicks="LeftButtonUp" inherits="UIPanelButtonTemplate">
+                <Size x="100" y="22" />
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-10" y="10"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick method="OnClick" />
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
+
+    <EditBox name="CraftScanDialogTextInputTemplate" mixin="CraftScanDialogTextInputMixin" inherits="InputBoxTemplate" frameStrata="DIALOG" virtual="true">
+        <Size x="200" y="22" />
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <OnEscapePressed method="OnEscapePressed" />
+            <OnTabPressed method="OnTabPressed" />
+            <OnTextChanged method="OnTextChanged" />
+            <OnEnterPressed method="OnEnterPressed" />
+        </Scripts>
+    </EditBox>
+
+    <Frame name="CraftScanDialogTextTemplate" frameStrata="DIALOG" virtual="true">
+        <Size x="260" y="22"/>
+        <Layers>
+            <Layer level="DIALOG">
+                <FontString parentKey="Text" inherits="GameFontHighlight" wordwrap="true">
+                    <Size x="260" y="22"/>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+</Ui>

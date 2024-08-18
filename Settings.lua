@@ -88,7 +88,7 @@ end
 local function CreateMultiSelectDropdown(category, variable, key, name, options, tooltip)
     local function GetValue()
         -- No-op. It's done by the menu checkbox get/sets
-        return nil;
+        return "";
     end
 
     local function SetValue(value)

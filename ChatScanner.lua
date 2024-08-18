@@ -251,7 +251,7 @@ local function idForKeywords(message, profConfig, section)
     end
 
     for id, config in pairs(sectionConfig) do
-        if config.keywords then
+        if (profConfig.all_enabled or section ~= 'recipes' or config.enabled) and config.keywords then
             if HasMatch(message, ParseStringList(config.keywords)) then
                 return id
             end
@@ -297,6 +297,7 @@ local function getCrafterForMessage(message)
         return nil
     end
 
+    local bestMatch = nil;
     for _, crafterInfo in ipairs(config.prof_keywords) do
         if HasMatch(message, crafterInfo.keywords) and not HasMatch(message, crafterInfo.exclusions) then
             -- For profession keywords, we store the parent profession ID,
@@ -327,14 +328,14 @@ local function getCrafterForMessage(message)
                     profID = ppConfig.primary_expansion;
                 end
 
-                if profID ~= nil then
-                    return { crafter = crafterInfo.crafter, profID = profID };
-                end -- Else keep looking for other crafters
+                if profID ~= nil and not bestMatch then
+                    bestMatch = { crafter = crafterInfo.crafter, profID = profID };
+                end -- Keep looking for other crafters with keywords that match something specific.
             end
         end
     end
 
-    return nil;
+    return bestMatch;
 end
 
 local function concatGreetings(lhs, rhs)

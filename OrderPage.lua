@@ -92,7 +92,7 @@ function CraftScanCrafterOrderListElementMixin:OnLineEnter()
     if response.recipeID then
         local reagents = {};
         local qualityIDs = C_TradeSkillUI.GetQualitiesForRecipe(response.recipeID);
-        local qualityIdx = #qualityIDs; -- self.option.minQuality or 1;
+        local qualityIdx = qualityIDs and #qualityIDs or 0;
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
         GameTooltip:SetRecipeResultItem(response.recipeID, reagents, nil, nil, qualityIDs and qualityIDs[qualityIdx]);
     end
@@ -457,7 +457,11 @@ local function UpdateAllCheckBox(checkbox)
         end);
     checkbox:UpdateAllCheckBoxDisplay();
     if stateBefore == 2 and checkbox.state ~= 2 then
-        checkbox:RememberAllUserState();
+        -- If we're applying the remote state, it has already taken the snapshot
+        -- for us, so we skip that step here.
+        if not CraftScanComm.applying_remote_state then
+            checkbox:RememberAllUserState();
+        end
     end
 end
 
@@ -507,13 +511,15 @@ function CraftScan_CrafterToggleMixin:OnClick(button)
             -- indeterminate to restore it.
             self:RememberAllUserState();
             self.state = 0;
-        elseif self.state == ForEachProfession(function(ppConfig) return ppConfig[self.ppconfig_key .. "_last"]; end) then
-            -- If the last saved state is the same as the current state, we're
-            -- just flipping between all on/off until the user clicks an
-            -- individual box again.
-            self.state = (self.state + 1) % 2;
+        elseif self.state == 1 then
+            local rememberedState = ForEachProfession(function(ppConfig) return ppConfig[self.ppconfig_key .. "_last"]; end);
+            if rememberedState == 2 then
+                self.state = 2;
+            else
+                self.state = 0;
+            end
         else
-            self.state = self.state + 1;
+            self.state = 1;
         end
 
         if self.state ~= 2 then
@@ -526,6 +532,9 @@ function CraftScan_CrafterToggleMixin:OnClick(button)
             ForEachCrafterFrame(function(frame)
                 frame[self:GetName()]:SetChecked(checked);
             end)
+
+            -- Push only the ppConfig of all characters across
+            CraftScanComm:ShareAllPpCharacterModifications();
         else
             -- When moving to the indeterminate state manually, reapply the last
             -- user state.
@@ -537,12 +546,20 @@ function CraftScan_CrafterToggleMixin:OnClick(button)
             ForEachCrafterFrame(function(frame)
                 frame[self:GetName()]:InitState();
             end)
+
+            -- Push only the ppConfig of all characters across
+            CraftScanComm:ShareAllPpCharacterModifications();
         end
 
         self:UpdateAllCheckBoxDisplay();
     else
-        ParentProfessionConfig(self:GetParent().crafterInfo)[self.ppconfig_key] = self:GetChecked();
+        local crafterInfo = self:GetParent().crafterInfo;
+        ParentProfessionConfig(crafterInfo)[self.ppconfig_key] = self:GetChecked();
         UpdateAllCheckBox(crafterListAll[self:GetName()])
+
+        local ppChangeOnly = true;
+        CraftScan.Utils.printTable("crafterInfo", crafterInfo);
+        CraftScanComm:ShareCharacterModification(crafterInfo.name, crafterInfo.parentProfessionID, ppChangeOnly);
     end
     if GameTooltip:IsShown() then
         self:SetTooltip();
@@ -685,7 +702,7 @@ function CraftScanCrafterListElementMixin:OnLeave()
     self.HoverBackground:Hide();
 end
 
-local function OnCrafterListModified()
+function CraftScan.OnCrafterListModified()
     -- Refresh the list to display the change.
     CraftScanCraftingOrderPage.BrowseFrame.CrafterList:SetupCrafterList();
 
@@ -696,10 +713,7 @@ end
 -- Provide common properties for our various confirmations.
 local function SetupPopupDialog(key, config)
     local popup = {
-        text = config.text,
-        button1 = config.button1,
         button2 = "Cancel",
-        OnAccept = config.OnAccept,
         OnCancel = nil,
         hasEditBox = true,
         timeout = 0,
@@ -715,7 +729,19 @@ local function SetupPopupDialog(key, config)
             parent.button2:Click() -- Simulate a click on the Cancel button
         end,
     };
+    for key, value in pairs(config) do
+        popup[key] = value;
+    end
     StaticPopupDialogs[key] = popup;
+end
+
+function CraftScan.RemoveChildProfessions(charConfig, ppID)
+    local pConfigs = charConfig.professions;
+    for profID, config in pairs(pConfigs) do
+        if config.parentProfID == ppID then
+            pConfigs[profID] = nil;
+        end
+    end
 end
 
 -- The confirmation dialog to 'disable' a profession for a specific character.
@@ -732,18 +758,22 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", {
             -- we don't keep re-enabling it when they open the
             -- profession window.
             local parentProfID = crafterInfo.parentProfessionID;
+
+            -- Wipe the ppConfig to a clean slate.
+            local rev = charConfig.parent_professions[parentProfID].rev;
+            charConfig.parent_professions[parentProfID] = CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG);
             local ppConfig = charConfig.parent_professions[parentProfID];
+            ppConfig.rev = rev; -- The revision needs to persist through disable/enable cycles so we know which side wins.
             ppConfig.character_disabled = true;
 
             -- Delete all details about the expansion level professions.
-            local pConfigs = charConfig.professions;
-            for profID, config in pairs(pConfigs) do
-                if config.parentProfID == parentProfID then
-                    pConfigs[profID] = nil;
-                end
-            end
+            CraftScan.RemoveChildProfessions(charConfig, parentProfID);
 
-            OnCrafterListModified();
+            -- Send the modification to any linked accounts.
+            local ppChangeOnly = true;
+            CraftScanComm:ShareCharacterModification(crafterInfo.name, parentProfID, ppChangeOnly);
+
+            CraftScan.OnCrafterListModified();
         else
             print("CraftScan confirmation failed.")
         end
@@ -770,14 +800,130 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", {
                 end
             end
 
-            OnCrafterListModified();
+            CraftScan.OnCrafterListModified();
         else
             print("CraftScan confirmation failed.")
         end
     end
 })
 
-local function ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig)
+CraftScan_PeerButtonMixin = {}
+
+function CraftScan_PeerButtonMixin:Reset()
+    if CraftScanComm:HavePendingPeerRequest() then
+        print(CraftScanComm:GetPendingPeerRequestCharacter());
+
+        self.PendingAlert:SetText(string.format(L(LID.ACCOUNT_LINK_ACCEPT_DST_LABEL),
+            CraftScanComm:GetPendingPeerRequestCharacter()));
+        self:SetText(L("Accept Linked Account"));
+        self.PendingAlert:Show();
+    else
+        self:SetText(L("Link Peer Account"));
+        self.PendingAlert:Hide();
+    end
+
+    self:FitToText();
+end
+
+function CraftScan_PeerButtonMixin:OnShow()
+    self:Reset();
+end
+
+function CraftScan_PeerButtonMixin:OnLoad()
+    self:Reset();
+end
+
+function CraftScan_PeerButtonMixin:OnClick()
+    if CraftScanComm:HavePendingPeerRequest() then
+        local OnAccept = function(nickname)
+            print("Accepted: ", nickname)
+            CraftScanComm:AcceptPeerRequest(nickname);
+        end
+
+        CraftScan.Dialog.Show({
+
+            title = L("Accept Linked Account"),
+            submit = L("Accept Linked Account"),
+            OnAccept = OnAccept,
+            elements = {
+                {
+                    type = CraftScan.Dialog.Element.Text,
+                    text = string.format(L(LID.ACCOUNT_LINK_ACCEPT_DST_INFO),
+                        CraftScanComm:GetPendingPeerRequestCharacter()),
+                },
+                {
+                    type = CraftScan.Dialog.Element.EditBox,
+                },
+            },
+        })
+    else
+        local OnAccept = function(character, nickname)
+            self.PendingAlert:SetText(string.format(L(LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL), character));
+            self.PendingAlert:Show();
+
+            CraftScan.Dialog.Show({
+                title = L("Accept Linked Account"),
+                submit = L("OK"),
+                elements = {
+                    {
+                        type = CraftScan.Dialog.Element.Text,
+                        text = L(LID.ACCOUNT_LINK_ACCEPT_SRC_INFO),
+                    },
+                },
+            })
+
+            CraftScanComm:SendHandshake(character, nickname);
+        end
+        local elements = {
+            {
+                type = CraftScan.Dialog.Element.Text,
+                text = L(LID.ACCOUNT_LINK_DESC),
+            },
+            {
+                type = CraftScan.Dialog.Element.Text,
+                text = L(LID.ACCOUNT_LINK_PROMPT_CHARACTER),
+                padding = 10,
+            },
+            {
+                type = CraftScan.Dialog.Element.EditBox,
+            },
+            {
+                type = CraftScan.Dialog.Element.Text,
+                text = L(LID.ACCOUNT_LINK_PROMPT_NICKNAME),
+                padding = 10,
+            },
+            {
+                type = CraftScan.Dialog.Element.EditBox,
+            },
+        }
+        CraftScan.Dialog.Show({
+            title = L("Link Account"),
+            submit = L("Link Account"),
+            OnAccept = OnAccept,
+            elements = elements,
+        })
+    end
+end
+
+function CraftScan.OnPendingPeerAdded()
+    CraftScanCraftingOrderPage.PeerButton:Reset();
+end
+
+function CraftScan.OnPendingPeerRejected(reason)
+    CraftScanCraftingOrderPage.PeerButton:Reset();
+
+    self.PendingAlert:SetText(reason);
+    self.PendingAlert:Show();
+end
+
+function CraftScan.OnPendingPeerAccepted()
+    CraftScanCraftingOrderPage.PeerButton:Reset();
+
+    CraftScan.Utils.printTable("my_uuid", CraftScan.DB.settings.my_uuid)
+    CraftScan.Utils.printTable("linked_accounts", CraftScan.DB.settings.linked_accounts)
+end
+
+function CraftScan.ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig, skipReplication)
     -- We can only have one primary crafter for a given profession, so walk the
     -- list and turn off the others.
     if not ppConfig.primary_crafter then
@@ -789,6 +935,11 @@ local function ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig)
             for parentProfID, parentProfConfig in pairs(charConfig.parent_professions) do
                 if parentProfID == crafterInfo.parentProfessionID and parentProfConfig.primary_crafter then
                     parentProfConfig.primary_crafter = false;
+
+                    if not skipReplication then
+                        local ppChangeOnly = true;
+                        CraftScanComm:ShareCharacterModification(char, parentProfID, ppChangeOnly);
+                    end
                     return; -- There can only be one.
                 end
             end
@@ -825,17 +976,30 @@ function CraftScanCrafterListElementMixin:OnClick(button)
     local ppConfig = charConfig.parent_professions[self.crafterInfo.parentProfessionID];
 
     MenuUtil.CreateContextMenu(owner, function(owner, rootDescription)
-        rootDescription:CreateTitle(CraftScan.NameAndRealmToName(self.crafterInfo.name));
-
+        local isRemoteCrafter = charConfig.sourceID and charConfig.sourceID ~= CraftScan.DB.settings.my_uuid;
+        do
+            local title = rootDescription:CreateTitle(CraftScan.NameAndRealmToName(self.crafterInfo.name));
+            if isRemoteCrafter then
+                title:SetTooltip(function(tooltip)
+                    --GameTooltip_SetTitle(tooltip, data.tooltipTitle or MenuUtil.GetElementText(elementDescription));
+                    GameTooltip_AddNormalLine(tooltip, L(LID.REMOTE_CRAFTER_TOOLTIP));
+                end);
+            end
+        end
         do
             local onClick = function()
                 StaticPopup_Show("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", profName, crafter, self.crafterInfo)
             end
             local data = {
-                tooltipText = string.format(L(LID.DELETE_CONFIG_TOOLTIP_TEXT), profName, crafter),
+                tooltipText = string.format(L(LID.DELETE_CONFIG_TOOLTIP_TEXT), profName, crafter)
             };
             local button = rootDescription:CreateButton(L("Disable"), onClick, data)
-            button:SetTooltip(SetTooltipWithTitle);
+
+            if isRemoteCrafter then
+                button:SetEnabled(false);
+            else
+                button:SetTooltip(SetTooltipWithTitle);
+            end
         end
         do
             local onClick = function()
@@ -852,13 +1016,13 @@ function CraftScanCrafterListElementMixin:OnClick(button)
                 return ppConfig.primary_crafter;
             end
             local SetSelected = function()
-                if not ppConfig.primary_crafter then
-                    ppConfig.primary_crafter = true;
-                else
-                    ppConfig.primary_crafter = not ppConfig.primary_crafter;
-                end
-                ProcessPrimaryCrafterUpdate(self.crafterInfo, ppConfig)
-                OnCrafterListModified();
+                ppConfig.primary_crafter = not ppConfig.primary_crafter;
+                CraftScan.ProcessPrimaryCrafterUpdate(self.crafterInfo, ppConfig)
+                CraftScan.OnCrafterListModified();
+
+                local ppChangeOnly = true;
+                CraftScanComm:ShareCharacterModification(self.crafterInfo.name, self.crafterInfo.parentProfessionID,
+                    ppChangeOnly);
             end
             local data = {
                 tooltipText = string.format(L(LID.PRIMARY_CRAFTER_TOOLTIP), crafter, profName),
