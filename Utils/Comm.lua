@@ -432,145 +432,146 @@ function CraftScanComm:AcceptPeerRequest(nickname)
     CraftScan.OnPendingPeerAccepted();
 end
 
+local function SendMessage(encoded, target)
+    CraftScanComm:SendCommMessage(CRAFT_SCAN_COMM_PREFIX, encoded, "WHISPER", target)
+end
+
+local function TransmitToAllTargets(encoded, targets)
+    for i, target in ipairs(targets) do
+        CraftScan.Utils.printTable("Sending request to", target)
+        SendMessage(encoded, target);
+    end
+end
+
+
+-- There is weirdly no way to test if a player is online, so our 'test' is
+-- to put a chat filter in place to ignore the 'player not found' message,
+-- fire off the message to everyone, and hopefully detect which character is
+-- online and remember it for next time. If we have a prior online
+-- character, we try that one first. If it doesn't match our filter after a
+-- few seconds, we assume the send was successful. If it does match our
+-- filter, the character has logged off and we try everyone again.
 local onlineCharacters = {};
-local function CreatePlayerOfflineChatFilter(ignoredMessages)
-    CraftScan.Utils.printTable("Created chat filter. Ignoring:", ignoredMessages)
-    return function(self, event, msg)
-        for char, ignore in pairs(ignoredMessages) do
-            if msg == ignore then
-                ignoredMessages[char] = nil;
-                return true;
+
+local IgnoreOfflineMessages = {}
+IgnoreOfflineMessages.__index = IgnoreOfflineMessages;
+
+function IgnoreOfflineMessages:new(targets)
+    local self = setmetatable({}, IgnoreOfflineMessages);
+
+    local onlineIndex = nil;
+    for i, target in ipairs(targets) do
+        -- If we've messaged a target successfully already, we try that
+        -- target first and test for success before sending to others.
+        if onlineCharacters[target] ~= nil then
+            self.lastOnline = target;
+            onlineIndex = i;
+            self.targets = targets;
+        else
+            self.filtered = self.filtered or {};
+            local msg = ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", CraftScan.NameAndRealmToName(target));
+            self.filtered[target] = {
+                msg = msg,
+                online = true, -- Assume true, flip to false if we filter an offline warning.
+            }
+        end
+    end
+
+    if onlineIndex then
+        table.remove(targets, onlineIndex)
+    end
+
+    local function CreateOfflineChatFilter(filtered)
+        CraftScan.Utils.printTable("Created chat filter. Ignoring:", filtered)
+        return function(self, event, msg)
+            for char, filter in pairs(filtered) do
+                if msg == filter.msg then
+                    filter.online = false;
+                    return true;
+                end
             end
         end
     end
+
+    self.filter = CreateOfflineChatFilter(self.lastOnline and onlineCharacters or self.filtered);
+
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", self.filter)
+
+    return self;
 end
 
---[[
--- Deserialize data:
-local handler = LibSerialize:DeserializeAsync(serialized)
-processing:SetScript("OnUpdate", function()
-    local completed, success, deserialized = handler()
-    if completed then
-        processing:SetScript("OnUpdate", nil)
-        -- Do something with `deserialized`
-    end
-end)
-]]
+function IgnoreOfflineMessages:Clear()
+    local function ClearFilter()
+        local function RemoveFilter()
+            ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", self.filter)
+        end
 
-local function TransmitToAllTargets(encoded, targets, filter, ignoredMessages)
-    for _, t in ipairs(targets) do
-        CraftScan.Utils.printTable("Sending request to", t)
-        CraftScanComm:SendCommMessage(CRAFT_SCAN_COMM_PREFIX, encoded, "WHISPER", t)
-    end
+        if self.lastOnline then
+            if not onlineCharacters[self.lastOnline].online then
+                onlineCharacters[self.lastOnline] = nil;
+                self.lastOnline = nil;
 
-    -- Sending to all characters known on an account can take a while because of
-    -- chat message throttling. Hopefully 10 seconds is enough.
-    C_Timer.After(10, function()
-        CraftScan.Utils.printTable("Filter timeout. Not matched", ignoredMessages)
-        for char, filter in pairs(ignoredMessages) do
-            -- If we still have entries in the ignoredMessages list, then those
-            -- characters did not match the filter and are presumable online
-            -- (depending on timing... we're guessing how long to leave the
-            -- filter in place). Save that information so we can start with them
-            -- next time.
-            onlineCharacters[char] = filter;
+                -- Try again by sending to all the targets
+                TransmitToAllTargets(encoded, targets, self);
+                self:Clear();
+            else
+                -- We successfully sent to the last online target, so we're done.
+                CraftScan.Utils.printTable("Send successful", self.lastOnline)
+                RemoveFilter();
+            end
+
+            return
+        end
+
+        CraftScan.Utils.printTable("Filter timeout. Results", self.filtered)
+        for char, filter in pairs(self.filtered) do
+            if filter.online then
+                onlineCharacters[char] = filter;
+            end
         end
         CraftScan.Utils.printTable("Online characters", onlineCharacters)
-        ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", filter)
-    end)
+        RemoveFilter();
+    end
+
+    -- If we're testing a character known to be online, we only wait 2 seconds
+    -- since it should be a single send and is hopefully fast. If that fails, we
+    -- fall back to the full list of targets and allow 10 seconds for all the
+    -- attempts. Addon messages are throttled, so it takes some time.
+    local timeout = self.lastOnline and 2 or 10;
+    C_Timer.After(timeout, ClearFilter);
 end
 
-local function TransmitSerialized(serialized, target)
-    if type(target) == "table" and #target == 1 then
-        target = target[1];
-    end
+local function TransmitSerialized(serialized, targets)
     local compressed = LibDeflate:CompressDeflate(serialized)
     local encoded = LibDeflate:EncodeForWoWAddonChannel(compressed)
 
-    -- There is weirdly no way to test if a player is online, so our 'test' is
-    -- to put a chat filter in place to ignore the 'player not found' message,
-    -- fire off the message to everyone, and hopefully detect which character is
-    -- online and remember it for next time. If we have a prior online
-    -- character, we try that one first. If it doesn't match our filter after a
-    -- few seconds, we assume the send was successful. If it does match our
-    -- filter, the character has logged off and we try everyone again.
-    --
-    -- TODO: This needs some clean up
-    if type(target) == "table" then
-        local ignoredMessages = {}
-        local onlineCharacter = nil;
-        for _, t in ipairs(target) do
-            local ignore = ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", CraftScan.NameAndRealmToName(t));
-            if onlineCharacters[t] ~= nil then
-                onlineCharacter = t;
-            end
-            ignoredMessages[t] = ignore;
-        end
+    local filter = IgnoreOfflineMessages:new(targets);
 
-        local filter = CreatePlayerOfflineChatFilter(ignoredMessages);
-        ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", filter)
-        if onlineCharacter then
-            CraftScan.Utils.printTable("Testing known online character first", onlineCharacter)
-            CraftScanComm:SendCommMessage(CRAFT_SCAN_COMM_PREFIX, encoded, "WHISPER", onlineCharacter)
-
-            -- Wait 2 seconds, then see if we were successful in sending to the
-            -- character that was online last time. If we weren't we send to
-            -- everyone to try to detect who is online.
-            C_Timer.After(2, function()
-                if not onlineCharacters[onlineCharacter] then
-                    -- Remove the now offline character from our pending request
-                    -- so we don't pay to try again.
-                    ignoredMessages[onlineCharacter] = nil;
-                    for i, t in ipairs(target) do
-                        if t == onlineCharacter then
-                            table.remove(target, i);
-                            break;
-                        end
-                    end
-                    TransmitToAllTargets(encoded, target, filter, ignoredMessages);
-                else
-                    -- We were  successful, so simply remove the filter and we're good to go.
-                    ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", filter);
-                    CraftScan.Utils.printTable("Transmit successful to", onlineCharacter)
-                end
-            end)
-            return;
-        end
-
-        TransmitToAllTargets(encoded, target, filter, ignoredMessages);
+    if filter.lastOnline then
+        SendMessage(encoded, filter.lastOnline);
     else
-        CraftScan.Utils.printTable("Sending request to", target)
-
-        local ignore = ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", CraftScan.NameAndRealmToName(target));
-        local ignoredMessages = {};
-        ignoredMessages[target] = ignore;
-
-        local filter = CreatePlayerOfflineChatFilter(ignoredMessages);
-        ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", filter)
-        CraftScanComm:SendCommMessage(CRAFT_SCAN_COMM_PREFIX, encoded, "WHISPER", target)
-        C_Timer.After(2, function()
-            if ignoredMessages[target] then
-                onlineCharacters[target] = ignore;
-            end
-            ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", filter);
-        end);
+        TransmitToAllTargets(encoded, targets);
     end
+
+    filter:Clear();
 end
 
 local asyncPool = CreateFramePool("Frame", UIParent);
 
-function CraftScanComm:Transmit(data, operation, target)
+function CraftScanComm:Transmit(data, operation, targets)
+    if type(targets) ~= "table" then
+        -- Normalize our input to keep it simple. We support either a single
+        -- character or an array of characters.
+        targets = { targets };
+    end
+
+
     local msg = {
         operation = operation,
         data = data,
         senderID = CraftScan.DB.settings.my_uuid,
     };
 
-    -- Sync version:
-    --local serialized = LibSerialize:Serialize(msg)
-    --TransmitSerialized(serialized, target);
-
-    -- Async Mode - Used in WoW to prevent locking the game while processing.
     local handler = LibSerialize:SerializeAsync(msg)
 
     local processing = asyncPool:Acquire();
@@ -579,7 +580,7 @@ function CraftScanComm:Transmit(data, operation, target)
         if completed then
             processing:SetScript("OnUpdate", nil)
             asyncPool:Release(processing);
-            TransmitSerialized(serialized, target);
+            TransmitSerialized(serialized, targets);
         end
     end)
 
@@ -588,23 +589,8 @@ function CraftScanComm:Transmit(data, operation, target)
     processing:Show();
 end
 
-function CraftScanComm:OnCommReceived(prefix, payload, distribution, sender)
-    CraftScan.Utils.printTable("Received packet", prefix);
-
-    if prefix ~= CRAFT_SCAN_COMM_PREFIX then return end
-
-    local decoded = LibDeflate:DecodeForWoWAddonChannel(payload)
-    if not decoded then return end
-    CraftScan.Utils.printTable("decoded", true);
-
-    local decompressed = LibDeflate:DecompressDeflate(decoded)
-    if not decompressed then return end
-    CraftScan.Utils.printTable("decompressed", true);
-
-    local success, msg = LibSerialize:Deserialize(decompressed)
-    CraftScan.Utils.printTable("success", success);
+local function ReceiveDeserialized(msg, sender)
     CraftScan.Utils.printTable("msg", msg);
-    if not success then return end
 
     if msg.operation == CraftScanComm.Operations.Handshake then
         self:ReceiveHandshake(sender, msg.data);
@@ -618,4 +604,36 @@ function CraftScanComm:OnCommReceived(prefix, payload, distribution, sender)
             ReceiveShareCharacterData(sender, msg.data, msg.senderID);
         end
     end
+end
+
+function CraftScanComm:OnCommReceived(prefix, payload, distribution, sender)
+    CraftScan.Utils.printTable("Received packet", prefix);
+
+    if prefix ~= CRAFT_SCAN_COMM_PREFIX then return; end
+
+    local decoded = LibDeflate:DecodeForWoWAddonChannel(payload);
+    if not decoded then return; end
+    CraftScan.Utils.printTable("decoded", true);
+
+    local decompressed = LibDeflate:DecompressDeflate(decoded);
+    if not decompressed then return; end
+    CraftScan.Utils.printTable("decompressed", true);
+
+    local handler = LibSerialize:DeserializeAsync(decompressed);
+    local processing = asyncPool:Acquire();
+    processing:SetScript("OnUpdate", function()
+        local completed, success, deserialized = handler()
+        if completed then
+            CraftScan.Utils.printTable("deserialize_complete", true);
+
+            processing:SetScript("OnUpdate", nil)
+            asyncPool:Release(processing);
+            if not success then return end
+            ReceiveDeserialized(deserialized, sender);
+        end
+    end)
+
+    -- OnUpdate won't fire if the frame is hidden, which is is by default when
+    -- fetched from the pool.
+    processing:Show();
 end

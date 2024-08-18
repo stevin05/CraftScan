@@ -518,16 +518,16 @@ local function OnRecipeSelected()
     playerNameWithRealm = player .. "-" .. GetRealmName()
     db_player = saved(CraftScan.DB.characters, playerNameWithRealm, {})
 
-    db_player.parent_professions = db_player.parent_professions or {}
-    db_parent_prof = saved(db_player.parent_professions, cur.profession.parentProfessionID,
-        CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG));
-
     -- my_uuid is initialized when linked to a new account, at which point all
     -- current characters are tagged. If this character is added after account
     -- linking, tag it as well.
-    if not db_parent_prof.sourceID and CraftScan.DB.settings.my_uuid then
-        db_parent_prof.sourceID = CraftScan.DB.settings.my_uuid;
+    if not db_player.sourceID and CraftScan.DB.settings.my_uuid then
+        db_player.sourceID = CraftScan.DB.settings.my_uuid;
     end
+
+    db_player.parent_professions = db_player.parent_professions or {}
+    db_parent_prof = saved(db_player.parent_professions, cur.profession.parentProfessionID,
+        CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG));
 
     if db_parent_prof.character_disabled then
         HideSchematicOptions();
