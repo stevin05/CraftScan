@@ -10,13 +10,11 @@ local saved = CraftScan.Utils.saved
 local LibSerialize = LibStub("LibSerialize")
 local LibDeflate = LibStub("LibDeflate")
 
--- With compression (recommended):
+-- We don't use this yet, but if we ever want a manual import/export process, use these:
+--[[
 function CraftScan.Utils:Export(data)
-    CraftScan.Utils.printTable("data", data);
     local serialized = LibSerialize:Serialize(data)
-    --CraftScan.Utils.printTable("serialized", serialized);
     local compressed = LibDeflate:CompressDeflate(serialized)
-    --CraftScan.Utils.printTable("compressed", compressed);
     local encoded = LibDeflate:EncodeForPrint(compressed);
     return encoded;
 end
@@ -30,6 +28,7 @@ function CraftScan.Utils:Import(encoded)
     if not success then return end
     return data;
 end
+]]
 
 CraftScanComm = LibStub("AceAddon-3.0"):NewAddon("CraftScan", "AceComm-3.0")
 local LibSerialize = LibStub("LibSerialize")
@@ -40,22 +39,87 @@ function CraftScanComm:OnEnable()
     self:RegisterComm(CRAFT_SCAN_COMM_PREFIX)
 end
 
--- When a player comes online, it sends a NotifyCharacterDataRev to all of its
--- imported characters with the revision number of all of its characters. If the
--- other account is online, it responds with all its characters that have a
--- higher revision number, and a request for any of its characters with a lower
--- revision number than it received. Imports/exports in this fashion do not
--- increment revision numbers, so the back and forth will settle down after each
--- side receives the most recent data. Accounts do report non-local revision
--- information so that information can be daisy chained to keep every account as
--- up to date as possibe.
-
-
 CraftScanComm.Operations = {
     ShareCharacterData = 'share_char_data',
     Handshake = 'handshake',
+    ShareCustomerOrder = 'share_customer_order',
 }
 
+-- A flag to send the request to all known linked accounts
+local TARGET_ALL = nil;
+
+-- Accounts that respond to the initial sharing phase are stored here. From then
+-- on, we keep this updated with who is talking to us, and we only talk back to
+-- them. If a new remote account comes online, their sharing phase will replace
+-- any prior entry from that account.
+local remoteTargets = nil;
+
+local function HaveTarget(sender)
+    -- If we have a specific target, of course we're good to go.
+    if sender then return true; end
+
+    if remoteTargets then
+        for _, target in pairs(remoteTargets) do
+            if next(target) then
+                return true;
+            end
+        end
+    end
+
+    -- We either have no one to talk to, or we haven't sent our greeting yet.
+    -- The greeting syncs in both directions, so it's fine to skip updates
+    -- before then. It's likely impossible in practice to sneak something into
+    -- this window.
+    return false;
+end
+
+local function CreateInitialTargets()
+    local targets = {};
+
+    for char, charConfig in pairs(CraftScan.DB.characters) do
+        if charConfig.sourceID ~= nil and charConfig.sourceID ~= CraftScan.DB.settings.my_uuid then
+            targets[charConfig.sourceID] = targets[charConfig.sourceID] or {}
+            targets[charConfig.sourceID][CraftScan.NameAndRealmToName(char)] = true;
+        end
+    end
+
+    for sourceID, info in pairs(CraftScan.DB.settings.linked_accounts) do
+        targets[sourceID] = targets[sourceID] or {}
+        for _, char in ipairs(info.backup_chars) do
+            targets[sourceID][char] = true;
+        end
+    end
+
+    return targets;
+end
+
+-- Sharing has 3 phases. The first side sends an InitialInquiry with their
+-- current profession revisions. The other side immediately responds with a
+-- ResponseInquiry with its revisions. (We could potentially be smarter here
+-- since we have a view of the other side already, but this data is small and
+-- this keeps it clean and easy.) The side that received the InitialInquiry then
+-- falls through and starts is ResponseData phase. When the originating side
+-- receives the ResponseInquiry, it moves directly to the ResponseData phase
+-- (without infinitely recursing on more ResponseInquiries). By the end, both
+-- sides will have received any out of date profession information that the
+-- other side has.
+--
+-- We do this full flow when establishing a linked account and when a character
+-- logs in to catch up on any changes it missed while offline. This message is
+-- also the only one we allow through while 'remoteTargets' is not initialized.
+-- This initial sharing phase is also used to seed the remoteTargets so we know
+-- who is online for future messages.
+--
+-- When individual profession changes are made, they are pushed across directly
+-- with the ResponseData phase since we know the other side is out of date.
+local SharingState = {
+    InitialInquiry = 1,
+    ResponseInquiry = 2,
+    ResponseData = 3,
+}
+
+-- Filter our character list to only the revisions to send a small amount of
+-- data in our greeting to other accounts.
 local function CreateRevisions()
     local revisions = {};
     for char, charConfig in pairs(CraftScan.DB.characters) do
@@ -67,6 +131,9 @@ local function CreateRevisions()
     return revisions;
 end
 
+-- Linked accounts can update eachother about a 3rd account, but only if the 3rd
+-- account is also a linked such that the receiver can see it directly.
+-- Inquiries include the requester's peer list so the response can be filtered.
 local function MyPeers()
     local peers = {};
     for peer, _ in pairs(CraftScan.DB.settings.linked_accounts) do
@@ -83,83 +150,26 @@ local function CharacterInPeers(charConfig, peers)
     return false;
 end
 
--- Sharing has 3 phases. The first side sends an InitialInquiry with their
--- current profession revisions. The other side immediately responds with a
--- ResponseInquiry with its revisions. (We could potentially be smarter here
--- since we have a view of the other side already, but this data is small and
--- this keeps it clean an easy.) The side that received the InitialInquirty then
--- falls through and starts is ResponseData phase. While the originating side
--- responds to the ResponseInquiry with its ResponseData phase. By the end, both
--- sides will have received any out of date profession information that the
--- other side has.
---
--- We do this full flow when establishing peers and when a character logs in to
--- catch up on any changes it missed while offline.
---
--- When individual profession changes are made, they are pushed across directly
--- with the ResponseData phase since we know the other side is out of date.
-local SharingState = {
-    InitialInquiry = 1,
-    ResponseInquiry = 2,
-    ResponseData = 3,
-}
-
--- TODO: This information will rarely change, so may be worth caching. It
--- shouldn't be run that often and it's not really expensive, so not bothering.
-local function CreateReceivers()
-    -- We don't know who is online on the other account, so walk our list of
-    -- characters and group them by account so we can try to message all
-    -- possible online characters.
-    local receivers = {};
-    for char, charConfig in pairs(CraftScan.DB.characters) do
-        if charConfig.sourceID ~= nil and charConfig.sourceID ~= CraftScan.DB.settings.my_uuid then
-            receivers[charConfig.sourceID] = receivers[charConfig.sourceID] or {}
-            table.insert(receivers[charConfig.sourceID], char);
-        end
-    end
-    if CraftScan.DB.settings.linked_accounts then
-        for remoteID, info in pairs(CraftScan.DB.settings.linked_accounts) do
-            -- It's possible we have receiving accounts with no crafters configured.
-            -- If so, send to the one character we were peered with intially since
-            -- that's the only character we know about.
-            if not receivers[remoteID] then
-                CraftScan.Utils.printTable("backup_char needed", info);
-                receivers[remoteID] = { info.backup_char };
-            end
-        end
-    end
-    return receivers;
+local function SendShareCharacterData(target, data)
+    CraftScanComm:Transmit(data, CraftScanComm.Operations.ShareCharacterData, target);
 end
 
-local function SendToReceivers(receivers, data)
-    if type(receivers) ~= "table" then
-        CraftScan.Utils.printTable("Single receiver", receivers)
-        CraftScanComm:Transmit(data, CraftScanComm.Operations.ShareCharacterData, receivers);
-    else
-        for sourceID, characters in pairs(receivers) do
-            CraftScan.Utils.printTable("Bulk send to", characters)
-            CraftScanComm:Transmit(data, CraftScanComm.Operations.ShareCharacterData, characters);
-        end
-    end
+local function SendResponseCharacterData(target, characters)
+    SendShareCharacterData(target, { characters = characters, state = SharingState.ResponseData });
 end
 
-local function SendResponseCharacterDataToReceivers(receivers, characters)
-    SendToReceivers(receivers, { characters = characters, state = SharingState.ResponseData });
-end
-
-local function ShareCharacterData_(state, receiver)
-    if not receiver then
-        receiver = CreateReceivers();
+local function ShareCharacterData_(state, target)
+    if not target and not CraftScan.DB.settings.linked_accounts then
+        -- This is used by the initial greeting, so we don't use HaveTarget().
+        -- If we potentially have someone to send to, we let it through.
+        return;
     end
-
-    if type(receiver) == "table" and not next(receiver) then return; end
 
     local revisions = CreateRevisions();
     local peers = MyPeers();
     local data = { revisions = revisions, peers = peers, state = state };
-    SendToReceivers(receiver, data);
+    SendShareCharacterData(target, data);
 end
-
 
 local function ReceiveShareCharacterData(sender, data, senderID)
     if data.state == SharingState.InitialInquiry then
@@ -177,6 +187,9 @@ local function ReceiveShareCharacterData(sender, data, senderID)
             if not localCharConfig then
                 CraftScan.DB.characters[char] = charConfig;
             else
+                if not localCharConfig.sourceID then
+                    localCharConfig.sourceID = charConfig.sourceID;
+                end
                 for ppID, ppConfig in pairs(charConfig.parent_professions) do
                     if not localCharConfig.parent_professions[ppID] or ((localCharConfig.parent_professions[ppID].rev or 0) < (ppConfig.rev or 0)) or ppConfig.character_disabled then
                         localCharConfig.parent_professions[ppID] = ppConfig;
@@ -194,16 +207,6 @@ local function ReceiveShareCharacterData(sender, data, senderID)
                                 end
                             end
                         end
-
-                        -- In case primary crafter was swapped while out of
-                        -- communication, respect the side that wins and disable
-                        -- others. It's possible that's the only modification
-                        -- and both sides are at the same revision, in which
-                        -- case they will stay out of sync until another
-                        -- modification triggers another revision increment.
-                        local skipReplication = true;
-                        CraftScan.ProcessPrimaryCrafterUpdate({ name = char, parentProfID = ppID },
-                            localCharConfig.parent_professions[ppID], skipReplication);
                     end
                 end
             end
@@ -257,7 +260,7 @@ local function ReceiveShareCharacterData(sender, data, senderID)
         end
 
         if next(responseCharacters) then
-            SendResponseCharacterDataToReceivers(sender, responseCharacters);
+            SendResponseCharacterData(sender, responseCharacters);
         end
     end
 end
@@ -270,6 +273,8 @@ local function AddOnePpMsg(msgCharacters, char, charConfig, ppID, ppConfig, ppCh
     ppConfig.rev = (ppConfig.rev or 0) + 1;
 
     local mc = saved(msgCharacters, char, {})
+    mc.sourceID = charConfig.sourceID;
+
     local pps = saved(mc, 'parent_professions', {})
     pps[ppID] = ppConfig;
 
@@ -286,8 +291,7 @@ end
 -- For the toggle-all buttons at the top of the character list, do a bulk push
 -- of all parent professions with no child profession data.
 function CraftScanComm:ShareAllPpCharacterModifications()
-    local receivers = CreateReceivers();
-    if not next(receivers) then return; end
+    if not HaveTarget() then return; end
 
     local msgCharacters = {};
     local ppChangeOnly = true;
@@ -297,12 +301,13 @@ function CraftScanComm:ShareAllPpCharacterModifications()
         end
     end
 
-    SendResponseCharacterDataToReceivers(receivers, msgCharacters);
+    SendResponseCharacterData(TARGET_ALL, msgCharacters);
 end
 
+-- A single modification to the profession. We don't get specific - if they
+-- changed anything, toss the whole profession across.
 function CraftScanComm:ShareCharacterModification(char, ppID, ppChangeOnly)
-    local receivers = CreateReceivers();
-    if not next(receivers) then return; end
+    if not HaveTarget() then return; end
 
     local msgCharacters = {};
 
@@ -310,7 +315,49 @@ function CraftScanComm:ShareCharacterModification(char, ppID, ppChangeOnly)
     local ppConfig = charConfig.parent_professions[ppID];
     AddOnePpMsg(msgCharacters, char, charConfig, ppID, ppConfig, ppChangeOnly)
 
-    SendResponseCharacterDataToReceivers(receivers, msgCharacters);
+    SendResponseCharacterData(TARGET_ALL, msgCharacters);
+end
+
+function CraftScanComm:ShareCustomerOrder(message, customer, customerGuid, lastChatFrameMessage)
+    if not HaveTarget() then return; end
+    if CraftScanComm.applying_remote_state then return; end          -- Block infinite recursion
+    if not CraftScan.DB.settings.proxy_send_enabled then return; end -- We're disabled
+
+    local data = {
+        message = message,
+        customer = customer,
+        customerGuid = customerGuid,
+        lastChatFrameMessage = CraftScan.Utils.DeepCopy(lastChatFrameMessage),
+    };
+
+    -- Trying to send a function crashes serialization. Only seen this in testing at args[9]
+    if data.lastChatFrameMessage and data.lastChatFrameMessage.args and type(data.lastChatFrameMessage.args[9]) == "function" then
+        data.lastChatFrameMessage.args[9] = nil;
+        data.lastChatFrameMessage.args['n'] = data.lastChatFrameMessage.args['n'] - 1;
+    end
+
+    CraftScanComm:Transmit(data, CraftScanComm.Operations.ShareCustomerOrder, TARGET_ALL);
+end
+
+local function ReceiveShareCustomerOrder(sender, data, senderID)
+    if not CraftScan.DB.settings.proxy_receive_enabled then return; end
+    if not CraftScan.InjectLastChatFrameMessage(data.customer, data.message, data.lastChatFrameMessage) then return; end
+
+    -- We pull the formatted message from a rotating chat log buffer, so
+    -- inject the raw chat frame into that so it can be found.
+    CraftScanComm.applying_remote_state = true;
+
+    -- Make sure the button is showing so the banner can be shown.
+    CraftScanScannerMenu:Show()
+
+    -- The sending side only sends after they get a match, but the minimum
+    -- amount of data to send is simply the message itself and the customer. We
+    -- have all the same config on this side, so we can process it in the same
+    -- way. This is more work on this side, but it minimizes both the sent data and
+    -- the differences between a received message and a naturally detected message.
+    CraftScan.OnMessage("CHAT_MSG_CHANNEL", data.message, data.customer, data.customerGuid);
+
+    CraftScanComm.applying_remote_state = false;
 end
 
 local function InitMyUUID()
@@ -364,7 +411,7 @@ local function AcceptPeerRequest_(pending)
     CraftScan.Utils.printTable("linkedAccounts:", linkedAccounts)
 end
 
-function CraftScanComm:ReceiveHandshake(sender, data)
+function ReceiveHandshake(sender, data)
     print("Received handshake from", sender)
     if data.result then
         print("data.result");
@@ -389,8 +436,7 @@ function CraftScanComm:ReceiveHandshake(sender, data)
         CraftScanComm:Transmit(
             {
                 result = CraftScanComm.Result.VersionMismatch,
-                result_data =
-                    CraftScan.CONST.CURRENT_VERSION
+                result_data = CraftScan.CONST.CURRENT_VERSION
             },
             CraftScanComm.Operations.Handshake, sender);
         return;
@@ -436,64 +482,46 @@ local function SendMessage(encoded, target)
     CraftScanComm:SendCommMessage(CRAFT_SCAN_COMM_PREFIX, encoded, "WHISPER", target)
 end
 
-local function TransmitToAllTargets(encoded, targets)
-    for i, target in ipairs(targets) do
-        CraftScan.Utils.printTable("Sending request to", target)
-        SendMessage(encoded, target);
-    end
-end
-
-
--- There is weirdly no way to test if a player is online, so our 'test' is
--- to put a chat filter in place to ignore the 'player not found' message,
--- fire off the message to everyone, and hopefully detect which character is
--- online and remember it for next time. If we have a prior online
--- character, we try that one first. If it doesn't match our filter after a
--- few seconds, we assume the send was successful. If it does match our
--- filter, the character has logged off and we try everyone again.
-local onlineCharacters = {};
-
+-- There is weirdly no way to test if a player is online. Originally, we tested
+-- if characters were online by the lack of an error message when sending a
+-- message. Unfortunately, it seems that at least in Aug 2024, you can
+-- successfully send messages to your own characters that have been offline for
+-- hours, so that test is out the window. The solution is actually better
+-- though. Since we always ping around the latest information on login, and we
+-- know only one character per account can be logged in, we can group our
+-- characters by account and know that the last one that sent us a message is
+-- the one that is online. If that one doesn't work any more, that's fine - when
+-- another logs in, it will tell us and we'll save that. The only time we need
+-- to ping multiple remote targets is on login when we are announcing ourselves
+-- and waiting for replies.
 local IgnoreOfflineMessages = {}
 IgnoreOfflineMessages.__index = IgnoreOfflineMessages;
 
-function IgnoreOfflineMessages:new(targets)
+function IgnoreOfflineMessages:new(targets, encoded)
     local self = setmetatable({}, IgnoreOfflineMessages);
 
-    local onlineIndex = nil;
-    for i, target in ipairs(targets) do
-        -- If we've messaged a target successfully already, we try that
-        -- target first and test for success before sending to others.
-        if onlineCharacters[target] ~= nil then
-            self.lastOnline = target;
-            onlineIndex = i;
-            self.targets = targets;
-        else
+    for _, accountTargets in pairs(targets) do
+        for target, _ in pairs(accountTargets) do
+            -- If we've messaged a target successfully already, we try that
+            -- target first and test for success before sending to others.
             self.filtered = self.filtered or {};
             local msg = ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", CraftScan.NameAndRealmToName(target));
-            self.filtered[target] = {
-                msg = msg,
-                online = true, -- Assume true, flip to false if we filter an offline warning.
-            }
+            self.filtered[target] = msg;
         end
     end
 
-    if onlineIndex then
-        table.remove(targets, onlineIndex)
-    end
-
     local function CreateOfflineChatFilter(filtered)
-        CraftScan.Utils.printTable("Created chat filter. Ignoring:", filtered)
+        CraftScan.Utils.printTable("Created chat filter. Ignoring", filtered)
         return function(self, event, msg)
             for char, filter in pairs(filtered) do
-                if msg == filter.msg then
-                    filter.online = false;
+                if msg == filter then
                     return true;
                 end
             end
         end
     end
 
-    self.filter = CreateOfflineChatFilter(self.lastOnline and onlineCharacters or self.filtered);
+    self.filter = CreateOfflineChatFilter(self.filtered);
 
     ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", self.filter)
 
@@ -501,56 +529,39 @@ function IgnoreOfflineMessages:new(targets)
 end
 
 function IgnoreOfflineMessages:Clear()
-    local function ClearFilter()
-        local function RemoveFilter()
-            ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", self.filter)
-        end
-
-        if self.lastOnline then
-            if not onlineCharacters[self.lastOnline].online then
-                onlineCharacters[self.lastOnline] = nil;
-                self.lastOnline = nil;
-
-                -- Try again by sending to all the targets
-                TransmitToAllTargets(encoded, targets, self);
-                self:Clear();
-            else
-                -- We successfully sent to the last online target, so we're done.
-                CraftScan.Utils.printTable("Send successful", self.lastOnline)
-                RemoveFilter();
-            end
-
-            return
-        end
-
-        CraftScan.Utils.printTable("Filter timeout. Results", self.filtered)
-        for char, filter in pairs(self.filtered) do
-            if filter.online then
-                onlineCharacters[char] = filter;
-            end
-        end
-        CraftScan.Utils.printTable("Online characters", onlineCharacters)
-        RemoveFilter();
-    end
-
-    -- If we're testing a character known to be online, we only wait 2 seconds
-    -- since it should be a single send and is hopefully fast. If that fails, we
-    -- fall back to the full list of targets and allow 10 seconds for all the
-    -- attempts. Addon messages are throttled, so it takes some time.
-    local timeout = self.lastOnline and 2 or 10;
-    C_Timer.After(timeout, ClearFilter);
+    C_Timer.After(10, function() ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", self.filter) end);
 end
 
-local function TransmitSerialized(serialized, targets)
+local function TransmitSerialized(serialized, target)
     local compressed = LibDeflate:CompressDeflate(serialized)
     local encoded = LibDeflate:EncodeForWoWAddonChannel(compressed)
 
-    local filter = IgnoreOfflineMessages:new(targets);
-
-    if filter.lastOnline then
-        SendMessage(encoded, filter.lastOnline);
+    -- In responses, we're given an explicit character to send to, so we use it.
+    -- Otherwise, generate a list of tarets based on our linked accounts. The
+    -- offline message filter will hopefully be able to narrow that down to a
+    -- character we already communicated with first so we don't have to send to
+    -- every character every time.
+    local targets = {};
+    if target then
+        table.insert(targets, { [target] = true });
     else
-        TransmitToAllTargets(encoded, targets);
+        if not remoteTargets then
+            targets = CreateInitialTargets();
+            remoteTargets = {};
+        else
+            targets = remoteTargets;
+        end
+    end
+
+    CraftScan.Utils.printTable("targets", targets);
+
+    local filter = IgnoreOfflineMessages:new(targets, encoded);
+
+    for _, accountTargets in pairs(targets) do
+        for target, _ in pairs(accountTargets) do
+            CraftScan.Utils.printTable("Sending request to", target)
+            SendMessage(encoded, target);
+        end
     end
 
     filter:Clear();
@@ -558,19 +569,14 @@ end
 
 local asyncPool = CreateFramePool("Frame", UIParent);
 
-function CraftScanComm:Transmit(data, operation, targets)
-    if type(targets) ~= "table" then
-        -- Normalize our input to keep it simple. We support either a single
-        -- character or an array of characters.
-        targets = { targets };
-    end
-
-
+function CraftScanComm:Transmit(data, operation, target)
     local msg = {
         operation = operation,
+        version = CraftScan.CONST.CURRENT_VERSION,
         data = data,
         senderID = CraftScan.DB.settings.my_uuid,
     };
+    CraftScan.Utils.printTable("Sending msg", msg)
 
     local handler = LibSerialize:SerializeAsync(msg)
 
@@ -580,7 +586,7 @@ function CraftScanComm:Transmit(data, operation, targets)
         if completed then
             processing:SetScript("OnUpdate", nil)
             asyncPool:Release(processing);
-            TransmitSerialized(serialized, targets);
+            TransmitSerialized(serialized, target);
         end
     end)
 
@@ -589,43 +595,64 @@ function CraftScanComm:Transmit(data, operation, targets)
     processing:Show();
 end
 
+local function ReceiveRemoteTarget(senderID, sender)
+    remoteTargets[senderID] = { [sender] = true };
+    local nameAndRealm = sender .. "-" .. GetRealmName();
+
+    -- If we are receiving from a character that is not a crafter, save the name
+    -- as a backup so we can find it again during future discovery phases.
+    local backupChars = CraftScan.DB.settings.linked_accounts[senderID].backup_chars;
+    if not CraftScan.DB.characters[nameAndRealm] and not CraftScan.Utils.Contains(backupChars, sender) then
+        table.insert(backupChars, sender);
+        CraftScan.Utils.printTable("Updated backupChars", backupChars);
+    end
+
+    CraftScan.Utils.printTable("Updated remoteTargets", remoteTargets);
+end
+
 local function ReceiveDeserialized(msg, sender)
-    CraftScan.Utils.printTable("msg", msg);
+    CraftScan.Utils.printTable("Received msg", msg);
 
     if msg.operation == CraftScanComm.Operations.Handshake then
-        self:ReceiveHandshake(sender, msg.data);
+        ReceiveHandshake(sender, msg.data);
     else
+        if msg.version ~= CraftScan.CONST.CURRENT_VERSION then
+            print(string.format(L(LID.VERSION_MISMATCH), msg.version, CraftScan.CONST.CURRENT_VERSION));
+        end
+
         local linkedAccounts = CraftScan.DB.settings.linked_accounts;
         if not linkedAccounts or not linkedAccounts[msg.senderID] then
             CraftScan.Utils.printTable("Ignoring message from unlinked account.", nil)
             return;
         end
+
+        if remoteTargets then
+            ReceiveRemoteTarget(msg.senderID, sender)
+        end
+
         if msg.operation == CraftScanComm.Operations.ShareCharacterData then
             ReceiveShareCharacterData(sender, msg.data, msg.senderID);
+        end
+        if msg.operation == CraftScanComm.Operations.ShareCustomerOrder then
+            ReceiveShareCustomerOrder(sender, msg.data, msg.senderID);
         end
     end
 end
 
 function CraftScanComm:OnCommReceived(prefix, payload, distribution, sender)
-    CraftScan.Utils.printTable("Received packet", prefix);
-
     if prefix ~= CRAFT_SCAN_COMM_PREFIX then return; end
 
     local decoded = LibDeflate:DecodeForWoWAddonChannel(payload);
     if not decoded then return; end
-    CraftScan.Utils.printTable("decoded", true);
 
     local decompressed = LibDeflate:DecompressDeflate(decoded);
     if not decompressed then return; end
-    CraftScan.Utils.printTable("decompressed", true);
 
     local handler = LibSerialize:DeserializeAsync(decompressed);
     local processing = asyncPool:Acquire();
     processing:SetScript("OnUpdate", function()
         local completed, success, deserialized = handler()
         if completed then
-            CraftScan.Utils.printTable("deserialize_complete", true);
-
             processing:SetScript("OnUpdate", nil)
             asyncPool:Release(processing);
             if not success then return end

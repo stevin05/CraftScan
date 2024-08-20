@@ -7,7 +7,16 @@ end
 
 CraftScan.Frames = {}
 CraftScan.Utils = {}
-CraftScan.Utils.DIAG_PRINT_ENABLED = false
+CraftScan.Utils.DIAG_PRINT_ENABLED = true
+
+function CraftScan.Utils.Contains(array, value)
+    for _, v in ipairs(array) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
 
 local function DeepCopy_(original)
     local copy
@@ -460,6 +469,16 @@ local function UpgradePersistentConfig()
             end
         end
     end
+
+    if CraftScan.DB.settings.linked_accounts then
+        for _, info in pairs(CraftScan.DB.settings.linked_accounts) do
+            if info.backup_char then
+                info.backup_chars = {};
+                table.insert(info.backup_chars, info.backup_char)
+                info.backup_char = nil;
+            end
+        end
+    end
 end
 
 function CraftScan.Utils.GetSetting(key)
@@ -489,7 +508,7 @@ local function CompareVersions(version1, version2)
     return 0
 end
 
-CraftScan.CONST.CURRENT_VERSION = 'v1.0.10';
+CraftScan.CONST.CURRENT_VERSION = 'v1.2.0';
 
 function CraftScan_RecentUpdatesMixin:OnHide()
     CraftScan.DB.settings.last_loaded_version = CraftScan.CONST.CURRENT_VERSION;

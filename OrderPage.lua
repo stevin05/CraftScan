@@ -628,6 +628,7 @@ function CraftScanCrafterListMixin:SetupCrafterList()
         if CraftScan.DB.characters[crafterInfo.name].parent_professions[crafterInfo.parentProfessionID].primary_crafter then
             frame.PrimaryCrafterIcon:Show();
         end
+        frame.LinkedAccountIcon:Init(frame.crafterInfo);
     end
 
     view:SetElementFactory(function(factory)
@@ -807,6 +808,61 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", {
     end
 })
 
+CraftScan_PrimaryCrafterIconMixin = {}
+
+function CraftScan_PrimaryCrafterIconMixin:OnShow()
+    local linkedAccount = self:GetParent().LinkedAccountIcon;
+    linkedAccount:ClearAllPoints()
+    linkedAccount:SetPoint("LEFT", self, "RIGHT", 2, 0)
+end
+
+CraftScan_LinkedAccountIconMixin = {}
+
+function CraftScan_LinkedAccountIconMixin:Init(crafterInfo)
+    -- GetParent() doesn't return during OnLoad, so we have a manual init call
+    -- to receive the crafterInfo directly.
+    local charConfig = CraftScan.DB.characters[crafterInfo.name];
+    if charConfig.sourceID and charConfig.sourceID ~= CraftScan.DB.settings.my_uuid then
+        self:Show();
+    end
+end
+
+function CraftScan_LinkedAccountIconMixin:OnEnter()
+    local crafter = self:GetParent().crafterInfo.name;
+    local sourceID = CraftScan.DB.characters[crafter].sourceID;
+    local nickname = CraftScan.DB.settings.linked_accounts[sourceID].nickname;
+
+    -- TODO - Configure this tooltip properly
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+    GameTooltip:SetText(nickname);
+    GameTooltip:Show()
+end
+
+function CraftScan_LinkedAccountIconMixin:OnLeave()
+    GameTooltip:Hide()
+end
+
+CraftScan_ProxyEnabledMixin = {}
+
+function CraftScan_ProxyEnabledMixin:OnLoad()
+    local value = CraftScan.DB.settings[self.key] or false;
+    self:SetChecked(value);
+    self.Text:SetText(L(self.key));
+end
+
+function CraftScan_ProxyEnabledMixin:OnClick()
+    CraftScan.DB.settings[self.key] = not CraftScan.DB.settings[self.key];
+
+    -- If disabled out in the world, we need a kick to hide the button.
+    CraftScanScannerMenu:UpdateFrameVisibility();
+end
+
+function CraftScan_ProxyEnabledMixin:OnEnter()
+end
+
+function CraftScan_ProxyEnabledMixin:OnLeave()
+end
+
 CraftScan_PeerButtonMixin = {}
 
 function CraftScan_PeerButtonMixin:Reset()
@@ -818,7 +874,7 @@ function CraftScan_PeerButtonMixin:Reset()
         self:SetText(L("Accept Linked Account"));
         self.PendingAlert:Show();
     else
-        self:SetText(L("Link Peer Account"));
+        self:SetText(L("Link Account"));
         self.PendingAlert:Hide();
     end
 
@@ -923,7 +979,7 @@ function CraftScan.OnPendingPeerAccepted()
     CraftScan.Utils.printTable("linked_accounts", CraftScan.DB.settings.linked_accounts)
 end
 
-function CraftScan.ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig, skipReplication)
+local function ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig)
     -- We can only have one primary crafter for a given profession, so walk the
     -- list and turn off the others.
     if not ppConfig.primary_crafter then
@@ -936,10 +992,9 @@ function CraftScan.ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig, skipReplic
                 if parentProfID == crafterInfo.parentProfessionID and parentProfConfig.primary_crafter then
                     parentProfConfig.primary_crafter = false;
 
-                    if not skipReplication then
-                        local ppChangeOnly = true;
-                        CraftScanComm:ShareCharacterModification(char, parentProfID, ppChangeOnly);
-                    end
+                    local ppChangeOnly = true;
+                    CraftScanComm:ShareCharacterModification(char, parentProfID, ppChangeOnly);
+
                     return; -- There can only be one.
                 end
             end
@@ -1017,7 +1072,7 @@ function CraftScanCrafterListElementMixin:OnClick(button)
             end
             local SetSelected = function()
                 ppConfig.primary_crafter = not ppConfig.primary_crafter;
-                CraftScan.ProcessPrimaryCrafterUpdate(self.crafterInfo, ppConfig)
+                ProcessPrimaryCrafterUpdate(self.crafterInfo, ppConfig)
                 CraftScan.OnCrafterListModified();
 
                 local ppChangeOnly = true;

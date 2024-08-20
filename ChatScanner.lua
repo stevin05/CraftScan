@@ -430,7 +430,9 @@ CraftScan.ColorizeCrafterName = function(name)
     return '|cff00ff00' .. name .. '|r'
 end
 
-local lastChatFrameMessage = { message = '', args = nil };
+local lastChatFrameMessages = {}
+local lastChatFrameIndex = 0; -- Incremented to 1 before use
+local CHAT_FRAME_BUFFER_SIZE = 10;
 
 local function MakeChatHistoryEntry(customer, message)
     -- We've hacked together the ChatFrame and the CHAT_MSG_ events, but they
@@ -443,13 +445,38 @@ local function MakeChatHistoryEntry(customer, message)
 
     -- You can test this out by leaving 'Say' chat, then saying an order for
     -- yourself.
-    if string.find(lastChatFrameMessage.message, CraftScan.NameAndRealmToName(customer)) then
-        return {
-            message = lastChatFrameMessage.message,
-            args = lastChatFrameMessage.args,
-        }
+    local function DoIt(index)
+        local lastChatFrameMessage = lastChatFrameMessages[index];
+        if string.find(lastChatFrameMessage.message, CraftScan.NameAndRealmToName(customer)) then
+            return {
+                message = lastChatFrameMessage.message,
+                args = lastChatFrameMessage.args,
+            }
+        end
+        return nil;
     end
 
+    -- We add entries to the circular buffer in increasing order, so start at
+    -- the last added entry and work our way backwards to find the customer's
+    -- message with formatting.
+    if lastChatFrameIndex then
+        for i = lastChatFrameIndex, 1, -1 do
+            local result = DoIt(i);
+            if result then return result; end
+        end
+
+        for i = 2, lastChatFrameIndex - 1, 1 do
+            local result = DoIt(i);
+            if result then return result; end
+        end
+    end
+
+    return nil;
+end
+
+local function MakeChatHistoryEntryDefault(customer, message)
+    local found = MakeChatHistoryEntry(customer, message);
+    if found then return found; end
     return {
         message = message,
         args = nil,
@@ -502,7 +529,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
     response.message = SplitResponse(greeting)
     local chat_history = saved(customerInfo, 'chat_history', {})
-    table.insert(chat_history, MakeChatHistoryEntry(customer, message));
+    table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
 
     if categoryID then
         -- Save the request at higher granularities as well so that we don't
@@ -576,10 +603,11 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
         CraftScanCraftingOrderPage:ShowGeneric()
     end
+
+    CraftScanComm:ShareCustomerOrder(message, customer, customerInfo.guid, chat_history[#chat_history]);
 end
 
-local function OnMessage(self, event, ...)
-    local message, customer = ...
+function CraftScan.OnMessage(event, message, customer, customerGuid)
     if not message or not customer then
         return false
     end
@@ -589,14 +617,14 @@ local function OnMessage(self, event, ...)
     if event == "CHAT_MSG_WHISPER_INFORM" then
         if customerInfo then
             local chat_history = saved(customerInfo, 'chat_history', {})
-            table.insert(chat_history, MakeChatHistoryEntry(customer, message));
+            table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
         end
         return false
     end
 
     if event == "CHAT_MSG_WHISPER" and customerInfo then
         local chat_history = saved(customerInfo, 'chat_history', {})
-        table.insert(chat_history, MakeChatHistoryEntry(customer, message));
+        table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
 
         for _, response in pairs(customerInfo.responses) do
             if response.greeting_sent then
@@ -614,7 +642,7 @@ local function OnMessage(self, event, ...)
     end
 
     local customerInfo = saved(CraftScan.DB.customers, customer, {})
-    customerInfo.guid = select(12, ...)
+    customerInfo.guid = customerGuid;
 
     if itemID or recipeInfo then
         if not itemID then
@@ -638,18 +666,47 @@ local function OnMessage(self, event, ...)
     return false
 end
 
+local function OnMessage_(self, event, ...)
+    local message, customer = ...;
+    local customerGuid = select(12, ...);
+    CraftScan.OnMessage(event, message, customer, customerGuid);
+end
+
 local frame = CreateFrame("frame")
 
 -- Can't unhook, so we disable it without the table allocation at least.
 local registered = false
 local disableHook = false
+
+local function InsertChatFrame(message, args)
+    if #lastChatFrameMessages < CHAT_FRAME_BUFFER_SIZE then
+        table.insert(lastChatFrameMessages, {});
+    end
+    lastChatFrameIndex = lastChatFrameIndex % CHAT_FRAME_BUFFER_SIZE + 1; -- Wow this looks weird. Thanks Lua 1-basedness
+    local currentChatFrame = lastChatFrameMessages[lastChatFrameIndex];
+
+    currentChatFrame.message = message;
+    currentChatFrame.args = args;
+end
 local function CaptureChatMessage(chatFrame, message, ...)
     if disableHook then return end
 
     -- For Prat integration, we grab the historyBuffer value, which has
     -- the timestamp separately added. 'message' does not include it.
-    lastChatFrameMessage.message = chatFrame.historyBuffer:GetEntryAtIndex(1).message;
-    lastChatFrameMessage.args = SafePack(...);
+    InsertChatFrame(chatFrame.historyBuffer:GetEntryAtIndex(1).message, SafePack(...));
+end
+
+function CraftScan.InjectLastChatFrameMessage(customer, message, last)
+    -- If we didn't see the same message, append it to our history and return
+    -- that we should continue processing it. Otherwise, this account has
+    -- already seen it so we can stop working.
+    local found = MakeChatHistoryEntry(customer, message);
+    if not found then
+        InsertChatFrame(last.message, last.args);
+        return true;
+    else
+    end
+    return false;
 end
 
 local function UpdateScannerEventRegistry(...)
@@ -689,7 +746,7 @@ end
 CraftScan.Utils.onLoad(function()
     CraftScan.Scanner.LoadConfig()
 
-    frame:SetScript("OnEvent", OnMessage)
+    frame:SetScript("OnEvent", OnMessage_);
 
     CraftScan.Utils.RegisterEnableDisableCallback(UpdateScannerEventRegistry)
     hooksecurefunc(_G.ChatFrame1, "AddMessage", CaptureChatMessage);

@@ -37,6 +37,33 @@
 		</Scripts>
 	</Button>
 
+	<CheckButton name="CraftScan_ProxyEnabledTemplate" mixin="CraftScan_ProxyEnabledMixin" virtual="true">
+		<Size x="18" y="18"/>
+		<Scripts>
+			<OnShow method="OnLoad"/>
+			<OnClick method="OnClick"/>
+			<OnEnter method="OnEnter"/>
+			<OnLeave method="OnLeave"/>
+		</Scripts>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormal" parentKey="Text">
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0"/>
+					</Anchors>
+					<Scripts>
+						<OnLoad function="UICheckButtonFontString_SetParentKeyAlias"/>
+					</Scripts>
+				</FontString>
+			</Layer>
+		</Layers>
+		<NormalTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+		<PushedTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+		<CheckedTexture atlas="checkmark-minimal" useAtlasSize="true"/>
+		<DisabledCheckedTexture atlas="checkmark-minimal-disabled" useAtlasSize="true"/>
+	</CheckButton>
+
+
 
 	<Button name="CraftScan_OpenProfessionButtonTemplate" inherits="CraftScan_TabButtonTemplate" mixin="CraftScan_OpenProfessionButtonMixin" virtual="true">
 		<Scripts>
@@ -144,11 +171,25 @@
 						<Anchor point="LEFT" relativePoint="LEFT" x="20"/>
 					</Anchors>
 				</FontString>
-				<Texture parentKey="PrimaryCrafterIcon" atlas="auctionhouse-icon-favorite" hidden="true">
+				<Texture parentKey="PrimaryCrafterIcon" atlas="auctionhouse-icon-favorite" mixin="CraftScan_PrimaryCrafterIconMixin" hidden="true">
 					<Size x="13" y="13"/>
 					<Anchors>
 						<Anchor relativeKey="$parent.CrafterName" point="LEFT" relativePoint="RIGHT" x="2"/>
 					</Anchors>
+					<Scripts>
+						<OnShow method="OnShow"/>
+					</Scripts>
+				</Texture>
+				<Texture parentKey="LinkedAccountIcon" atlas="questlog-questtypeicon-group" mixin="CraftScan_LinkedAccountIconMixin" hidden="true">
+					<Size x="13" y="13"/>
+					<Anchors>
+						<!-- This anchor can be dynamically changed by PrimaryCrafterIcon OnShow -->
+						<Anchor relativeKey="$parent.CrafterName" point="LEFT" relativePoint="RIGHT" x="2"/>
+					</Anchors>
+					<Scripts>
+						<OnEnter method="OnEnter"/>
+						<OnLeave method="OnLeave"/>
+					</Scripts>
 				</Texture>
 				<FontString parentKey="ProfessionName" inherits="Number14FontWhite" justifyH="RIGHT" setAllPoints="true">
 					<Anchors>
@@ -219,6 +260,24 @@
 					</Layer>
 				</Layers>
 			</Button>
+
+			<CheckButton parentKey="ProxySendEnabled" inherits="CraftScan_ProxyEnabledTemplate">
+				<KeyValues>
+					<KeyValue key="key" value="proxy_send_enabled" type="string"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent.PeerButton" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton parentKey="ProxyReceiveEnabled" inherits="CraftScan_ProxyEnabledTemplate">
+				<KeyValues>
+					<KeyValue key="key" value="proxy_receive_enabled" type="string"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent.ProxySendEnabled" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+				</Anchors>
+			</CheckButton>
 
 			<Frame parentKey="BrowseFrame" setAllPoints="true">
 				<Size x="1105" y="658"/>

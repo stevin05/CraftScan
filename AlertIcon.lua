@@ -57,6 +57,14 @@ function CraftScanPageButtonMixin:UpdateIcon(profession)
     self.Portrait:SetTexture(profession and profession.icon or 4620670);
 end
 
+function CraftScanScannerMenuMixin:UpdateFrameVisibility(...)
+    if CraftScan.Utils.IsScanningEnbled(...) then
+        self:Show()
+    else
+        self:Hide()
+    end
+end
+
 function CraftScanScannerMenuMixin:SetPulseLock(lock, enabled)
     self.pulseLocks[lock] = enabled;
 end
@@ -201,17 +209,13 @@ CraftScan.Utils.onLoad(function()
         end
     end)
 
-    local function UpdateFrameVisibility(...)
-        if CraftScan.Utils.IsScanningEnbled(...) then
-            frame:Show()
-        else
-            frame:Hide()
-        end
+    local function DoUpdateFrameVisibility(...)
+        frame:UpdateFrameVisibility(...);
     end
 
-    CraftScan.Utils.RegisterEnableDisableCallback(UpdateFrameVisibility)
+    CraftScan.Utils.RegisterEnableDisableCallback(DoUpdateFrameVisibility)
 
     frame.PageButton:UpdateIcon();
 
-    UpdateFrameVisibility();
+    DoUpdateFrameVisibility();
 end)
