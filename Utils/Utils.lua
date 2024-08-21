@@ -554,7 +554,12 @@ local function NotifyRecentChanges()
             version = 'v1.0.10',
             id = LID.RN_CLEANUP,
         },
+        {
+            version = 'v1.2.0',
+            id = LID.RN_LINKED_ACCOUNTS,
+        },
     };
+
 
     local anchor = AnchorUtil.CreateAnchor("TOP", CraftScanRecentUpdatesFrame.ScrollFrame.Content, "TOP");
     local organizer = CraftScan.Frames.CreateVerticalLayoutOrganizer(anchor, 0, 0);

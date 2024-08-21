@@ -173,6 +173,62 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.CHAT_BUTTON_BINDING_NAME]        = "Flüster-Banner-Kunde",
         ["Customer Request"]                  = "Anfrage von %s",
 
+        [LID.ADDON_WHITELIST_LABEL]           = "Addon-Whitelist",
+        [LID.ADDON_WHITELIST_TOOLTIP]         =
+        "Wenn du den Button drückst, um alle Addons vorübergehend zu deaktivieren, bleiben die hier ausgewählten Addons aktiviert. CraftScan bleibt immer aktiviert. Behalte nur das, was du zum effektiven Handwerk benötigst.",
+        [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d ausgewählt", -- Count
+
+        [LID.ACCOUNT_LINK_DESC]               =
+        "Teile Handwerker zwischen mehreren Accounts.\n\nBeim Einloggen oder nach einer Konfigurationsänderung wird CraftScan die neuesten Informationen zwischen den konfigurierten Accounts synchronisieren, um sicherzustellen, dass beide Seiten eines verlinkten Accounts immer auf dem neuesten Stand sind.",
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "Gib den Namen eines Charakters auf deinem anderen Account ein:",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "Gib einen Spitznamen für den anderen Account ein:",
+        ["Link Account"]                      = "Account verlinken",
+        ["Linked Accounts"]                   = "Verlinkte Accounts",
+        ["Accept Linked Account"]             = "Verlinkten Account akzeptieren",
+        ["Delete Linked Account"]             = "Verlinkten Account löschen",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    =
+        "'%s' hat eine Anfrage zur Verlinkung von Accounts gesendet.\n\nNICHT AKZEPTIEREN, WENN DU ES NICHT SELBST ANGEFORDERT HAST.\n\nGib einen Spitznamen für den anderen Account ein:",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   =
+        "|cFF00FF00Du hast eine ausstehende Anfrage zur Verlinkung von Accounts mit %s. Klicke hier, um sie zu akzeptieren.|r",
+        ["OK"]                                = "OK",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    =
+        "Um die Account-Verlinkung abzuschließen, musst du die Anfrage auf dem anderen Account akzeptieren. Der 'Account verlinken'-Button wird durch einen 'Verlinkten Account akzeptieren'-Button ersetzt, um den Vorgang abzuschließen. Falls ein Fehler auftritt, wird er neben dem 'Account verlinken'-Button angezeigt.",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   =
+        "|cFFFFA500Warte auf %s, um die Account-Verlinkungsanfrage zu akzeptieren.|r",
+        [LID.VERSION_MISMATCH]                =
+        "|cFFFF0000Fehler: CraftScan-Version nicht kompatibel. Andere Account-Version: %s. Deine Version: %s.|r",
+
+        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        "Dieser Charakter gehört zu einem verlinkten Account. Er kann nur auf dem Account, dem er gehört, deaktiviert werden. Du kannst diesen Charakter vollständig über 'Bereinigung' entfernen, musst dies jedoch manuell auf allen verlinkten Accounts tun, sonst wird er beim Einloggen wiederhergestellt.",
+        [LID.REMOTE_CRAFTER_SUMMARY]          = "Synchronisiert mit %s.",
+        ["proxy_send_enabled"]                = "Proxy-Aufträge",
+        ["proxy_send_enabled_tooltip"]        = "Wenn eine Kundenbestellung erkannt wird, sende sie an verlinkte Accounts.",
+        ["proxy_receive_enabled"]             = "Proxy-Aufträge empfangen",
+        ["proxy_receive_enabled_tooltip"]     =
+        "Wenn ein anderer Account eine Kundenbestellung erkennt und sendet, empfängt dieser Account sie. Der CraftScan-Button wird angezeigt, um bei Bedarf das Benachrichtigungsbanner zu zeigen.",
+        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s (zuletzt gesehen %s)|r", -- Crafter, Time
+        [LID.LINK_DEAD]                       = "|cFFFF0000Offline|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        "Lösche die Verlinkung zu '%s' und alle importierten Charaktere. Dieser Account wird jegliche Kommunikation mit der anderen Seite einstellen. Die andere Seite wird weiterhin versuchen, Verbindungen herzustellen, bis die Verlinkung auch dort manuell entfernt wird.\n\nEntfernte importierte Handwerker:\n%s",
+        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        "Standardmäßig sind der Charakter, den du zunächst verlinkt hast, alle Handwerker und alle Charaktere, die eingeloggt waren, während dieser Account online war, bei CraftScan bekannt. Füge weitere Charaktere des anderen Accounts hinzu, damit sie ebenfalls verwendet werden können. '/reload', um die Synchronisierung mit dem neuen Charakter zu erzwingen, wenn dieser online ist.",
+        ["Backup characters"]                 = "Zusätzliche Charaktere",
+        ["Unlink account"]                    = "Account entkoppeln",
+        ["Add"]                               = "Hinzufügen",
+        ["Remove"]                            = "Entfernen",
+        ["Rename account"]                    = "Account umbenennen",
+        ["New name"]                          = "Neuer Name:",
+
+        [LID.RN_LINKED_ACCOUNTS]              = "Verlinkte Accounts",
+        [LID.RN_LINKED_ACCOUNTS + 1]          =
+        "Verlinke mehrere WoW-Accounts, um Handwerksinformationen zu teilen und von jedem Account aus zu scannen.",
+        [LID.RN_LINKED_ACCOUNTS + 2]          =
+        "Optional: Proxy-Kundenaufträge von einem Account zu den anderen senden, damit du einen Testaccount in der Stadt parken kannst, während dein Hauptcharakter unterwegs ist.",
+        [LID.RN_LINKED_ACCOUNTS + 3]          =
+        "Um loszulegen, klicke auf den 'Account verlinken'-Button in der unteren linken Ecke des CraftScan-Fensters und folge den Anweisungen.",
+        [LID.RN_LINKED_ACCOUNTS + 4]          = "Demo: https://www.youtube.com/watch?v=x1JLEph6t_c",
+
+
 
     }
 end

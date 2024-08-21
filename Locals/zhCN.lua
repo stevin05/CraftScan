@@ -162,6 +162,48 @@ function CraftScan.LOCAL_CN:GetData()
         ["Proposed Greeting"]                 = "建议的问候:",
         [LID.CHAT_BUTTON_BINDING_NAME]        = "密语横幅客户",
         ["Customer Request"]                  = "%s的请求",
+        [LID.ADDON_WHITELIST_LABEL]           = "插件白名单",
+        [LID.ADDON_WHITELIST_TOOLTIP]         = "当你按下按钮暂时禁用所有插件时，保持这里选择的插件启用状态。CraftScan将始终保持启用。只保留你有效制作所需的内容。",
+        [LID.MULTI_SELECT_BUTTON_TEXT]        = "已选择%d项", -- Count
 
+        [LID.ACCOUNT_LINK_DESC]               = "在多个帐户之间共享制造者。\n\n在登录时或配置更改后，CraftScan会在配置的制造者之间传播最新信息，以确保链接的帐户的双方始终保持同步。",
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "输入你其他帐户中在线角色的名字：",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "为另一个帐户输入一个昵称：",
+        ["Link Account"]                      = "链接帐户",
+        ["Linked Accounts"]                   = "已链接帐户",
+        ["Accept Linked Account"]             = "接受已链接帐户",
+        ["Delete Linked Account"]             = "删除已链接帐户",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    = "'%s'发出了链接帐户的请求。\n\n如果您没有发送此请求，请勿接受。\n\n为另一个帐户输入一个昵称：",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   = "|cFF00FF00你有一个挂起的请求与%s链接帐户。点击此处接受。|r",
+        ["OK"]                                = "确定",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    = "要完成帐户链接，你需要在另一个帐户上接受请求。'链接帐户'按钮将被'接受已链接帐户'按钮替换以完成操作。如果有错误，它将显示在'链接帐户'按钮旁边。",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   = "|cFFFFA500正在等待%s接受帐户链接请求。|r",
+        [LID.VERSION_MISMATCH]                = "|cFFFF0000错误：CraftScan版本不兼容。另一个帐户的版本：%s。您的版本：%s。|r",
+
+        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        "此角色属于已链接的帐户。它只能在其所属的帐户上被禁用。你可以通过“清理”完全移除此角色，但你需要在所有已链接的帐户上手动执行此操作，否则它将在登录时被已链接的帐户恢复。",
+        [LID.REMOTE_CRAFTER_SUMMARY]          = "与%s同步。",
+        ["proxy_send_enabled"]                = "代理订单",
+        ["proxy_send_enabled_tooltip"]        = "当检测到客户订单时，将其发送到已链接的帐户。",
+        ["proxy_receive_enabled"]             = "接收代理订单",
+        ["proxy_receive_enabled_tooltip"]     = "当另一个帐户检测到并发送客户订单时，此帐户将接收它。如果需要，CraftScan按钮将显示警告横幅。",
+        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s（上次看到%s）|r", -- Crafter, Time
+        [LID.LINK_DEAD]                       = "|cFFFF0000离线|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        "删除与'%s'的链接并删除所有导入的角色。此帐户将停止与另一方的所有通信。另一方将继续尝试建立连接，直到在该处手动删除链接为止。\n\n将被删除的导入制造者：\n%s",
+        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        "默认情况下，你最初链接的角色、任何制造者以及此帐户在线时登录的任何角色都为CraftScan所知。添加属于另一个帐户的其他角色，以便他们也可以使用。如果他们在线，请使用'/reload'强制与新角色同步。",
+        ["Backup characters"]                 = "其他角色",
+        ["Unlink account"]                    = "取消链接帐户",
+        ["Add"]                               = "添加",
+        ["Remove"]                            = "移除",
+        ["Rename account"]                    = "重命名帐户",
+        ["New name"]                          = "新名字：",
+
+        [LID.RN_LINKED_ACCOUNTS]              = "已链接帐户",
+        [LID.RN_LINKED_ACCOUNTS + 1]          = "将多个WoW帐户链接在一起以共享制造信息并从任何帐户扫描到任何帐户。",
+        [LID.RN_LINKED_ACCOUNTS + 2]          = "可选地，发送客户订单代理从一个帐户到其他帐户，这样你可以让测试帐户在城市中保持不变，而你的主账户在外面。",
+        [LID.RN_LINKED_ACCOUNTS + 3]          = "要开始，请点击CraftScan窗口左下角的“链接帐户”按钮，并按照说明操作。",
+        [LID.RN_LINKED_ACCOUNTS + 4]          = "演示：https://www.youtube.com/watch?v=x1JLEph6t_c",
     }
 end

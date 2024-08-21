@@ -171,6 +171,60 @@ function CraftScan.LOCAL_IT:GetData()
         ["Proposed Greeting"]                 = "Saluto proposto:",
         [LID.CHAT_BUTTON_BINDING_NAME]        = "Cliente Banner Sussurro",
         ["Customer Request"]                  = "Richiesta da %s",
+        [LID.ADDON_WHITELIST_LABEL]           = "Lista bianca degli addon",
+        [LID.ADDON_WHITELIST_TOOLTIP]         =
+        "Quando premi il pulsante per disattivare temporaneamente tutti gli addon, mantieni attivi gli addon selezionati qui. CraftScan rimarrà sempre attivo. Mantieni solo ciò che ti serve per craftare efficacemente.",
+        [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d selezionati", -- Count
+
+        [LID.ACCOUNT_LINK_DESC]               =
+        "Condividi gli artigiani tra più account.\n\nAl login o dopo una modifica della configurazione, CraftScan propaga le ultime informazioni tra gli artigiani configurati su entrambi gli account per garantire che entrambi i lati di un account collegato siano sempre sincronizzati.",
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "Inserisci il nome di un personaggio online sull'altro tuo account:",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "Inserisci un soprannome per l'altro account:",
+        ["Link Account"]                      = "Collega Account",
+        ["Linked Accounts"]                   = "Account Collegati",
+        ["Accept Linked Account"]             = "Accetta Account Collegato",
+        ["Delete Linked Account"]             = "Elimina Account Collegato",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    =
+        "'%s' ha inviato una richiesta per collegare gli account.\n\nNON ACCETTARE SE NON HAI INVIATO QUESTA RICHIESTA.\n\nInserisci un soprannome per l'altro account:",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   =
+        "|cFF00FF00Hai una richiesta in sospeso per collegare l'account con %s. Clicca qui per accettarla.|r",
+        ["OK"]                                = "OK",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    =
+        "Per completare il collegamento dell'account, devi accettare la richiesta sull'altro account. Il pulsante 'Collega Account' sarà sostituito da un pulsante 'Accetta Account Collegato' per completare l'operazione. Se c'è un errore, sarà visualizzato accanto al pulsante 'Collega Account'.",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   =
+        "|cFFFFA500In attesa che %s accetti la richiesta di collegamento dell'account.|r",
+        [LID.VERSION_MISMATCH]                =
+        "|cFFFF0000Errore: versione di CraftScan non compatibile. Versione dell'altro account: %s. La tua versione: %s.|r",
+
+        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        "Questo personaggio appartiene a un account collegato. Può essere disattivato solo sull'account a cui appartiene. Puoi rimuovere completamente questo personaggio tramite 'Pulizia', ma dovrai farlo manualmente su tutti gli account collegati, altrimenti sarà ripristinato da un account collegato al login.",
+        [LID.REMOTE_CRAFTER_SUMMARY]          = "Sincronizzato con %s.",
+        ["proxy_send_enabled"]                = "Ordini Proxy",
+        ["proxy_send_enabled_tooltip"]        = "Quando viene rilevato un ordine cliente, invialo agli account collegati.",
+        ["proxy_receive_enabled"]             = "Ricevi Ordini Proxy",
+        ["proxy_receive_enabled_tooltip"]     =
+        "Quando un altro account rileva e invia un ordine cliente, questo account lo riceverà. Il pulsante CraftScan sarà visualizzato per mostrare l'avviso se necessario.",
+        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s (visto l'ultima volta %s)|r", -- Crafter, Time
+        [LID.LINK_DEAD]                       = "|cFFFF0000Offline|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        "Elimina il collegamento con '%s' e tutti i personaggi importati. Questo account cesserà ogni comunicazione con l'altro lato. L'altro lato continuerà a tentare di stabilire connessioni fino a quando il collegamento non sarà eliminato manualmente anche lì.\n\nArtigiani importati che saranno eliminati:\n%s",
+        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        "Per impostazione predefinita, il personaggio che hai inizialmente collegato, qualsiasi artigiano e qualsiasi personaggio che si è connesso mentre questo account era online sono conosciuti da CraftScan. Aggiungi personaggi aggiuntivi appartenenti all'altro account in modo che possano essere utilizzati anche loro. '/reload' per forzare la sincronizzazione con il nuovo personaggio se è online.",
+        ["Backup characters"]                 = "Personaggi Aggiuntivi",
+        ["Unlink account"]                    = "Scollega Account",
+        ["Add"]                               = "Aggiungi",
+        ["Remove"]                            = "Rimuovi",
+        ["Rename account"]                    = "Rinomina Account",
+        ["New name"]                          = "Nuovo Nome:",
+
+        [LID.RN_LINKED_ACCOUNTS]              = "Account Collegati",
+        [LID.RN_LINKED_ACCOUNTS + 1]          =
+        "Collega più account WoW insieme per condividere informazioni di crafting e scannerizzare da qualsiasi account.",
+        [LID.RN_LINKED_ACCOUNTS + 2]          =
+        "Facoltativamente, invia ordini cliente per proxy da un account agli altri così puoi lasciare un account di prova in città mentre il tuo main è in giro.",
+        [LID.RN_LINKED_ACCOUNTS + 3]          =
+        "Per iniziare, clicca sul pulsante 'Collega Account' nell'angolo in basso a sinistra della finestra di CraftScan e segui le istruzioni.",
+        [LID.RN_LINKED_ACCOUNTS + 4]          = "Demo: https://www.youtube.com/watch?v=x1JLEph6t_c",
 
     }
 end

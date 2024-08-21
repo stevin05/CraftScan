@@ -170,8 +170,6 @@ function CraftScan.LOCAL_EN:GetData()
         ["Proposed Greeting"]                 = "Proposed greeting:",
         [LID.CHAT_BUTTON_BINDING_NAME]        = "Whisper Banner Customer",
         ["Customer Request"]                  = "Request from %s",
-
-        -- Translations complete above this line
         [LID.ADDON_WHITELIST_LABEL]           = "Addon whitelist",
         [LID.ADDON_WHITELIST_TOOLTIP]         =
         "When you hit the button to temporarily disable all addons, keep the addons selected here enabled. CraftScan will always stay enabled. Keep only what you need to craft effectively.",
@@ -218,5 +216,18 @@ function CraftScan.LOCAL_EN:GetData()
         ["Rename account"]                    = "Rename account",
         ["New name"]                          = "New name:",
 
+
+        [LID.RN_LINKED_ACCOUNTS]     = "Linked Accounts",
+        [LID.RN_LINKED_ACCOUNTS + 1] =
+        "Link multiple WoW accounts together to share crafting information and scan for any account from any account.",
+        [LID.RN_LINKED_ACCOUNTS + 2] =
+        "Optionally, proxy customer orders from one account to the others so you can park a trial account in town while your main is out and about.",
+        [LID.RN_LINKED_ACCOUNTS + 3] =
+        "To get started, click the 'Link Account' button in the bottom left corner of the CraftScan window and follow the instruction.",
+        [LID.RN_LINKED_ACCOUNTS + 4] =
+        "Demo: https://www.youtube.com/watch?v=x1JLEph6t_c",
+
+        -- Translations complete above this line
+        ["Open Settings"]            = "Open Settings",
     }
 end

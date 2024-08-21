@@ -163,6 +163,48 @@ function CraftScan.LOCAL_TW:GetData()
         ["Proposed Greeting"]                 = "建議的問候語:",
         [LID.CHAT_BUTTON_BINDING_NAME]        = "悄悄話橫幅顧客",
         ["Customer Request"]                  = "%s 的請求",
+        [LID.ADDON_WHITELIST_LABEL]           = "插件白名單",
+        [LID.ADDON_WHITELIST_TOOLTIP]         = "當你按下按鈕暫時禁用所有插件時，保持此處選擇的插件啟用。CraftScan將始終保持啟用。僅保留你有效製作所需的內容。",
+        [LID.MULTI_SELECT_BUTTON_TEXT]        = "已選擇%d項", -- Count
 
+        [LID.ACCOUNT_LINK_DESC]               = "在多個帳戶之間共享製作人。\n\n在登錄或配置更改後，CraftScan會在配置的製作人之間傳播最新信息，以確保連結的帳戶雙方始終保持同步。",
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "輸入你其他帳戶中在線角色的名字：",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "為另一個帳戶輸入一個暱稱：",
+        ["Link Account"]                      = "連結帳戶",
+        ["Linked Accounts"]                   = "已連結帳戶",
+        ["Accept Linked Account"]             = "接受已連結帳戶",
+        ["Delete Linked Account"]             = "刪除已連結帳戶",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    = "'%s'發出了連結帳戶的請求。\n\n如果您沒有發送此請求，請勿接受。\n\n為另一個帳戶輸入一個暱稱：",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   = "|cFF00FF00你有一個掛起的請求與%s連結帳戶。點擊此處接受。|r",
+        ["OK"]                                = "確定",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    = "要完成帳戶連結，你需要在另一個帳戶上接受請求。“連結帳戶”按鈕將被“接受已連結帳戶”按鈕替換以完成操作。如果有錯誤，它將顯示在“連結帳戶”按鈕旁邊。",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   = "|cFFFFA500正在等待%s接受帳戶連結請求。|r",
+        [LID.VERSION_MISMATCH]                = "|cFFFF0000錯誤：CraftScan版本不相容。另一個帳戶的版本：%s。您的版本：%s。|r",
+
+        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        "此角色屬於已連結的帳戶。它只能在其所屬的帳戶上被禁用。你可以通過“清理”完全移除此角色，但你需要在所有已連結的帳戶上手動執行此操作，否則它將在登錄時被已連結的帳戶恢復。",
+        [LID.REMOTE_CRAFTER_SUMMARY]          = "與%s同步。",
+        ["proxy_send_enabled"]                = "代理訂單",
+        ["proxy_send_enabled_tooltip"]        = "當檢測到客戶訂單時，將其發送到已連結的帳戶。",
+        ["proxy_receive_enabled"]             = "接收代理訂單",
+        ["proxy_receive_enabled_tooltip"]     = "當另一個帳戶檢測到並發送客戶訂單時，此帳戶將接收它。如果需要，CraftScan按鈕將顯示警告橫幅。",
+        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s（上次看到%s）|r", -- Crafter, Time
+        [LID.LINK_DEAD]                       = "|cFFFF0000離線|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        "刪除與'%s'的連結並刪除所有導入的角色。此帳戶將停止與另一方的所有通信。另一方將繼續嘗試建立連接，直到在該處手動刪除連結為止。\n\n將被刪除的導入製作人：\n%s",
+        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        "默認情況下，你最初連結的角色、任何製作人以及此帳戶在線時登錄的任何角色都為CraftScan所知。添加屬於另一個帳戶的其他角色，以便他們也可以使用。如果他們在線，請使用'/reload'強制與新角色同步。",
+        ["Backup characters"]                 = "其他角色",
+        ["Unlink account"]                    = "取消連結帳戶",
+        ["Add"]                               = "添加",
+        ["Remove"]                            = "移除",
+        ["Rename account"]                    = "重新命名帳戶",
+        ["New name"]                          = "新名字：",
+
+        [LID.RN_LINKED_ACCOUNTS]              = "已連結帳戶",
+        [LID.RN_LINKED_ACCOUNTS + 1]          = "將多個WoW帳戶連結在一起以共享製作信息並從任何帳戶掃描到任何帳戶。",
+        [LID.RN_LINKED_ACCOUNTS + 2]          = "可選地，發送客戶訂單代理從一個帳戶到其他帳戶，這樣你可以讓測試帳戶在城市中保持不變，而你的主賬戶在外面。",
+        [LID.RN_LINKED_ACCOUNTS + 3]          = "要開始，請點擊CraftScan窗口左下角的“連結帳戶”按鈕，並按照說明操作。",
+        [LID.RN_LINKED_ACCOUNTS + 4]          = "演示：https://www.youtube.com/watch?v=x1JLEph6t_c",
     }
 end

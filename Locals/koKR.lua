@@ -164,6 +164,52 @@ function CraftScan.LOCAL_KO:GetData()
         ["Proposed Greeting"]                 = "제안된 인사말:",
         [LID.CHAT_BUTTON_BINDING_NAME]        = "귓말 배너 고객",
         ["Customer Request"]                  = "%s의 요청",
+        [LID.ADDON_WHITELIST_LABEL]           = "애드온 허용 목록",
+        [LID.ADDON_WHITELIST_TOOLTIP]         =
+        "모든 애드온을 일시적으로 비활성화하는 버튼을 누를 때, 여기에서 선택한 애드온을 유지합니다. CraftScan은 항상 활성화됩니다. 제작에 필요한 것만 유지하세요.",
+        [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d 선택됨", -- Count
+
+        [LID.ACCOUNT_LINK_DESC]               =
+        "여러 계정 간에 제작자를 공유하세요.\n\n로그인 시 또는 설정 변경 후, CraftScan은 양쪽 계정에 설정된 제작자 간 최신 정보를 전파하여 항상 동기화되도록 합니다.",
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "다른 계정에 있는 온라인 캐릭터 이름을 입력하세요:",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "다른 계정의 별명을 입력하세요:",
+        ["Link Account"]                      = "계정 연결",
+        ["Linked Accounts"]                   = "연결된 계정",
+        ["Accept Linked Account"]             = "연결된 계정 수락",
+        ["Delete Linked Account"]             = "연결된 계정 삭제",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    = "'%s'님이 계정 연결 요청을 보냈습니다.\n\n이 요청을 보내지 않았다면 수락하지 마세요.\n\n다른 계정의 별명을 입력하세요:",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   = "|cFF00FF00%s와(과) 계정 연결 요청이 있습니다. 여기 클릭하여 수락하세요.|r",
+        ["OK"]                                = "확인",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    =
+        "계정 연결을 완료하려면 다른 계정에서 요청을 수락해야 합니다. '계정 연결' 버튼이 '연결된 계정 수락' 버튼으로 바뀌어 작업을 완료합니다. 오류가 발생하면 '계정 연결' 버튼 옆에 표시됩니다.",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   = "|cFFFFA500%s님이 계정 연결 요청을 수락할 때까지 기다리는 중입니다.|r",
+        [LID.VERSION_MISMATCH]                = "|cFFFF0000오류: CraftScan 버전 불일치. 다른 계정의 버전: %s. 현재 버전: %s.|r",
+
+        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        "이 캐릭터는 연결된 계정에 속합니다. 캐릭터가 속한 계정에서만 비활성화할 수 있습니다. '정리'를 통해 이 캐릭터를 완전히 제거할 수 있지만, 모든 연결된 계정에서 수동으로 제거해야 하며, 로그인 시 연결된 계정에 의해 복원됩니다.",
+        [LID.REMOTE_CRAFTER_SUMMARY]          = "%s와(과) 동기화됨.",
+        ["proxy_send_enabled"]                = "프록시 주문",
+        ["proxy_send_enabled_tooltip"]        = "고객 주문이 감지되면, 연결된 계정에 보냅니다.",
+        ["proxy_receive_enabled"]             = "프록시 주문 받기",
+        ["proxy_receive_enabled_tooltip"]     = "다른 계정이 고객 주문을 감지하고 전송하면 이 계정이 받습니다. 필요한 경우 CraftScan 버튼이 경고 배너를 표시합니다.",
+        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s (마지막 접속: %s)|r", -- Crafter, Time
+        [LID.LINK_DEAD]                       = "|cFFFF0000오프라인|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        "'%s'와(과)의 연결을 삭제하고 모든 가져온 캐릭터를 삭제합니다. 이 계정은 다른 계정과의 모든 통신을 중단합니다. 다른 계정은 수동으로 연결을 제거할 때까지 계속 연결을 시도할 것입니다.\n\n삭제될 가져온 제작자:\n%s",
+        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        "기본적으로 처음 연결한 캐릭터, 모든 제작자, 이 계정이 온라인 상태일 때 로그인한 모든 캐릭터가 CraftScan에 알려져 있습니다. 다른 계정에 속한 추가 캐릭터를 추가하여 사용할 수 있도록 합니다. 온라인 상태인 경우 '/reload'로 새 캐릭터와 강제로 동기화하세요.",
+        ["Backup characters"]                 = "추가 캐릭터",
+        ["Unlink account"]                    = "계정 연결 해제",
+        ["Add"]                               = "추가",
+        ["Remove"]                            = "제거",
+        ["Rename account"]                    = "계정 이름 변경",
+        ["New name"]                          = "새 이름:",
+
+        [LID.RN_LINKED_ACCOUNTS]              = "연결된 계정",
+        [LID.RN_LINKED_ACCOUNTS + 1]          = "제작 정보를 공유하고 모든 계정에서 모든 계정의 스캔을 할 수 있도록 여러 WoW 계정을 연결하세요.",
+        [LID.RN_LINKED_ACCOUNTS + 2]          = "원하는 경우 한 계정에서 다른 계정으로 고객 주문을 프록시하여 메인 캐릭터가 외부에 있는 동안 시험 계정을 도시에 주차할 수 있습니다.",
+        [LID.RN_LINKED_ACCOUNTS + 3]          = "시작하려면 CraftScan 창의 왼쪽 하단 모서리에 있는 '계정 연결' 버튼을 클릭하고 지침을 따르세요.",
+        [LID.RN_LINKED_ACCOUNTS + 4]          = "데모: https://www.youtube.com/watch?v=x1JLEph6t_c",
 
 
     }

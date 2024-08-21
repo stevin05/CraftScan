@@ -171,5 +171,60 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.CHAT_BUTTON_BINDING_NAME]        = "Client Bannière Chuchotement",
         ["Customer Request"]                  = "Demande de %s",
 
+        [LID.ADDON_WHITELIST_LABEL]           = "Liste blanche d'addons",
+        [LID.ADDON_WHITELIST_TOOLTIP]         =
+        "Lorsque vous appuyez sur le bouton pour désactiver temporairement tous les addons, gardez les addons sélectionnés ici activés. CraftScan restera toujours activé. Gardez uniquement ce dont vous avez besoin pour fabriquer efficacement.",
+        [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d sélectionnés", -- Count
+
+        [LID.ACCOUNT_LINK_DESC]               =
+        "Partagez les artisans entre plusieurs comptes.\n\nLors de la connexion ou après un changement de configuration, CraftScan propagera les dernières informations entre les artisans configurés sur les deux comptes pour s'assurer que les deux côtés d'un compte lié soient toujours synchronisés.",
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "Entrez le nom d'un personnage en ligne sur votre autre compte :",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "Entrez un surnom pour l'autre compte :",
+        ["Link Account"]                      = "Lier le compte",
+        ["Linked Accounts"]                   = "Comptes liés",
+        ["Accept Linked Account"]             = "Accepter le compte lié",
+        ["Delete Linked Account"]             = "Supprimer le compte lié",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    =
+        "'%s' a envoyé une demande de liaison de compte.\n\nNE L'ACCEPTEZ PAS SI VOUS NE L'AVEZ PAS ENVOYÉ.\n\nEntrez un surnom pour l'autre compte :",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   =
+        "|cFF00FF00Vous avez une demande en attente pour lier des comptes avec %s. Cliquez ici pour l'accepter.|r",
+        ["OK"]                                = "OK",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    =
+        "Pour terminer la liaison des comptes, vous devez accepter la demande sur l'autre compte. Le bouton 'Lier le compte' sera remplacé par un bouton 'Accepter le compte lié' pour terminer l'opération. En cas d'erreur, elle sera affichée à côté du bouton 'Lier le compte'.",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   =
+        "|cFFFFA500En attente de %s pour accepter la demande de liaison de compte.|r",
+        [LID.VERSION_MISMATCH]                =
+        "|cFFFF0000Erreur : incompatibilité de version de CraftScan. Version de l'autre compte : %s. Votre version : %s.|r",
+
+        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        "Ce personnage appartient à un compte lié. Il ne peut être désactivé que sur le compte auquel il appartient. Vous pouvez complètement supprimer ce personnage via 'Nettoyage', mais vous devrez le faire manuellement sur tous les comptes liés, sinon il sera restauré par un compte lié lors de la connexion.",
+        [LID.REMOTE_CRAFTER_SUMMARY]          = "Synchronisé avec %s.",
+        ["proxy_send_enabled"]                = "Ordres Proxy",
+        ["proxy_send_enabled_tooltip"]        = "Lorsqu'une commande client est détectée, envoyez-la aux comptes liés.",
+        ["proxy_receive_enabled"]             = "Recevoir les ordres proxy",
+        ["proxy_receive_enabled_tooltip"]     =
+        "Lorsqu'un autre compte détecte et envoie une commande client, ce compte la recevra. Le bouton CraftScan s'affichera pour montrer la bannière d'alerte si nécessaire.",
+        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s (vu pour la dernière fois %s)|r", -- Crafter, Time
+        [LID.LINK_DEAD]                       = "|cFFFF0000Hors ligne|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        "Supprimez la liaison avec '%s' et supprimez tous les personnages importés. Ce compte cessera toute communication avec l'autre côté. L'autre côté continuera à essayer d'établir des connexions jusqu'à ce que la liaison soit manuellement supprimée également.\n\nArtisans importés qui seront supprimés :\n%s",
+        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        "Par défaut, le personnage que vous avez initialement lié, ainsi que tous les artisans et personnages qui se sont connectés alors que ce compte était en ligne, sont connus de CraftScan. Ajoutez des personnages supplémentaires appartenant à l'autre compte afin qu'il puisse également être utilisé. '/reload' pour forcer la synchronisation avec le nouveau personnage s'il est en ligne.",
+        ["Backup characters"]                 = "Personnages supplémentaires",
+        ["Unlink account"]                    = "Dissocier le compte",
+        ["Add"]                               = "Ajouter",
+        ["Remove"]                            = "Supprimer",
+        ["Rename account"]                    = "Renommer le compte",
+        ["New name"]                          = "Nouveau nom :",
+
+        [LID.RN_LINKED_ACCOUNTS]              = "Comptes liés",
+        [LID.RN_LINKED_ACCOUNTS + 1]          =
+        "Liez plusieurs comptes WoW ensemble pour partager les informations de fabrication et scanner depuis n'importe quel compte.",
+        [LID.RN_LINKED_ACCOUNTS + 2]          =
+        "Optionnellement, envoyez des commandes clients par proxy d'un compte aux autres afin que vous puissiez stationner un compte d'essai en ville pendant que votre personnage principal est en déplacement.",
+        [LID.RN_LINKED_ACCOUNTS + 3]          =
+        "Pour commencer, cliquez sur le bouton 'Lier le compte' en bas à gauche de la fenêtre CraftScan et suivez les instructions.",
+        [LID.RN_LINKED_ACCOUNTS + 4]          = "Démo : https://www.youtube.com/watch?v=x1JLEph6t_c",
+
     }
 end
