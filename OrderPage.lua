@@ -1636,10 +1636,120 @@ CraftScan_OpenSettingsButtonMixin = {}
 
 function CraftScan_OpenSettingsButtonMixin:OnLoad()
     self:SetText(L("Open Settings"))
+    self:FitToText();
 end
 
 function CraftScan_OpenSettingsButtonMixin:OnClick()
     CraftScan.Settings:Open();
+end
+
+CraftScan_CustomGreetingButtonMixin = {}
+
+function CraftScan_CustomGreetingButtonMixin:OnLoad()
+    self:SetText(L("Customize Greeting"))
+    self:FitToText();
+end
+
+function CraftScan_CustomGreetingButtonMixin:OnClick()
+    local greetings = {
+        { key = 'GREETING_I_CAN_CRAFT_ITEM',   placeholders = 1, suggestion = L("item link") },
+        { key = 'GREETING_I_HAVE_PROF',        placeholders = 1, suggestion = L("profession name") },
+        { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = 2, suggestion = L("alt name and then item link") },
+        { key = 'GREETING_ALT_HAS_PROF',       placeholders = 2, suggestion = L("alt name and then profession name") },
+        { key = 'GREETING_ALT_SUFFIX',         placeholders = 0, },
+    };
+
+    local function Validator(index, text)
+        local function HasOnlyPercentS(inputString)
+            -- Thanks ChatGPT. Hope it works...
+            local length = #inputString
+            local i = 1
+            while i <= length do
+                local char = inputString:sub(i, i)
+
+                if char == "%" then
+                    -- Check if the % is escaped
+                    local isEscaped = i > 1 and inputString:sub(i - 1, i - 1) == "%"
+
+                    if not isEscaped then
+                        -- Look ahead to the next character
+                        local nextChar = inputString:sub(i + 1, i + 1)
+                        if nextChar ~= "s" and nextChar ~= "%" and nextChar ~= "" then
+                            return false -- Found a non-%s specifier
+                        end
+                        -- Skip the next character if it's part of the format specifier
+                        i = i + 1
+                    end
+                end
+
+                i = i + 1
+            end
+
+            return true -- Only %s specifiers found, or no specifiers found
+        end
+
+        local count = 0
+        for _ in string.gmatch(text, "([^%%])%%s") do
+            count = count + 1
+        end
+
+        local expected = greetings[index].placeholders;
+        if count > expected then
+            return { error = string.format(L(LID.WRONG_NUMBER_OF_PLACEHOLDERS), expected, count), };
+        end
+
+        if not HasOnlyPercentS(text) then
+            return { error = L(LID.WRONG_TYPE_OF_PLACEHOLDERS) };
+        end
+
+        if count ~= expected then
+            return {
+                warning = string.format(L(LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION), expected,
+                    greetings[index].suggestion,
+                    count),
+            }
+        end
+
+        return nil;
+    end
+
+    local function OnAccept(...)
+        local sv = CraftScan.Utils.saved(CraftScan.DB.settings, 'greeting', {})
+        local numArgs = select("#", ...)
+        for i = 1, numArgs do
+            local value = select(i, ...)
+            local greeting = greetings[i];
+
+            sv[greeting.key] = value;
+        end
+        CraftScanComm:ShareCustomGreeting(sv);
+    end
+
+    local elements = {
+        {
+            type = CraftScan.Dialog.Element.Text,
+            text = string.format(L(LID.CUSTOM_GREETING_INFO)),
+        },
+    };
+
+    local sv = CraftScan.DB.settings.greeting or {};
+    for _, greeting in ipairs(greetings) do
+        local default = L(LID[greeting.key]);
+        table.insert(elements, {
+            type = CraftScan.Dialog.Element.EditBox,
+            initial_text = sv[greeting.key] or default,
+            default_text = default,
+            Validator = Validator,
+            padding = 5,
+        })
+    end
+    CraftScan.Dialog.Show({
+        width = 450,
+        title = L("Customize Greeting"),
+        submit = L("Customize Greeting"),
+        OnAccept = OnAccept,
+        elements = elements,
+    })
 end
 
 CraftScan.Utils.onLoad(function()

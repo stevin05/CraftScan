@@ -194,6 +194,10 @@ function CraftScan.Frames.CreateVerticalLayoutOrganizer(anchor, xPadding, yPaddi
     xPadding = xPadding or 0;
     yPadding = yPadding or 0;
 
+    function OrganizerMixin:Empty()
+        return not next(self.entries);
+    end
+
     function OrganizerMixin:Add(frame, xPadding, yPadding, child)
         table.insert(self.entries, {
             frame = frame,
@@ -508,7 +512,7 @@ local function CompareVersions(version1, version2)
     return 0
 end
 
-CraftScan.CONST.CURRENT_VERSION = 'v1.2.0';
+CraftScan.CONST.CURRENT_VERSION = 'v1.2.1';
 
 function CraftScan_RecentUpdatesMixin:OnHide()
     CraftScan.DB.settings.last_loaded_version = CraftScan.CONST.CURRENT_VERSION;
@@ -590,11 +594,13 @@ local function NotifyRecentChanges()
         end
     end
 
-    organizer:Layout();
-    CraftScan.Frames.makeMovable(CraftScanRecentUpdatesFrame)
-    CraftScanRecentUpdatesFrame.ScrollFrame:SetScrollChild(CraftScanRecentUpdatesFrame.ScrollFrame.Content)
-    CraftScanRecentUpdatesFrame:SetTitle(L("CraftScan Release Notes"));
-    CraftScanRecentUpdatesFrame:Show();
+    if not organizer:Empty() then
+        organizer:Layout();
+        CraftScan.Frames.makeMovable(CraftScanRecentUpdatesFrame)
+        CraftScanRecentUpdatesFrame.ScrollFrame:SetScrollChild(CraftScanRecentUpdatesFrame.ScrollFrame.Content)
+        CraftScanRecentUpdatesFrame:SetTitle(L("CraftScan Release Notes"));
+        CraftScanRecentUpdatesFrame:Show();
+    end
 end
 
 local once = false

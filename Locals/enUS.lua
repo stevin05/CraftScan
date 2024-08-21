@@ -217,17 +217,35 @@ function CraftScan.LOCAL_EN:GetData()
         ["New name"]                          = "New name:",
 
 
-        [LID.RN_LINKED_ACCOUNTS]     = "Linked Accounts",
-        [LID.RN_LINKED_ACCOUNTS + 1] =
+        [LID.RN_LINKED_ACCOUNTS]                      = "Linked Accounts",
+        [LID.RN_LINKED_ACCOUNTS + 1]                  =
         "Link multiple WoW accounts together to share crafting information and scan for any account from any account.",
-        [LID.RN_LINKED_ACCOUNTS + 2] =
+        [LID.RN_LINKED_ACCOUNTS + 2]                  =
         "Optionally, proxy customer orders from one account to the others so you can park a trial account in town while your main is out and about.",
-        [LID.RN_LINKED_ACCOUNTS + 3] =
+        [LID.RN_LINKED_ACCOUNTS + 3]                  =
         "To get started, click the 'Link Account' button in the bottom left corner of the CraftScan window and follow the instruction.",
-        [LID.RN_LINKED_ACCOUNTS + 4] =
+        [LID.RN_LINKED_ACCOUNTS + 4]                  =
         "Demo: https://www.youtube.com/watch?v=x1JLEph6t_c",
 
         -- Translations complete above this line
-        ["Open Settings"]            = "Open Settings",
+        ["Open Settings"]                             = "Open Settings",
+        ["Customize Greeting"]                        = "Customize Greeting",
+        [LID.CUSTOM_GREETING_INFO]                    =
+        "CraftScan uses these sentences to create the initial greeting sent to customers depending on the situation. Override some or all of them below to create your own greeting.",
+        ["Default"]                                   = "Default",
+        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "Error: Expected %d or fewer %%s placeholders. The provided text has %d.",
+        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Error: Only %s placeholders are supported.",
+
+        ["item link"]                                 = "item link",
+        ["alt name and then item link"]               = "alt name and then an item link",
+        ["profession name"]                           = "profession name",
+        ["alt name and then profession name"]         = "alt name and then the profession name",
+        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
+        "This text must contain %d or fewer %%s placeholders to hold the %s. You have included %d.\n\nCraftScan will work with fewer placeholders, but you likely want to include them for context.",
+
+
+
+        -- ChatGPT prompt:
+        -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.  
     }
 end

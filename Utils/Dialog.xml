@@ -31,9 +31,26 @@
             <OnLoad method="OnLoad" />
             <OnEscapePressed method="OnEscapePressed" />
             <OnTabPressed method="OnTabPressed" />
-            <OnTextChanged method="OnTextChanged" />
+            <!-- <OnTextChanged method="OnTextChanged" /> -->
             <OnEnterPressed method="OnEnterPressed" />
+            <OnEditFocusLost method="OnEditFocusLost" />
         </Scripts>
+
+        <Layers>
+            <Layer level="DIALOG" textureSubLevel="1">
+                <Texture parentKey="InvalidInput" mixin="CraftScan_DialogTextInputAlertIconMixin" atlas="common-icon-redx" hidden="true">
+                    <Size x="16" y="16"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativePoint="RIGHT" x="-2"/>
+                    </Anchors>
+                    <Scripts>
+                        <OnEnter method="OnEnter" />
+                        <OnLeave method="OnLeave" />
+                    </Scripts>
+                </Texture>
+            </Layer>
+        </Layers>
+
     </EditBox>
 
     <Frame name="CraftScanDialogTextTemplate" frameStrata="DIALOG" virtual="true">
@@ -46,4 +63,12 @@
             </Layer>
         </Layers>
     </Frame>
+
+    <Button name="CraftScan_DialogDefaultButtonTemplate" mixin="CraftScan_DialogDefaultButtonMixin" registerForClicks="LeftButtonUp" inherits="UIPanelButtonTemplate" virtual="true">
+        <Size x="100" y="22" />
+        <Scripts>
+            <OnClick method="OnClick" />
+        </Scripts>
+    </Button>
+
 </Ui>

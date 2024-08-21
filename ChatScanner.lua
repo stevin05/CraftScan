@@ -434,7 +434,7 @@ local lastChatFrameMessages = {}
 local lastChatFrameIndex = 0; -- Incremented to 1 before use
 local CHAT_FRAME_BUFFER_SIZE = 10;
 
-local function MakeChatHistoryEntry(customer, message)
+local function MakeChatHistoryEntry(customer)
     -- We've hacked together the ChatFrame and the CHAT_MSG_ events, but they
     -- are not guaranteed to line up with eachother because we depend on the
     -- message appearing on ChatFrame1 but it could appear on any (or no) chat
@@ -475,7 +475,7 @@ local function MakeChatHistoryEntry(customer, message)
 end
 
 local function MakeChatHistoryEntryDefault(customer, message)
-    local found = MakeChatHistoryEntry(customer, message);
+    local found = MakeChatHistoryEntry(customer);
     if found then return found; end
     return {
         message = message,
@@ -508,19 +508,28 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     local crafter = crafterInfo.crafter:match("^([^-]+)")
     local alt_craft = crafter ~= UnitName("player")
 
+    local function GetGreeting(tag)
+        -- We support configured or internationalized greetings. They use the
+        -- same naming pattern, so we can look them up by tag.
+        local greeting = CraftScan.DB.settings.greeting;
+        if not greeting then return L(LID[tag]); end
+        return greeting[tag] or L(LID[tag]);
+    end
+
     local greeting = '';
     if alt_craft then
         if itemID then
-            greeting = string.format(L(LID.GREETING_ALT_CAN_CRAFT_ITEM), crafter, itemLink or L(LID.GREETING_LINK_BACKUP));
+            greeting = string.format(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'), crafter,
+                itemLink or L(LID.GREETING_LINK_BACKUP));
         else
-            greeting = string.format(L(LID.GREETING_ALT_HAS_PROF), crafter, profInfo.parentProfessionName);
+            greeting = string.format(GetGreeting('GREETING_ALT_HAS_PROF'), crafter, profInfo.parentProfessionName);
         end
-        greeting = greeting .. ' ' .. L(LID.GREETING_ALT_SUFFIX);
+        greeting = greeting .. ' ' .. GetGreeting('GREETING_ALT_SUFFIX');
     else
         if itemID then
-            greeting = string.format(L(LID.GREETING_I_CAN_CRAFT_ITEM), itemLink or L(LID.GREETING_LINK_BACKUP));
+            greeting = string.format(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'), itemLink or L(LID.GREETING_LINK_BACKUP));
         else
-            greeting = string.format(L(LID.GREETING_I_HAVE_PROF), profInfo.parentProfessionName);
+            greeting = string.format(GetGreeting('GREETING_I_HAVE_PROF'), profInfo.parentProfessionName);
         end
     end
 
@@ -700,8 +709,8 @@ function CraftScan.InjectLastChatFrameMessage(customer, message, last)
     -- If we didn't see the same message, append it to our history and return
     -- that we should continue processing it. Otherwise, this account has
     -- already seen it so we can stop working.
-    local found = MakeChatHistoryEntry(customer, message);
-    if not found then
+    local found = MakeChatHistoryEntry(customer);
+    if not found or found.message ~= last.message then
         CraftScan.Utils.printTable("Inserting", last.message);
         InsertChatFrame(last.message, last.args);
         return true;

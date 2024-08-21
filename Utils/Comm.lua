@@ -40,9 +40,10 @@ function CraftScanComm:OnEnable()
 end
 
 CraftScanComm.Operations = {
-    ShareCharacterData = 'share_char_data',
-    Handshake = 'handshake',
-    ShareCustomerOrder = 'share_customer_order',
+    ShareCharacterData  = 'share_char_data',
+    Handshake           = 'handshake',
+    ShareCustomerOrder  = 'share_customer_order',
+    ShareCustomGreeting = 'share_custom_greeting'
 }
 
 -- A flag to send the request to all known linked accounts
@@ -54,10 +55,7 @@ local TARGET_ALL = nil;
 -- any prior entry from that account.
 local remoteTargets = nil;
 
-local function HaveTarget(sender)
-    -- If we have a specific target, of course we're good to go.
-    if sender then return true; end
-
+local function HaveTarget()
     if remoteTargets then
         for _, target in pairs(remoteTargets) do
             if next(target) then
@@ -71,6 +69,13 @@ local function HaveTarget(sender)
     -- before then. It's likely impossible in practice to sneak something into
     -- this window.
     return false;
+end
+
+local function LinkedAccountsConfigured()
+    if not CraftScan.DB.settings.linked_accounts or not next(CraftScan.DB.settings.linked_accounts) then
+        return false;
+    end
+    return true;
 end
 
 local function CreateInitialTargets()
@@ -150,25 +155,32 @@ local function CharacterInPeers(charConfig, peers)
     return false;
 end
 
+local function GreetingRevision()
+    local greeting = CraftScan.DB.settings.greeting;
+    return greeting and greeting.rev or 0;
+end
+
 local function SendShareCharacterData(target, data)
     CraftScanComm:Transmit(data, CraftScanComm.Operations.ShareCharacterData, target);
 end
 
-local function SendResponseCharacterData(target, characters)
-    SendShareCharacterData(target, { characters = characters, state = SharingState.ResponseData });
+local function SendResponseCharacterData(target, characters, greeting)
+    SendShareCharacterData(target, { characters = characters, greeting = greeting, state = SharingState.ResponseData });
 end
 
 local function ShareCharacterData_(state, target)
-    if not target and not CraftScan.DB.settings.linked_accounts then
-        -- This is used by the initial greeting, so we don't use HaveTarget().
-        -- If we potentially have someone to send to, we let it through.
-        return;
-    end
+    if not LinkedAccountsConfigured() then return; end
 
     local revisions = CreateRevisions();
     local peers = MyPeers();
-    local data = { revisions = revisions, peers = peers, state = state };
+    local data = { revisions = revisions, peers = peers, greeting_revision = GreetingRevision(), state = state };
     SendShareCharacterData(target, data);
+end
+
+local function ReceiveShareCustomGreeting_(greeting)
+    if not CraftScan.DB.settings.greeting or CraftScan.DB.settings.greeting.rev < greeting.rev then
+        CraftScan.DB.settings.greeting = greeting;
+    end
 end
 
 local function ReceiveShareCharacterData(sender, data, senderID)
@@ -218,6 +230,10 @@ local function ReceiveShareCharacterData(sender, data, senderID)
         end
     end
 
+    if data.greeting then
+        ReceiveShareCustomGreeting_(data.greeting);
+    end
+
     if data.state ~= SharingState.ResponseData then
         -- We were given revisions. Respond with any character data that is
         -- either newer than or not included in the revisions, filtered by what
@@ -259,8 +275,14 @@ local function ReceiveShareCharacterData(sender, data, senderID)
             end
         end
 
-        if next(responseCharacters) then
-            SendResponseCharacterData(sender, responseCharacters);
+        local greetingResponse = nil;
+        local greetingRevision = GreetingRevision();
+        if data.greeting_revision and data.greeting_revision < greetingRevision then
+            greetingResponse = CraftScan.DB.settings.greeting;
+        end
+
+        if next(responseCharacters) or greetingResponse then
+            SendResponseCharacterData(sender, responseCharacters, greetingResponse);
         end
     end
 end
@@ -270,8 +292,6 @@ function CraftScanComm:ShareCharacterData()
 end
 
 local function AddOnePpMsg(msgCharacters, char, charConfig, ppID, ppConfig, ppChangeOnly)
-    ppConfig.rev = (ppConfig.rev or 0) + 1;
-
     local mc = saved(msgCharacters, char, {})
     mc.sourceID = charConfig.sourceID;
 
@@ -291,6 +311,14 @@ end
 -- For the toggle-all buttons at the top of the character list, do a bulk push
 -- of all parent professions with no child profession data.
 function CraftScanComm:ShareAllPpCharacterModifications()
+    if not LinkedAccountsConfigured() then return; end
+
+    for _, charConfig in pairs(CraftScan.DB.characters) do
+        for _, ppConfig in pairs(charConfig.parent_professions) do
+            ppConfig.rev = (ppConfig.rev or 0) + 1;
+        end
+    end
+
     if not HaveTarget() then return; end
 
     local msgCharacters = {};
@@ -307,19 +335,23 @@ end
 -- A single modification to the profession. We don't get specific - if they
 -- changed anything, toss the whole profession across.
 function CraftScanComm:ShareCharacterModification(char, ppID, ppChangeOnly)
+    if not LinkedAccountsConfigured() then return; end
+
+    local charConfig = CraftScan.DB.characters[char];
+    local ppConfig = charConfig.parent_professions[ppID];
+    ppConfig.rev = (ppConfig.rev or 0) + 1;
+
     if not HaveTarget() then return; end
 
     local msgCharacters = {};
 
-    local charConfig = CraftScan.DB.characters[char];
-    local ppConfig = charConfig.parent_professions[ppID];
     AddOnePpMsg(msgCharacters, char, charConfig, ppID, ppConfig, ppChangeOnly)
 
     SendResponseCharacterData(TARGET_ALL, msgCharacters);
 end
 
 function CraftScanComm:ShareCustomerOrder(message, customer, customerGuid, lastChatFrameMessage)
-    if not HaveTarget() then return; end
+    if not HaveTarget() or not LinkedAccountsConfigured() then return; end
     if CraftScanComm.applying_remote_state then return; end          -- Block infinite recursion
     if not CraftScan.DB.settings.proxy_send_enabled then return; end -- We're disabled
 
@@ -358,6 +390,21 @@ local function ReceiveShareCustomerOrder(sender, data, senderID)
     CraftScan.OnMessage("CHAT_MSG_CHANNEL", data.message, data.customer, data.customerGuid);
 
     CraftScanComm.applying_remote_state = false;
+end
+
+function CraftScanComm:ShareCustomGreeting(greeting)
+    if not LinkedAccountsConfigured() then return; end
+
+    greeting.rev = (greeting.rev or 0) + 1;
+
+    if not HaveTarget() then return; end
+    if CraftScanComm.applying_remote_state then return; end -- Block infinite recursion
+
+    CraftScanComm:Transmit(greeting, CraftScanComm.Operations.ShareCustomGreeting, TARGET_ALL);
+end
+
+local function ReceiveShareCustomGreeting(sender, data, senderID)
+    ReceiveShareCustomGreeting_(data);
 end
 
 local function InitMyUUID()
@@ -618,6 +665,7 @@ local function ReceiveDeserialized(msg, sender)
     else
         if msg.version ~= CraftScan.CONST.CURRENT_VERSION then
             print(string.format(L(LID.VERSION_MISMATCH), msg.version, CraftScan.CONST.CURRENT_VERSION));
+            return;
         end
 
         local linkedAccounts = CraftScan.DB.settings.linked_accounts;
@@ -635,6 +683,9 @@ local function ReceiveDeserialized(msg, sender)
         end
         if msg.operation == CraftScanComm.Operations.ShareCustomerOrder then
             ReceiveShareCustomerOrder(sender, msg.data, msg.senderID);
+        end
+        if msg.operation == CraftScanComm.Operations.ShareCustomGreeting then
+            ReceiveShareCustomGreeting(sender, msg.data, msg.senderID);
         end
     end
 end

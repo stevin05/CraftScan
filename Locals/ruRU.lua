@@ -5,219 +5,236 @@ CraftScan.LOCAL_RU = {}
 function CraftScan.LOCAL_RU:GetData()
     local LID = CraftScan.CONST.TEXT;
     return {
-        ["CraftScan"]                         = "CraftScan",
-        [LID.CRAFT_SCAN]                      = "CraftScan",
-        [LID.CHAT_ORDERS]                     = "Заказы в чате",
-        [LID.DISABLE_ADDONS]                  = "Отключить аддоны",
-        [LID.RENABLE_ADDONS]                  = "Включить аддоны",
-        [LID.DISABLE_ADDONS_TOOLTIP]          =
+        ["CraftScan"]                                 = "CraftScan",
+        [LID.CRAFT_SCAN]                              = "CraftScan",
+        [LID.CHAT_ORDERS]                             = "Заказы в чате",
+        [LID.DISABLE_ADDONS]                          = "Отключить аддоны",
+        [LID.RENABLE_ADDONS]                          = "Включить аддоны",
+        [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Сохраните свой список аддонов и затем отключите их, чтобы быстро переключиться на альтернативного персонажа. Эту кнопку можно нажать снова, чтобы в любое время снова включить аддоны.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]       = "Я могу создать %s.", -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "Мой альт, %s, может создать %s.", -- Crafter Name, ItemLink
-        [LID.GREETING_LINK_BACKUP]            = "это",
-        [LID.GREETING_I_HAVE_PROF]            = "У меня есть %s.", -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]           = "У моего альта, %s, есть %s.", -- Crafter Name, Profession Name
-        [LID.GREETING_ALT_SUFFIX]             = "Сообщите мне, если вы отправите заказ, чтобы я мог перейти.",
-        [LID.MAIN_BUTTON_BINDING_NAME]        = "Переключить страницу заказа",
-        [LID.GREET_BUTTON_BINDING_NAME]       = "Приветствовать клиента",
-        [LID.DISMISS_BUTTON_BINDING_NAME]     = "Отклонить клиента",
-        [LID.TOGGLE_CHAT_TOOLTIP]             = "Переключить чат заказов%s", -- Keybind
-        [LID.SCANNER_CONFIG_SHOW]             = "Показать CraftScan",
-        [LID.SCANNER_CONFIG_HIDE]             = "Скрыть CraftScan",
-        [LID.CRAFT_SCAN_OPTIONS]              = "Опции CraftScan",
-        [LID.ITEM_SCAN_CHECK]                 = "Сканировать чат на наличие этого предмета",
-        [LID.HELP_PROFESSION_KEYWORDS]        =
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Я могу создать %s.", -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Мой альт, %s, может создать %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_LINK_BACKUP]                    = "это",
+        [LID.GREETING_I_HAVE_PROF]                    = "У меня есть %s.", -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "У моего альта, %s, есть %s.", -- Crafter Name, Profession Name
+        [LID.GREETING_ALT_SUFFIX]                     = "Сообщите мне, если вы отправите заказ, чтобы я мог перейти.",
+        [LID.MAIN_BUTTON_BINDING_NAME]                = "Переключить страницу заказа",
+        [LID.GREET_BUTTON_BINDING_NAME]               = "Приветствовать клиента",
+        [LID.DISMISS_BUTTON_BINDING_NAME]             = "Отклонить клиента",
+        [LID.TOGGLE_CHAT_TOOLTIP]                     = "Переключить чат заказов%s", -- Keybind
+        [LID.SCANNER_CONFIG_SHOW]                     = "Показать CraftScan",
+        [LID.SCANNER_CONFIG_HIDE]                     = "Скрыть CraftScan",
+        [LID.CRAFT_SCAN_OPTIONS]                      = "Опции CraftScan",
+        [LID.ITEM_SCAN_CHECK]                         = "Сканировать чат на наличие этого предмета",
+        [LID.HELP_PROFESSION_KEYWORDS]                =
         "Сообщение должно содержать один из этих терминов. Чтобы сопоставить сообщение, такое как 'LF Lariat', здесь должно быть указано 'lariet'. Для создания ссылки на предмет Elemental Lariat в ответе также 'lariat' следует включить в ключевые слова конфигурации предмета для Elemental Lariat.",
-        [LID.HELP_PROFESSION_EXCLUSIONS]      =
+        [LID.HELP_PROFESSION_EXCLUSIONS]              =
         "Сообщение будет проигнорировано, если оно содержит один из этих терминов, даже если оно в противном случае будет соответствовать. Чтобы избежать ответа на 'LF JC Lariat' с 'У меня есть Jewelcrafting', когда у вас нет рецепта на Lariat, 'lariat' должен быть указан здесь.",
-        [LID.HELP_SCAN_ALL]                   = "Включить сканирование всех рецептов в том же дополнении, что и выбранный рецепт.",
-        [LID.HELP_PRIMARY_EXPANSION]          =
+        [LID.HELP_SCAN_ALL]                           = "Включить сканирование всех рецептов в том же дополнении, что и выбранный рецепт.",
+        [LID.HELP_PRIMARY_EXPANSION]                  =
         "Используйте это приветствие при ответе на общий запрос, такой как 'LF Blacksmith'. После выпуска нового дополнения вы, вероятно, захотите приветствовать, описывая, какие предметы вы можете создать, вместо того чтобы утверждать, что у вас максимальные знания из предыдущего дополнения.",
-        [LID.HELP_EXPANSION_GREETING]         =
+        [LID.HELP_EXPANSION_GREETING]                 =
         "Начальное приветствие всегда генерируется, утверждая, что вы можете создать предмет. Этот текст добавляется к нему. Новые строки допускаются и будут отправлены как отдельный ответ. Если текст слишком длинный, он будет разбит на несколько ответов.",
-        [LID.HELP_CATEGORY_KEYWORDS]          =
+        [LID.HELP_CATEGORY_KEYWORDS]                  =
         "Если была сопоставлена профессия, проверьте эти ключевые слова, специфичные для категории, чтобы уточнить приветствие. Например, вы можете указать здесь 'toxic' или 'slimy', чтобы попытаться обнаружить Мастерские рецепты кожевничества, которые требуют Алтарь Гниения.",
-        [LID.HELP_CATEGORY_GREETING]          =
+        [LID.HELP_CATEGORY_GREETING]                  =
         "Когда эта категория обнаружена в сообщении, как через ключевое слово, так и через ссылку на предмет, это дополнительное приветствие будет добавлено после приветствия профессии.",
-        [LID.HELP_CATEGORY_OVERRIDE]          = "Исключить приветствие профессии и начать с приветствия категории.",
-        [LID.HELP_ITEM_KEYWORDS]              =
+        [LID.HELP_CATEGORY_OVERRIDE]                  = "Исключить приветствие профессии и начать с приветствия категории.",
+        [LID.HELP_ITEM_KEYWORDS]                      =
         "Если была сопоставлена профессия, проверьте эти ключевые слова, специфичные для предмета, чтобы уточнить приветствие. При совпадении ответ будет включать ссылку на предмет вместо общего приветствия профессии. Если 'lariat' является ключевым словом профессии, но не ключевым словом предмета, ответ будет 'У меня есть Jewelcrafting.'. Если 'lariat' является только ключевым словом предмета, 'LF Lariat' не будет считаться профессией и не будет считаться совпадением. Если 'lariat' является и ключевым словом профессии, и ключевым словом предмета, ответ на 'LF Lariat' будет 'Я могу создать [Elemental Lariat].'",
-        [LID.HELP_ITEM_GREETING]              =
+        [LID.HELP_ITEM_GREETING]                      =
         "Когда этот предмет обнаружен в сообщении, как через ключевое слово, так и через ссылку на предмет, это дополнительное приветствие будет добавлено после приветствия профессии и категории.",
-        [LID.HELP_ITEM_OVERRIDE]              = "Исключить приветствия профессии и категории и начать с приветствия предмета.",
-        [LID.HELP_GLOBAL_KEYWORDS]            = "Сообщение должно содержать один из этих терминов.",
-        [LID.HELP_GLOBAL_EXCLUSIONS]          = "Сообщение будет проигнорировано, если оно содержит один из этих терминов.",
-        [LID.SCAN_ALL_RECIPES]                = 'Сканировать все рецепты',
-        [LID.SCANNING_ENABLED]                = "Сканирование включено, потому что '%s' отмечено.", -- SCAN_ALL_RECIPES or ITEM_SCAN_CHECK
-        [LID.SCANNING_DISABLED]               = "Сканирование отключено.",
-        [LID.PRIMARY_KEYWORDS]                = "Основные ключевые слова",
-        [LID.HELP_PRIMARY_KEYWORDS]           =
+        [LID.HELP_ITEM_OVERRIDE]                      = "Исключить приветствия профессии и категории и начать с приветствия предмета.",
+        [LID.HELP_GLOBAL_KEYWORDS]                    = "Сообщение должно содержать один из этих терминов.",
+        [LID.HELP_GLOBAL_EXCLUSIONS]                  = "Сообщение будет проигнорировано, если оно содержит один из этих терминов.",
+        [LID.SCAN_ALL_RECIPES]                        = 'Сканировать все рецепты',
+        [LID.SCANNING_ENABLED]                        = "Сканирование включено, потому что '%s' отмечено.", -- SCAN_ALL_RECIPES or ITEM_SCAN_CHECK
+        [LID.SCANNING_DISABLED]                       = "Сканирование отключено.",
+        [LID.PRIMARY_KEYWORDS]                        = "Основные ключевые слова",
+        [LID.HELP_PRIMARY_KEYWORDS]                   =
         "Все сообщения фильтруются по этим терминам, которые общие для всех профессий. Соответствующее сообщение дополнительно обрабатывается для поиска связанного с профессией контента.",
-        [LID.HELP_CATEGORY_SECTION]           =
+        [LID.HELP_CATEGORY_SECTION]                   =
         "Категория - это сворачиваемый раздел, содержащий рецепт в списке слева. 'Избранное' не является категорией. Это предназначено главным образом для таких вещей, как токсичные рецепты кожевничества, которые сложнее создавать. Это также может быть полезно в начале дополнений, когда вы можете специализироваться только на одной категории.",
-        [LID.HELP_EXPANSION_SECTION]          =
+        [LID.HELP_EXPANSION_SECTION]                  =
         "Деревья знаний отличаются в каждом дополнении, поэтому и приветствие может отличаться.",
-        [LID.HELP_PROFESSION_SECTION]         =
+        [LID.HELP_PROFESSION_SECTION]                 =
         "С точки зрения клиента, нет разницы между дополнениями. Эти термины совмещаются с выбором 'Основного дополнения', чтобы предоставить общее приветствие (например, 'У меня есть <профессия>.') при невозможности сопоставить что-то более конкретное.",
-        [LID.RECIPE_NOT_LEARNED]              = "Вы не изучили этот рецепт. Сканирование отключено.",
-        [LID.PING_SOUND_LABEL]                = "Звук оповещения",
-        [LID.PING_SOUND_TOOLTIP]              = "Звук, который воспроизводится при обнаружении клиента.",
-        [LID.BANNER_SIDE_LABEL]               = "Направление баннера",
-        [LID.BANNER_SIDE_TOOLTIP]             = "Баннер будет расширяться от кнопки в этом направлении.",
-        Left                                  = "Слева",
-        Right                                 = "Справа",
-        Minute                                = "Минута",
-        Minutes                               = "Минуты",
-        Second                                = "Секунда",
-        Seconds                               = "Секунды",
-        Millisecond                           = "Миллисекунда",
-        Milliseconds                          = "Миллисекунды",
-        Version                               = "Новое в",
-        ["CraftScan Release Notes"]           = "Заметки к выпуску CraftScan",
-        [LID.CUSTOMER_TIMEOUT_LABEL]          = "Время ожидания клиента",
-        [LID.CUSTOMER_TIMEOUT_TOOLTIP]        = "Автоматически отклонить клиента после указанного количества минут.",
-        [LID.BANNER_TIMEOUT_LABEL]            = "Время ожидания баннера",
-        [LID.BANNER_TIMEOUT_TOOLTIP]          =
+        [LID.RECIPE_NOT_LEARNED]                      = "Вы не изучили этот рецепт. Сканирование отключено.",
+        [LID.PING_SOUND_LABEL]                        = "Звук оповещения",
+        [LID.PING_SOUND_TOOLTIP]                      = "Звук, который воспроизводится при обнаружении клиента.",
+        [LID.BANNER_SIDE_LABEL]                       = "Направление баннера",
+        [LID.BANNER_SIDE_TOOLTIP]                     = "Баннер будет расширяться от кнопки в этом направлении.",
+        Left                                          = "Слева",
+        Right                                         = "Справа",
+        Minute                                        = "Минута",
+        Minutes                                       = "Минуты",
+        Second                                        = "Секунда",
+        Seconds                                       = "Секунды",
+        Millisecond                                   = "Миллисекунда",
+        Milliseconds                                  = "Миллисекунды",
+        Version                                       = "Новое в",
+        ["CraftScan Release Notes"]                   = "Заметки к выпуску CraftScan",
+        [LID.CUSTOMER_TIMEOUT_LABEL]                  = "Время ожидания клиента",
+        [LID.CUSTOMER_TIMEOUT_TOOLTIP]                = "Автоматически отклонить клиента после указанного количества минут.",
+        [LID.BANNER_TIMEOUT_LABEL]                    = "Время ожидания баннера",
+        [LID.BANNER_TIMEOUT_TOOLTIP]                  =
         "Уведомление о клиенте будет отображаться в течение этого времени после обнаружения совпадения.",
-        ["All crafters"]                      = "Все создатели",
-        ["Crafter Name"]                      = "Имя создателя",
-        ["Profession"]                        = "Профессия",
-        ["Customer Name"]                     = "Имя клиента",
-        ["Replies"]                           = "Ответы",
-        ["Keywords"]                          = "Ключевые слова",
-        ["Profession greeting"]               = "Приветствие профессии",
-        ["Category greeting"]                 = "Приветствие категории",
-        ["Item greeting"]                     = "Приветствие предмета",
-        ["Primary expansion"]                 = "Основное дополнение",
-        ["Override greeting"]                 = "Переопределить приветствие",
-        ["Excluded keywords"]                 = "Исключенные ключевые слова",
-        [LID.EXCLUSION_INSTRUCTIONS]          = "Не сопоставлять сообщения, содержащие эти через запятую токены.",
-        [LID.KEYWORD_INSTRUCTIONS]            = "Сопоставить сообщения, содержащие одно из этих ключевых слов через запятую.",
-        [LID.GREETING_INSTRUCTIONS]           = "Приветствие, отправляемое клиентам, ищущим рецепт.",
-        [LID.GLOBAL_INCLUSION_DEFAULT]        = "LF, LFC, WTB, recraft",
-        [LID.GLOBAL_EXCLUSION_DEFAULT]        = "LFW, WTS, LF work",
-        [LID.DEFAULT_KEYWORDS_BLACKSMITHING]  = "Кузнец, Кузнечное дело, Бронник, Оружейник",
-        [LID.DEFAULT_KEYWORDS_LEATHERWORKING] = "Кожевник, Кожевничество, Кожевник",
-        [LID.DEFAULT_KEYWORDS_ALCHEMY]        = "Алхимик, Алхимия, Камень",
-        [LID.DEFAULT_KEYWORDS_TAILORING]      = "Портной",
-        [LID.DEFAULT_KEYWORDS_ENGINEERING]    = "Инженер, Инж",
-        [LID.DEFAULT_KEYWORDS_ENCHANTING]     = "Зачарователь, Герб",
-        [LID.DEFAULT_KEYWORDS_JEWELCRAFTING]  = "Ювелир, Ювелирное дело",
-        [LID.DEFAULT_KEYWORDS_INSCRIPTION]    = "Магический пергамент, Маг, Резчик",
+        ["All crafters"]                              = "Все создатели",
+        ["Crafter Name"]                              = "Имя создателя",
+        ["Profession"]                                = "Профессия",
+        ["Customer Name"]                             = "Имя клиента",
+        ["Replies"]                                   = "Ответы",
+        ["Keywords"]                                  = "Ключевые слова",
+        ["Profession greeting"]                       = "Приветствие профессии",
+        ["Category greeting"]                         = "Приветствие категории",
+        ["Item greeting"]                             = "Приветствие предмета",
+        ["Primary expansion"]                         = "Основное дополнение",
+        ["Override greeting"]                         = "Переопределить приветствие",
+        ["Excluded keywords"]                         = "Исключенные ключевые слова",
+        [LID.EXCLUSION_INSTRUCTIONS]                  = "Не сопоставлять сообщения, содержащие эти через запятую токены.",
+        [LID.KEYWORD_INSTRUCTIONS]                    = "Сопоставить сообщения, содержащие одно из этих ключевых слов через запятую.",
+        [LID.GREETING_INSTRUCTIONS]                   = "Приветствие, отправляемое клиентам, ищущим рецепт.",
+        [LID.GLOBAL_INCLUSION_DEFAULT]                = "LF, LFC, WTB, recraft",
+        [LID.GLOBAL_EXCLUSION_DEFAULT]                = "LFW, WTS, LF work",
+        [LID.DEFAULT_KEYWORDS_BLACKSMITHING]          = "Кузнец, Кузнечное дело, Бронник, Оружейник",
+        [LID.DEFAULT_KEYWORDS_LEATHERWORKING]         = "Кожевник, Кожевничество, Кожевник",
+        [LID.DEFAULT_KEYWORDS_ALCHEMY]                = "Алхимик, Алхимия, Камень",
+        [LID.DEFAULT_KEYWORDS_TAILORING]              = "Портной",
+        [LID.DEFAULT_KEYWORDS_ENGINEERING]            = "Инженер, Инж",
+        [LID.DEFAULT_KEYWORDS_ENCHANTING]             = "Зачарователь, Герб",
+        [LID.DEFAULT_KEYWORDS_JEWELCRAFTING]          = "Ювелир, Ювелирное дело",
+        [LID.DEFAULT_KEYWORDS_INSCRIPTION]            = "Магический пергамент, Маг, Резчик",
         -- Release notes
-        [LID.RN_WELCOME]                      = "Добро пожаловать в CraftScan!",
-        [LID.RN_WELCOME + 1]                  =
+        [LID.RN_WELCOME]                              = "Добро пожаловать в CraftScan!",
+        [LID.RN_WELCOME + 1]                          =
         "Этот аддон сканирует чат на предметы, похожие на запросы на создание. Если конфигурация указывает, что вы можете создать запрошенный предмет, будет сгенерировано уведомление, и информация о клиенте будет сохранена для облегчения общения.",
 
-        [LID.RN_INITIAL_SETUP]                = "Первоначальная настройка",
-        [LID.RN_INITIAL_SETUP + 1]            =
+        [LID.RN_INITIAL_SETUP]                        = "Первоначальная настройка",
+        [LID.RN_INITIAL_SETUP + 1]                    =
         "Чтобы начать, откройте профессию и нажмите новую кнопку 'Показать CraftScan' внизу.",
-        [LID.RN_INITIAL_SETUP + 2]            =
+        [LID.RN_INITIAL_SETUP + 2]                    =
         "Прокрутите вниз этого нового окна и начните снизу. Вещи, которые вам редко придется менять, находятся внизу, но именно эти настройки следует сначала проверить.",
-        [LID.RN_INITIAL_SETUP + 3]            =
+        [LID.RN_INITIAL_SETUP + 3]                    =
         "Щелкните по значку справа вверху окна, если вам нужно объяснение любого из вводимых данных.",
 
-        [LID.RN_INITIAL_TESTING]              = "Первичное тестирование",
-        [LID.RN_INITIAL_TESTING + 1]          =
+        [LID.RN_INITIAL_TESTING]                      = "Первичное тестирование",
+        [LID.RN_INITIAL_TESTING + 1]                  =
         "После настройки введите сообщение в чат /say, например, 'LF BS' для кузнечного дела, предполагая, что у вас есть ключевые слова 'LF' и 'BS'. Должно появиться уведомление.",
-        [LID.RN_INITIAL_TESTING + 2]          =
+        [LID.RN_INITIAL_TESTING + 2]                  =
         "Щелкните по уведомлению, чтобы сразу отправить ответ, щелкните правой кнопкой, чтобы отклонить клиента, или щелкните по круглой кнопке профессии, чтобы открыть окно заказов.",
-        [LID.RN_INITIAL_TESTING + 3]          =
+        [LID.RN_INITIAL_TESTING + 3]                  =
         "Дублированные уведомления подавляются, если они уже были отклонены, поэтому щелкните правой кнопкой мыши по вашему тестовому уведомлению, чтобы отклонить его, если вы хотите попробовать снова.",
 
-        [LID.RN_MANAGING_CRAFTERS]            = "Управление вашими создателями",
-        [LID.RN_MANAGING_CRAFTERS + 1]        =
+        [LID.RN_MANAGING_CRAFTERS]                    = "Управление вашими создателями",
+        [LID.RN_MANAGING_CRAFTERS + 1]                =
         "Слева в окне заказов отображается список ваших создателей. Этот список будет заполняться по мере входа в систему на ваши различные персонажи и настройки их профессий. Вы можете выбрать, какие персонажи должны быть активно сканированы в данный момент, а также включены ли визуальные и звуковые уведомления для каждого из ваших создателей.",
 
-        [LID.RN_MANAGING_CUSTOMERS]           = "Управление клиентами",
-        [LID.RN_MANAGING_CUSTOMERS + 1]       =
+        [LID.RN_MANAGING_CUSTOMERS]                   = "Управление клиентами",
+        [LID.RN_MANAGING_CUSTOMERS + 1]               =
         "Справа в окне заказов отображаются заказы на создание, обнаруженные в чате. Щелкните левой кнопкой мыши по строке, чтобы отправить приветствие, если вы еще не сделали этого с баннера. Щелкните еще раз левой кнопкой мыши, чтобы открыть личное сообщение клиенту. Щелкните правой кнопкой мыши, чтобы отклонить строку.",
-        [LID.RN_MANAGING_CUSTOMERS + 2]       =
+        [LID.RN_MANAGING_CUSTOMERS + 2]               =
         "Строки в этой таблице будут сохраняться на всех персонажах, поэтому вы можете переключиться на альтернативного персонажа и затем снова щелкнуть по клиенту, чтобы восстановить связь. Строки истекают через 10 минут по умолчанию. Этот период можно настроить на основной странице настроек (Esc -> Опции -> Аддоны -> CraftScan).",
-        [LID.RN_MANAGING_CUSTOMERS + 3]       =
+        [LID.RN_MANAGING_CUSTOMERS + 3]               =
         "Надеюсь, большая часть таблицы сама себя объясняет. В столбце 'Ответы' есть 3 значка. Левый крест или галочка означает, отправили ли вы сообщение клиенту. Правый крест или галочка означает, ответил ли клиент. Пиктограмма чатового пузыря - это кнопка, которая откроет временное окно личного сообщения с клиентом и заполнит его вашей историей чата.",
 
-        [LID.RN_KEYBINDS]                     = "Клавиатурные привязки",
-        [LID.RN_KEYBINDS + 1]                 =
+        [LID.RN_KEYBINDS]                             = "Клавиатурные привязки",
+        [LID.RN_KEYBINDS + 1]                         =
         "Доступны клавиатурные привязки для от крытия страницы заказов, ответа на последнего клиента и отклонения последнего клиента. Ищите 'CraftScan', чтобы найти все доступные настройки.",
 
-        [LID.RN_CLEANUP]                      = "Очистка Настроек",
-        [LID.RN_CLEANUP + 1]                  =
+        [LID.RN_CLEANUP]                              = "Очистка Настроек",
+        [LID.RN_CLEANUP + 1]                          =
         "Ваши ремесленники на левой стороне страницы 'Заказы в чате' теперь имеют контекстное меню при нажатии правой кнопкой мыши. Используйте это меню, чтобы поддерживать список в чистоте и удалять устаревших персонажей/профессии.",
-        ["Disable"]                           = "Отключить",
-        [LID.DELETE_CONFIG_TOOLTIP_TEXT]      =
+        ["Disable"]                                   = "Отключить",
+        [LID.DELETE_CONFIG_TOOLTIP_TEXT]              =
         "Постоянно удалите любые сохраненные данные %s для %s.\n\nНа странице профессии будет присутствовать кнопка 'Включить CraftScan', чтобы снова включить его с настройками по умолчанию.\n\nИспользуйте это, если вы хотите продолжать использовать профессию, но без взаимодействия с CraftScan (например, когда у вас алхимия на каждом альте для длительных настоев).", -- profession-name, character-name
-        [LID.DELETE_CONFIG_CONFIRM]           = "Введите 'DELETE', чтобы продолжить:",
-        [LID.SCANNER_CONFIG_DISABLED]         = "Включить CraftScan",
+        [LID.DELETE_CONFIG_CONFIRM]                   = "Введите 'DELETE', чтобы продолжить:",
+        [LID.SCANNER_CONFIG_DISABLED]                 = "Включить CraftScan",
 
-        ["Cleanup"]                           = "Очистка",
-        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]     =
+        ["Cleanup"]                                   = "Очистка",
+        [LID.CLEANUP_CONFIG_TOOLTIP_TEXT]             =
         "Постоянно удалите любые сохраненные данные %s для %s.\n\nПрофессия останется в состоянии, как если бы она никогда не была настроена. Простое открытие профессии снова восстановит стандартную конфигурацию.\n\nИспользуйте это, если хотите полностью сбросить профессию, удалили персонажа или отказались от профессии.", -- profession-name, character-name
-        [LID.CLEANUP_CONFIG_CONFIRM]          = "Введите 'CLEANUP', чтобы продолжить:",
+        [LID.CLEANUP_CONFIG_CONFIRM]                  = "Введите 'CLEANUP', чтобы продолжить:",
 
-        ["Primary Crafter"]                   = "Основной ремесленник",
-        [LID.PRIMARY_CRAFTER_TOOLTIP]         =
+        ["Primary Crafter"]                           = "Основной ремесленник",
+        [LID.PRIMARY_CRAFTER_TOOLTIP]                 =
         "Отметьте %s как вашего основного ремесленника для %s. Этот ремесленник будет иметь приоритет перед другими, если есть несколько совпадений с той же просьбой.",
-        ["Chat History"]                      = "История чата с %s", -- customer, left-click-help
-        ["Greet Help"]                        = "|cffffd100ЛКМ: Поздороваться с клиентом%s|r",
-        ["Chat Help"]                         = "|cffffd100ЛКМ: Открыть шёпот|r",
-        ["Chat Override"]                     = "|cffffd100СКМ: Открыть шёпот%s|r",
-        ["Dismiss"]                           = "|cffffd100ПКМ: Закрыть%s|r",
-        ["Proposed Greeting"]                 = "Предлагаемое приветствие:",
-        [LID.CHAT_BUTTON_BINDING_NAME]        = "Шёпот баннера клиента",
-        ["Customer Request"]                  = "Запрос от %s",
-        [LID.ADDON_WHITELIST_LABEL]           = "Белый список аддонов",
-        [LID.ADDON_WHITELIST_TOOLTIP]         =
+        ["Chat History"]                              = "История чата с %s", -- customer, left-click-help
+        ["Greet Help"]                                = "|cffffd100ЛКМ: Поздороваться с клиентом%s|r",
+        ["Chat Help"]                                 = "|cffffd100ЛКМ: Открыть шёпот|r",
+        ["Chat Override"]                             = "|cffffd100СКМ: Открыть шёпот%s|r",
+        ["Dismiss"]                                   = "|cffffd100ПКМ: Закрыть%s|r",
+        ["Proposed Greeting"]                         = "Предлагаемое приветствие:",
+        [LID.CHAT_BUTTON_BINDING_NAME]                = "Шёпот баннера клиента",
+        ["Customer Request"]                          = "Запрос от %s",
+        [LID.ADDON_WHITELIST_LABEL]                   = "Белый список аддонов",
+        [LID.ADDON_WHITELIST_TOOLTIP]                 =
         "Когда вы нажимаете кнопку для временного отключения всех аддонов, оставьте включенными выбранные здесь аддоны. CraftScan всегда будет включен. Оставьте только то, что вам нужно для эффективного крафта.",
-        [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d выбрано", -- Count
+        [LID.MULTI_SELECT_BUTTON_TEXT]                = "%d выбрано", -- Count
 
-        [LID.ACCOUNT_LINK_DESC]               =
+        [LID.ACCOUNT_LINK_DESC]                       =
         "Делитесь ремесленниками между несколькими аккаунтами.\n\nПри входе в систему или после изменения конфигурации, CraftScan будет передавать последнюю информацию между ремесленниками, настроенными на обоих аккаунтах, чтобы убедиться, что обе стороны связанного аккаунта всегда синхронизированы.",
-        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "Введите имя персонажа в сети на другом вашем аккаунте:",
-        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "Введите псевдоним для другого аккаунта:",
-        ["Link Account"]                      = "Связать аккаунт",
-        ["Linked Accounts"]                   = "Связанные аккаунты",
-        ["Accept Linked Account"]             = "Принять связанный аккаунт",
-        ["Delete Linked Account"]             = "Удалить связанный аккаунт",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    =
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]           = "Введите имя персонажа в сети на другом вашем аккаунте:",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]            = "Введите псевдоним для другого аккаунта:",
+        ["Link Account"]                              = "Связать аккаунт",
+        ["Linked Accounts"]                           = "Связанные аккаунты",
+        ["Accept Linked Account"]                     = "Принять связанный аккаунт",
+        ["Delete Linked Account"]                     = "Удалить связанный аккаунт",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
         "'%s' отправил запрос на связывание аккаунтов.\n\nНЕ ПРИНИМАЙТЕ ЭТО, ЕСЛИ ВЫ НЕ ОТПРАВЛЯЛИ ЗАПРОС.\n\nВведите псевдоним для другого аккаунта:",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   =
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]           =
         "|cFF00FF00У вас есть ожидающий запрос на связывание аккаунтов с %s. Нажмите здесь, чтобы принять.|r",
-        ["OK"]                                = "OK",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    =
+        ["OK"]                                        = "OK",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]            =
         "Чтобы завершить связывание аккаунта, вам нужно принять запрос на другом аккаунте. Кнопка 'Связать аккаунт' будет заменена кнопкой 'Принять связанный аккаунт' для завершения операции. Если возникнет ошибка, она будет отображена рядом с кнопкой 'Связать аккаунт'.",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   = "|cFFFFA500Ожидаем принятия запроса на связывание аккаунта от %s.|r",
-        [LID.VERSION_MISMATCH]                =
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]           = "|cFFFFA500Ожидаем принятия запроса на связывание аккаунта от %s.|r",
+        [LID.VERSION_MISMATCH]                        =
         "|cFFFF0000Ошибка: несовместимость версии CraftScan. Версия другого аккаунта: %s. Ваша версия: %s.|r",
 
-        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        [LID.REMOTE_CRAFTER_TOOLTIP]                  =
         "Этот персонаж принадлежит связанному аккаунту. Он может быть отключен только на аккаунте, к которому он принадлежит. Вы можете полностью удалить этого персонажа с помощью 'Очистки', но вам придется сделать это вручную на всех связанных аккаунтах, иначе он будет восстановлен связанным аккаунтом при входе в систему.",
-        [LID.REMOTE_CRAFTER_SUMMARY]          = "Синхронизирован с %s.",
-        ["proxy_send_enabled"]                = "Прокси-заказы",
-        ["proxy_send_enabled_tooltip"]        = "Когда обнаруживается заказ клиента, отправьте его на связанные аккаунты.",
-        ["proxy_receive_enabled"]             = "Получать прокси-заказы",
-        ["proxy_receive_enabled_tooltip"]     =
+        [LID.REMOTE_CRAFTER_SUMMARY]                  = "Синхронизирован с %s.",
+        ["proxy_send_enabled"]                        = "Прокси-заказы",
+        ["proxy_send_enabled_tooltip"]                = "Когда обнаруживается заказ клиента, отправьте его на связанные аккаунты.",
+        ["proxy_receive_enabled"]                     = "Получать прокси-заказы",
+        ["proxy_receive_enabled_tooltip"]             =
         "Когда другой аккаунт обнаруживает и отправляет заказ клиента, этот аккаунт его получит. Кнопка CraftScan будет отображена, чтобы показать предупреждающий баннер при необходимости.",
-        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s (последний раз в сети %s)|r", -- Crafter, Time
-        [LID.LINK_DEAD]                       = "|cFFFF0000Оффлайн|r",
-        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        [LID.LINK_ACTIVE]                             = "|cFF00FF00%s (последний раз в сети %s)|r", -- Crafter, Time
+        [LID.LINK_DEAD]                               = "|cFFFF0000Оффлайн|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]                =
         "Удалите связь с '%s' и всеми импортированными персонажами. Этот аккаунт прекратит все коммуникации с другой стороной. Другая сторона продолжит пытаться установить соединения, пока связь не будет вручную удалена также там.\n\nИмпортированные ремесленники, которые будут удалены:\n%s",
-        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        [LID.ACCOUNT_LINK_ADD_CHAR]                   =
         "По умолчанию персонаж, которого вы изначально связали, любой ремесленник и любой персонаж, который заходил в систему, пока этот аккаунт был в сети, известны CraftScan. Добавьте дополнительных персонажей, принадлежащих другому аккаунту, чтобы они тоже могли быть использованы. '/reload' для принудительной синхронизации с новым персонажем, если он в сети.",
-        ["Backup characters"]                 = "Дополнительные персонажи",
-        ["Unlink account"]                    = "Разорвать связь аккаунта",
-        ["Add"]                               = "Добавить",
-        ["Remove"]                            = "Удалить",
-        ["Rename account"]                    = "Переименовать аккаунт",
-        ["New name"]                          = "Новое имя:",
+        ["Backup characters"]                         = "Дополнительные персонажи",
+        ["Unlink account"]                            = "Разорвать связь аккаунта",
+        ["Add"]                                       = "Добавить",
+        ["Remove"]                                    = "Удалить",
+        ["Rename account"]                            = "Переименовать аккаунт",
+        ["New name"]                                  = "Новое имя:",
 
-        [LID.RN_LINKED_ACCOUNTS]              = "Связанные аккаунты",
-        [LID.RN_LINKED_ACCOUNTS + 1]          =
+        [LID.RN_LINKED_ACCOUNTS]                      = "Связанные аккаунты",
+        [LID.RN_LINKED_ACCOUNTS + 1]                  =
         "Свяжите несколько аккаунтов WoW вместе, чтобы делиться информацией о крафте и сканировать из любого аккаунта.",
-        [LID.RN_LINKED_ACCOUNTS + 2]          =
+        [LID.RN_LINKED_ACCOUNTS + 2]                  =
         "При желании отправляйте клиентские заказы по прокси с одного аккаунта на другие, чтобы оставить тестовый аккаунт в городе, пока ваш основной персонаж находится в поле.",
-        [LID.RN_LINKED_ACCOUNTS + 3]          =
+        [LID.RN_LINKED_ACCOUNTS + 3]                  =
         "Чтобы начать, нажмите кнопку 'Связать аккаунт' в нижнем левом углу окна CraftScan и следуйте инструкциям.",
-        [LID.RN_LINKED_ACCOUNTS + 4]          = "Демонстрация: https://www.youtube.com/watch?v=x1JLEph6t_c",
+        [LID.RN_LINKED_ACCOUNTS + 4]                  = "Демонстрация: https://www.youtube.com/watch?v=x1JLEph6t_c",
+
+        ["Open Settings"]                             = "Открыть настройки",
+        ["Customize Greeting"]                        = "Настроить приветствие",
+        [LID.CUSTOM_GREETING_INFO]                    =
+        "CraftScan использует эти фразы для создания первоначального приветствия, отправляемого клиентам в зависимости от ситуации. Измените некоторые или все из них ниже, чтобы создать свое собственное приветствие.",
+        ["Default"]                                   = "По умолчанию",
+        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            =
+        "Ошибка: Ожидается %d или меньшее количество заполнителей %%s. Предоставленный текст содержит %d.",
+        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Ошибка: Поддерживаются только заполнители %s.",
+
+        ["item link"]                                 = "ссылка на предмет",
+        ["alt name and then item link"]               = "альтернативное имя и затем ссылка на предмет",
+        ["profession name"]                           = "название профессии",
+        ["alt name and then profession name"]         = "альтернативное имя и затем название профессии",
+        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
+        "Этот текст должен содержать %d или меньше заполнителей %%s, чтобы соответствовать %s. Вы включили %d.\n\nCraftScan будет работать с меньшим количеством заполнителей, но вы, вероятно, захотите включить их для контекста.",
+
     }
 end

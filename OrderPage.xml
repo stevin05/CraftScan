@@ -499,7 +499,7 @@
 					<Button parentKey="AddonToggleButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_AddonToggleButtonMixin" motionScriptsWhileDisabled="true">
 						<Size x="120" y="22"/>
 						<Anchors>
-							<Anchor point="BOTTOMLEFT" relativeKey="$parent.LeftPanel" relativePoint="TOPLEFT" x="5" y="0"/>
+							<Anchor point="BOTTOMLEFT" relativeKey="$parent.LeftPanel" relativePoint="TOPLEFT" x="5" y="5"/>
 						</Anchors>
 						<Scripts>
 							<OnClick method="OnClick"/>
@@ -512,7 +512,7 @@
 						<Size x="140" y="22"/>
 
 						<Anchors>
-							<Anchor point="TOPLEFT" relativeKey="$parent.AddonToggleButton" relativePoint="TOPRIGHT" x="5" y="0"/>
+							<Anchor point="TOPLEFT" relativeKey="$parent.AddonToggleButton" relativePoint="TOPRIGHT" x="5" y="5"/>
 						</Anchors>
 						<Scripts>
 							<OnLoad method="OnLoad"/>
@@ -521,6 +521,18 @@
 							<OnLeave method="OnLeave"/>
 						</Scripts>
 					</Button>
+
+					<Button parentKey="CustomGreetingButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_CustomGreetingButtonMixin">
+						<Size x="120" y="22"/>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.OrderList" relativePoint="TOPRIGHT" x="-5" y="5"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+							<OnClick method="OnClick"/>
+						</Scripts>
+					</Button>
+
 
 				</Frames>
 			</Frame>
