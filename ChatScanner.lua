@@ -702,9 +702,12 @@ function CraftScan.InjectLastChatFrameMessage(customer, message, last)
     -- already seen it so we can stop working.
     local found = MakeChatHistoryEntry(customer, message);
     if not found then
+        CraftScan.Utils.printTable("Inserting", last.message);
         InsertChatFrame(last.message, last.args);
         return true;
     else
+        CraftScan.Utils.printTable("Filtering", last.message);
+        CraftScan.Utils.printTable("Because", found.message);
     end
     return false;
 end

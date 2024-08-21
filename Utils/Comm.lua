@@ -406,15 +406,13 @@ local function AcceptPeerRequest_(pending)
     local linkedAccounts = saved(CraftScan.DB.settings, 'linked_accounts', {});
     linkedAccounts[pending.remoteID] = {
         nickname = pending.nickname,
-        backup_char = pending.character,
+        backup_chars = { pending.character },
     }
     CraftScan.Utils.printTable("linkedAccounts:", linkedAccounts)
 end
 
 function ReceiveHandshake(sender, data)
-    print("Received handshake from", sender)
     if data.result then
-        print("data.result");
         if data.result == CraftScanComm.Result.OK then
             CraftScan.pending_peer_accept.remoteID = data.result_data.remoteID;
             AcceptPeerRequest_(CraftScan.pending_peer_accept);
@@ -432,7 +430,6 @@ function ReceiveHandshake(sender, data)
     end
 
     if data.version ~= CraftScan.CONST.CURRENT_VERSION then
-        print("version mismatch");
         CraftScanComm:Transmit(
             {
                 result = CraftScanComm.Result.VersionMismatch,
@@ -442,7 +439,6 @@ function ReceiveHandshake(sender, data)
         return;
     end
 
-    print("Updating UI");
     CraftScan.pending_peer_request = {
         remoteID = data.remoteID,
         character = sender,
@@ -459,7 +455,6 @@ function CraftScanComm:GetPendingPeerRequestCharacter()
 end
 
 function CraftScanComm:AcceptPeerRequest(nickname)
-    print("Setting nickname:", nickname);
     CraftScan.pending_peer_request.nickname = nickname;
     AcceptPeerRequest_(CraftScan.pending_peer_request);
 
@@ -529,7 +524,9 @@ function IgnoreOfflineMessages:new(targets, encoded)
 end
 
 function IgnoreOfflineMessages:Clear()
-    C_Timer.After(10, function() ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", self.filter) end);
+    -- 30 is hopefully overkill here, but it's not really harmful as people are
+    -- not likely to message their own offline alts manually.
+    C_Timer.After(30, function() ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", self.filter) end);
 end
 
 local function TransmitSerialized(serialized, target)
@@ -596,7 +593,10 @@ function CraftScanComm:Transmit(data, operation, target)
 end
 
 local function ReceiveRemoteTarget(senderID, sender)
-    remoteTargets[senderID] = { [sender] = true };
+    remoteTargets[senderID] = { [sender] = time() };
+    CraftScan.OnLinkedAccountStateChange()
+
+    -- TODO: Connected realms - does sender come with the realm name?
     local nameAndRealm = sender .. "-" .. GetRealmName();
 
     -- If we are receiving from a character that is not a crafter, save the name
@@ -663,4 +663,11 @@ function CraftScanComm:OnCommReceived(prefix, payload, distribution, sender)
     -- OnUpdate won't fire if the frame is hidden, which is is by default when
     -- fetched from the pool.
     processing:Show();
+end
+
+function CraftScanComm:LinkState(sourceID)
+    if not remoteTargets or remoteTargets[sourceID] == nil then
+        return nil;
+    end
+    return next(remoteTargets[sourceID]);
 end

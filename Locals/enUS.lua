@@ -182,7 +182,9 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "Enter the name of an online character on your other account:",
         [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "Enter a nickname for the other account:",
         ["Link Account"]                      = "Link Account",
+        ["Linked Accounts"]                   = "Linked Accounts",
         ["Accept Linked Account"]             = "Accept Linked Account",
+        ["Delete Linked Account"]             = "Delete Linked Account",
         [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    =
         "'%s' has sent a request to link accounts.\n\nDO NOT ACCEPT THIS IF YOU DID NOT SEND IT.\n\nEnter a nickname for the other account:",
         [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   =
@@ -197,11 +199,24 @@ function CraftScan.LOCAL_EN:GetData()
 
         [LID.REMOTE_CRAFTER_TOOLTIP]          =
         "This character belongs to a linked account. It can only be disabled on the account that owns the character. You can completely remove this character via 'Cleanup', but will need to do so manually on all linked accounts, or it will be restored by a linked account on login.",
+        [LID.REMOTE_CRAFTER_SUMMARY]          = "Synced with %s.",
         ["proxy_send_enabled"]                = "Proxy Orders",
         ["proxy_send_enabled_tooltip"]        = "When a customer order is detected, send it linked accounts.",
         ["proxy_receive_enabled"]             = "Receive Proxied Orders",
         ["proxy_receive_enabled_tooltip"]     =
         "When another account detects and sends a customer order, this account will receive it. The CraftScan button will be displayed to show the alert banner if necessary.",
+        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s (last seen %s)|r", -- Crafter, Time
+        [LID.LINK_DEAD]                       = "|cFFFF0000Offline|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        "Delete the link to '%s' and delete all imported characters. This account will cease all communication with the other side. The other side will still attempt to establish connections until the link is manually removed there as well.\n\nImported crafters that will be removed:\n%s",
+        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        "By default, the character you initially linked to, any crafters, and any characters that have logged in while this account was online are known to CraftScan. Add additional characters owned by the other account so that it can be used as well. '/reload' to force sync with the new character if it is online.",
+        ["Backup characters"]                 = "Additional characters",
+        ["Unlink account"]                    = "Unlink account",
+        ["Add"]                               = "Add",
+        ["Remove"]                            = "Remove",
+        ["Rename account"]                    = "Rename account",
+        ["New name"]                          = "New name:",
 
     }
 end

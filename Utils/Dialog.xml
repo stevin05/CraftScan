@@ -37,11 +37,11 @@
     </EditBox>
 
     <Frame name="CraftScanDialogTextTemplate" frameStrata="DIALOG" virtual="true">
-        <Size x="260" y="22"/>
+        <Size x="260" />
         <Layers>
             <Layer level="DIALOG">
                 <FontString parentKey="Text" inherits="GameFontHighlight" wordwrap="true">
-                    <Size x="260" y="22"/>
+                    <Size x="260" />
                 </FontString>
             </Layer>
         </Layers>

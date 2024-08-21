@@ -128,10 +128,12 @@ function CraftScan.Dialog.Show(config)
             submitEnabled = false;
         elseif entry.type == CraftScan.Dialog.Element.Text then
             frame = textPool:Acquire();
-            frame.Text:SetHeight(9999); -- ALlow textwrapping to work, then resize to fit
+            frame.Text:SetHeight(1000); -- ALlow textwrapping to work, then resize to fit
+            frame:SetHeight(1000);      -- ALlow textwrapping to work, then resize to fit
             frame.Text:SetText(entry.text);
-            frame.Text:SetHeight(frame.Text:GetStringHeight());
-            frame:SetHeight(frame.Text:GetStringHeight());
+            local height = frame.Text:GetStringHeight() + 25;
+            frame.Text:SetHeight(height);
+            frame:SetHeight(height);
         end
         frame.type = entry.type;
         frame.padding = entry.padding;

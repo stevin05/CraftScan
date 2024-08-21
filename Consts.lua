@@ -88,6 +88,11 @@ CraftScan.CONST.TEXT = {
     ACCOUNT_LINK_ACCEPT_DST_LABEL   = 80,
     VERSION_MISMATCH                = 81,
     REMOTE_CRAFTER_TOOLTIP          = 83,
+    REMOTE_CRAFTER_SUMMARY          = 84,
+    LINK_ACTIVE                     = 85,
+    LINK_DEAD                       = 86,
+    ACCOUNT_LINK_DELETE_INFO        = 87,
+    ACCOUNT_LINK_ADD_CHAR           = 88,
 
 
 

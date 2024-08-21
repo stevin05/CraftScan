@@ -149,7 +149,7 @@ end
 --end
 
 function CraftScanCraftingOrderPageMixin:UpdateFilterResetVisibility()
-    self.BrowseFrame.CrafterList.FilterButton.ResetButton:SetShown(
+    self.BrowseFrame.LeftPanel.CrafterList.FilterButton.ResetButton:SetShown(
         not CraftScan.IsUsingDefaultFilters(ignoreSkillLine));
 end
 
@@ -437,7 +437,7 @@ local function ForEachProfession(op)
 end
 
 local function ForEachCrafterFrame(op)
-    for _, frame in pairs(CraftScanCraftingOrderPage.BrowseFrame.CrafterList.ScrollBox:GetFrames()) do
+    for _, frame in pairs(CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.CrafterList.ScrollBox:GetFrames()) do
         op(frame)
     end
 end
@@ -589,10 +589,10 @@ function CraftScan_CrafterToggleMixin:OnLeave()
     GameTooltip:Hide();
 end
 
-CraftScanCrafterListMixin = {}
+CraftScan_CrafterListMixin = {}
 
-function CraftScanCrafterListMixin:SetupCrafterList()
-    crafterListAll = CraftScanCraftingOrderPage.BrowseFrame.CrafterList.CrafterListAllButton;
+function CraftScan_CrafterListMixin:SetupCrafterList()
+    crafterListAll = self.CrafterListAllButton;
 
     InitAllCheckBox(crafterListAll.EnabledCheckBox)
     InitAllCheckBox(crafterListAll.SoundAlertCheckBox)
@@ -627,6 +627,8 @@ function CraftScanCrafterListMixin:SetupCrafterList()
 
         if CraftScan.DB.characters[crafterInfo.name].parent_professions[crafterInfo.parentProfessionID].primary_crafter then
             frame.PrimaryCrafterIcon:Show();
+        else
+            frame.PrimaryCrafterIcon:Hide();
         end
         frame.LinkedAccountIcon:Init(frame.crafterInfo);
     end
@@ -689,7 +691,7 @@ function CraftScanCrafterListMixin:SetupCrafterList()
     self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
 end
 
-function CraftScanCrafterListMixin:OnShow()
+function CraftScan_CrafterListMixin:OnShow()
     self:SetupCrafterList();
 end
 
@@ -704,8 +706,10 @@ function CraftScanCrafterListElementMixin:OnLeave()
 end
 
 function CraftScan.OnCrafterListModified()
-    -- Refresh the list to display the change.
-    CraftScanCraftingOrderPage.BrowseFrame.CrafterList:SetupCrafterList();
+    if CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.CrafterList:IsShown() then
+        -- Refresh the list to display the change.
+        CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.CrafterList:SetupCrafterList();
+    end
 
     -- Reload the scanner data to apply the change.
     CraftScan.Scanner.LoadConfig()
@@ -816,6 +820,14 @@ function CraftScan_PrimaryCrafterIconMixin:OnShow()
     linkedAccount:SetPoint("LEFT", self, "RIGHT", 2, 0)
 end
 
+function CraftScan_PrimaryCrafterIconMixin:OnHide()
+    local linkedAccount = self:GetParent().LinkedAccountIcon;
+    if linkedAccount then
+        linkedAccount:ClearAllPoints()
+        linkedAccount:SetPoint("LEFT", self:GetParent().CrafterName, "RIGHT", 2, 0)
+    end
+end
+
 CraftScan_LinkedAccountIconMixin = {}
 
 function CraftScan_LinkedAccountIconMixin:Init(crafterInfo)
@@ -824,6 +836,8 @@ function CraftScan_LinkedAccountIconMixin:Init(crafterInfo)
     local charConfig = CraftScan.DB.characters[crafterInfo.name];
     if charConfig.sourceID and charConfig.sourceID ~= CraftScan.DB.settings.my_uuid then
         self:Show();
+    else
+        self:Hide();
     end
 end
 
@@ -832,9 +846,8 @@ function CraftScan_LinkedAccountIconMixin:OnEnter()
     local sourceID = CraftScan.DB.characters[crafter].sourceID;
     local nickname = CraftScan.DB.settings.linked_accounts[sourceID].nickname;
 
-    -- TODO - Configure this tooltip properly
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-    GameTooltip:SetText(nickname);
+    GameTooltip:SetText(string.format(L(LID.REMOTE_CRAFTER_SUMMARY), nickname));
     GameTooltip:Show()
 end
 
@@ -863,12 +876,10 @@ end
 function CraftScan_ProxyEnabledMixin:OnLeave()
 end
 
-CraftScan_PeerButtonMixin = {}
+CraftScan_LinkAccountButtonMixin = {}
 
-function CraftScan_PeerButtonMixin:Reset()
+function CraftScan_LinkAccountButtonMixin:Reset()
     if CraftScanComm:HavePendingPeerRequest() then
-        print(CraftScanComm:GetPendingPeerRequestCharacter());
-
         self.PendingAlert:SetText(string.format(L(LID.ACCOUNT_LINK_ACCEPT_DST_LABEL),
             CraftScanComm:GetPendingPeerRequestCharacter()));
         self:SetText(L("Accept Linked Account"));
@@ -881,18 +892,17 @@ function CraftScan_PeerButtonMixin:Reset()
     self:FitToText();
 end
 
-function CraftScan_PeerButtonMixin:OnShow()
+function CraftScan_LinkAccountButtonMixin:OnShow()
     self:Reset();
 end
 
-function CraftScan_PeerButtonMixin:OnLoad()
+function CraftScan_LinkAccountButtonMixin:OnLoad()
     self:Reset();
 end
 
-function CraftScan_PeerButtonMixin:OnClick()
+function CraftScan_LinkAccountButtonMixin:OnClick()
     if CraftScanComm:HavePendingPeerRequest() then
         local OnAccept = function(nickname)
-            print("Accepted: ", nickname)
             CraftScanComm:AcceptPeerRequest(nickname);
         end
 
@@ -962,21 +972,273 @@ function CraftScan_PeerButtonMixin:OnClick()
 end
 
 function CraftScan.OnPendingPeerAdded()
-    CraftScanCraftingOrderPage.PeerButton:Reset();
+    CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkAccountControls.LinkAccountButton:Reset();
 end
 
 function CraftScan.OnPendingPeerRejected(reason)
-    CraftScanCraftingOrderPage.PeerButton:Reset();
+    CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkAccountControls.LinkAccountButton:Reset();
 
     self.PendingAlert:SetText(reason);
     self.PendingAlert:Show();
 end
 
 function CraftScan.OnPendingPeerAccepted()
-    CraftScanCraftingOrderPage.PeerButton:Reset();
+    CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkAccountControls.LinkAccountButton:Reset();
+    CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
 
     CraftScan.Utils.printTable("my_uuid", CraftScan.DB.settings.my_uuid)
     CraftScan.Utils.printTable("linked_accounts", CraftScan.DB.settings.linked_accounts)
+end
+
+CraftScan_LinkedAccountListMixin = {}
+
+function CraftScan_LinkedAccountListMixin:OnShow()
+    self:Init();
+end
+
+function FormatTimeAgo(pastTime)
+    local currentTime = time()
+    local diff = currentTime - pastTime
+
+    if diff < 60 then
+        return diff .. "s"
+    elseif diff < 3600 then
+        local minutes = math.floor(diff / 60)
+        return minutes .. "m"
+    else
+        local hours = math.floor(diff / 3600)
+        return hours .. "h"
+    end
+end
+
+function CraftScan_LinkedAccountListMixin:Init()
+    -- If there are linked accounts, show additional controls for them.
+    -- Otherwise, we only show the button to create a link.
+    local showList = CraftScan.DB.settings.linked_accounts and next(CraftScan.DB.settings.linked_accounts);
+
+    local linkAccountControls = self:GetParent().LinkAccountControls;
+    if showList then
+        linkAccountControls:SetHeight(70)
+        linkAccountControls.ProxyReceiveEnabled:Show();
+        linkAccountControls.ProxySendEnabled:Show();
+    else
+        linkAccountControls:SetHeight(35)
+        linkAccountControls.ProxyReceiveEnabled:Hide();
+        linkAccountControls.ProxySendEnabled:Hide();
+    end
+
+    local crafterList = self:GetParent().CrafterList;
+    crafterList:ClearAllPoints();
+    crafterList:SetPoint("TOPLEFT", self:GetParent(), "TOPLEFT", 0, 0);
+    crafterList:SetPoint("BOTTOMLEFT", linkAccountControls, "TOPLEFT", 0, showList and 105 or 0);
+
+    if not showList then
+        self:Hide();
+        return;
+    end
+
+    self.Title:SetText(L("Linked Accounts"));
+
+    local topPadding = 3;
+    local leftPadding = 4;
+    local rightPadding = 2;
+    local spacing = 1;
+    local view = CreateScrollBoxListLinearView(topPadding, 0, leftPadding, rightPadding, spacing);
+
+    local function FrameInitializer(frame, linkedAccount)
+        frame.linkedAccount = linkedAccount;
+        frame.AccountName:SetText(linkedAccount.info.nickname);
+        frame.UpdateDisplay = function(frame)
+            local linkedAccount = frame.linkedAccount;
+            local connectedTo, lastSeen = CraftScanComm:LinkState(linkedAccount.sourceID);
+            frame.LinkState:SetText(connectedTo and
+                string.format(L(LID.LINK_ACTIVE), connectedTo, FormatTimeAgo(lastSeen)) or
+                FRIENDS_LIST_OFFLINE);
+
+            frame.StatusIcon:SetTexture(connectedTo and FRIENDS_TEXTURE_ONLINE or FRIENDS_TEXTURE_OFFLINE);
+        end
+        frame.UpdateDisplay(frame);
+    end
+
+    view:SetElementFactory(function(factory)
+        factory("CraftScan_LinkedAccountListElementTemplate", FrameInitializer);
+    end);
+
+    ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view);
+
+    -- Highly unlikely to ever need a scroll bar, so hide it unless needed.
+    -- Tested one time with 20 dummy characters in the config and the scroll
+    -- bar did appear and was usable.
+    ScrollUtil.AddManagedScrollBarVisibilityBehavior(self.ScrollBox, self.ScrollBar, nil,
+        nil);
+
+    local linkedAccounts = {}
+    for sourceID, info in pairs(CraftScan.DB.settings.linked_accounts) do
+        table.insert(linkedAccounts, {
+            sourceID = sourceID,
+            info = info
+        });
+    end
+
+    -- Sort characters so all primary crafters appear first, then alphabetically within the two groups.
+    table.sort(linkedAccounts, function(lhs, rhs)
+        return lhs.info.nickname < rhs.info.nickname;
+    end)
+
+    local dataProvider = CreateDataProvider(linkedAccounts)
+    self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
+
+    local function UpdateDisplay()
+        if CraftScanCraftingOrderPage:IsShown() then
+            for _, frame in pairs(CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList.ScrollBox:GetFrames()) do
+                frame.UpdateDisplay(frame);
+            end
+
+            C_Timer.After(5, self.UpdateDisplay)
+        end
+    end
+
+    if self.UpdateDisplay then
+        self.UpdateDisplay:Cancel();
+    end
+    self.UpdateDisplay = C_FunctionContainers.CreateCallback(UpdateDisplay);
+    UpdateDisplay();
+
+    self:Show();
+end
+
+CraftScan_LinkedAccountListElementMixin = {}
+
+function CraftScan_LinkedAccountListElementMixin:OnClick()
+    local linkedAccount = self.linkedAccount;
+    CraftScan.Utils.printTable("linkedAccount", linkedAccount)
+    MenuUtil.CreateContextMenu(owner, function(owner, rootDescription)
+        local crafterList = {}
+        for char, charConfig in pairs(CraftScan.DB.characters) do
+            if charConfig.sourceID == linkedAccount.sourceID then
+                table.insert(crafterList, CraftScan.NameAndRealmToName(char));
+            end
+        end
+
+
+        do
+            rootDescription:CreateTitle(linkedAccount.info.nickname);
+        end
+        do
+            rootDescription:QueueDivider();
+            rootDescription:QueueTitle(L("Backup characters"));
+            local OnClick = function(char)
+                for i, backup_char in ipairs(linkedAccount.info.backup_chars) do
+                    if char == backup_char then
+                        table.remove(linkedAccount.info.backup_chars, i)
+                        break;
+                    end
+                end
+            end
+
+            for _, char in ipairs(linkedAccount.info.backup_chars) do
+                local popoutButton = rootDescription:CreateButton(char);
+                popoutButton:CreateButton(L("Remove"), OnClick, char);
+            end
+
+            do
+                local OnClick = function()
+                    local function AddChar(char)
+                        table.insert(CraftScan.DB.settings.linked_accounts[linkedAccount.sourceID].backup_chars, char);
+                    end
+                    CraftScan.Dialog.Show({
+                        title = L("Add character"),
+                        submit = L("Add character"),
+                        OnAccept = AddChar,
+                        elements = {
+                            {
+                                type = CraftScan.Dialog.Element.Text,
+                                text = string.format(L(LID.ACCOUNT_LINK_ADD_CHAR)),
+                            },
+                            {
+                                type = CraftScan.Dialog.Element.EditBox,
+                            },
+                        },
+                    });
+                end
+
+                local button = rootDescription:CreateButton(L("Add"), OnClick, nil)
+            end
+        end
+        rootDescription:QueueDivider();
+        do
+            local function DoRename(nickname)
+                CraftScan.DB.settings.linked_accounts[linkedAccount.sourceID].nickname = nickname;
+                CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
+            end
+
+            local OnClick = function()
+                CraftScan.Dialog.Show({
+                    title = L("Rename account"),
+                    submit = L("Rename account"),
+                    OnAccept = DoRename,
+                    elements = {
+                        {
+                            type = CraftScan.Dialog.Element.Text,
+                            text = L("New name"),
+                        },
+                        {
+                            type = CraftScan.Dialog.Element.EditBox,
+                        },
+                    },
+                });
+            end
+
+            local button = rootDescription:CreateButton(L("Rename account"), OnClick, nil)
+            --button:SetTooltip(SetTooltipWithTitle);
+        end
+
+        do
+            local function DoDelete()
+                for char, charConfig in pairs(CraftScan.DB.characters) do
+                    if charConfig.sourceID == linkedAccount.sourceID then
+                        CraftScan.DB.characters[char] = nil;
+                    end
+                end
+                CraftScan.DB.settings.linked_accounts[linkedAccount.sourceID] = nil;
+
+                CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
+                CraftScan.OnCrafterListModified();
+            end
+
+            local OnClick = function()
+                CraftScan.Dialog.Show({
+                    title = L("Delete Linked Account"),
+                    submit = L("Delete Linked Account"),
+                    OnAccept = DoDelete,
+                    elements = {
+                        {
+                            type = CraftScan.Dialog.Element.Text,
+                            text = string.format(L(LID.ACCOUNT_LINK_DELETE_INFO), linkedAccount.info.nickname,
+                                table.concat(crafterList, "\n")),
+                        },
+                    },
+                });
+            end
+
+            local button = rootDescription:CreateButton(L("Unlink account"), OnClick, nil)
+            --button:SetTooltip(SetTooltipWithTitle);
+        end
+    end);
+end
+
+function CraftScan_LinkedAccountListElementMixin:OnEnter()
+    self.HoverBackground:Show();
+end
+
+function CraftScan_LinkedAccountListElementMixin:OnLeave()
+    self.HoverBackground:Hide();
+end
+
+function CraftScan.OnLinkedAccountStateChange()
+    if CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:IsShown() then
+        CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
+    end
 end
 
 local function ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig)
@@ -1257,7 +1519,7 @@ local auto_reply_refresh_interval = 60;
 
 local function AutoReplyTimeout()
     CraftScan.auto_replies_enabled = false;
-    CraftScanCraftingOrderPage.BrowseFrame.CrafterList.AutoReplyButton:SetButtonText();
+    CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.CrafterList.AutoReplyButton:SetButtonText();
     ResetAutoReplyTimeouts();
     autoReplyConfirmationFrame:Hide();
     autoReplyConfirmationFrame = nil;
@@ -1386,8 +1648,10 @@ CraftScan.Utils.onLoad(function()
     table.insert(UISpecialFrames, "CraftScanCraftingOrderPage"); -- Make 'esc' close the frame
     UIPanelWindows["CraftScanCraftingOrderPage"] = { area = "doublewide", pushable = 1, whileDead = 1 }
 
-    frame.BrowseFrame.CrafterList.AddonToggleButton:SetButtonText();
-    frame.BrowseFrame.CrafterList.AutoReplyButton:SetButtonText();
+    frame.BrowseFrame.AddonToggleButton:SetButtonText();
+    frame.BrowseFrame.AutoReplyButton:SetButtonText();
+
+    frame.BrowseFrame.LeftPanel.LinkedAccountList:Init();
 
     local lastButton = nil;
     for i, profession in ipairs(CraftScan.CONST.PROFESSIONS) do

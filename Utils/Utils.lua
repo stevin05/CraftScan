@@ -7,7 +7,7 @@ end
 
 CraftScan.Frames = {}
 CraftScan.Utils = {}
-CraftScan.Utils.DIAG_PRINT_ENABLED = true
+CraftScan.Utils.DIAG_PRINT_ENABLED = false
 
 function CraftScan.Utils.Contains(array, value)
     for _, v in ipairs(array) do
@@ -615,6 +615,9 @@ local function doOnce()
     local persistentMode                             = true
     if persistentMode then
         CraftScan_DB = CraftScan_DB or {}
+
+        local realmNames = GetAutoCompleteRealms()
+        CraftScan.Utils.printTable("realmNames", realmNames)
 
         CraftScan.DB.settings = CraftScan.Utils.saved(CraftScan_DB, 'settings', {})
         CraftScan.DB.settings.inclusions = CraftScan.DB.settings.inclusions or L(LID.GLOBAL_INCLUSION_DEFAULT);
