@@ -525,8 +525,7 @@ local function OnRecipeSelected()
 
     -- At this point, the player has opened a tradeskill window, so it makes
     -- sense to start tracking that character. Initialize the saved variables.
-    local player = GetUnitName("player")
-    playerNameWithRealm = player .. "-" .. GetRealmName()
+    playerNameWithRealm = CraftScan.GetPlayerName(true)
     db_player = saved(CraftScan.DB.characters, playerNameWithRealm, {})
 
     -- my_uuid is initialized when linked to a new account, at which point all

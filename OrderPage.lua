@@ -609,10 +609,7 @@ function CraftScan_CrafterListMixin:SetupCrafterList()
     local view = CreateScrollBoxListLinearView(topPadding, 0, leftPadding, rightPadding, spacing);
 
     local function FrameInitializer(frame, crafterInfo)
-        local crafterName = CraftScan.NameAndRealmToName(crafterInfo.name)
-        if crafterName == UnitName("PLAYER") then
-            crafterName = '|cff00ff00' .. crafterName .. '|r'
-        end
+        local crafterName = CraftScan.ColorizeCrafterName(crafterInfo.name)
         frame.CrafterName:SetText(crafterName)
         frame.crafterInfo = crafterInfo
         frame.EnabledCheckBox:InitState()
@@ -844,7 +841,7 @@ end
 function CraftScan_LinkedAccountIconMixin:OnEnter()
     local crafter = self:GetParent().crafterInfo.name;
     local sourceID = CraftScan.DB.characters[crafter].sourceID;
-    local nickname = CraftScan.DB.settings.linked_accounts[sourceID].nickname;
+    local nickname = CraftScan.DB.realm.linked_accounts[sourceID].nickname;
 
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
     GameTooltip:SetText(string.format(L(LID.REMOTE_CRAFTER_SUMMARY), nickname));
@@ -924,6 +921,12 @@ function CraftScan_LinkAccountButtonMixin:OnClick()
         })
     else
         local OnAccept = function(character, nickname)
+            if not CraftScan.State.realmID and string.find(character, "-") == nil then
+                -- On non-connected realms, hardcode the realm to our own to
+                -- avoid auto-complete on whisper sending to our own characters
+                -- on other realms.
+                character = CraftScan.GetUnitName(character, true, true);
+            end
             self.PendingAlert:SetText(string.format(L(LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL), character));
             self.PendingAlert:Show();
 
@@ -987,7 +990,7 @@ function CraftScan.OnPendingPeerAccepted()
     CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
 
     CraftScan.Utils.printTable("my_uuid", CraftScan.DB.settings.my_uuid)
-    CraftScan.Utils.printTable("linked_accounts", CraftScan.DB.settings.linked_accounts)
+    CraftScan.Utils.printTable("linked_accounts", CraftScan.DB.realm.linked_accounts)
 end
 
 CraftScan_LinkedAccountListMixin = {}
@@ -1014,7 +1017,7 @@ end
 function CraftScan_LinkedAccountListMixin:Init()
     -- If there are linked accounts, show additional controls for them.
     -- Otherwise, we only show the button to create a link.
-    local showList = CraftScan.DB.settings.linked_accounts and next(CraftScan.DB.settings.linked_accounts);
+    local showList = CraftScan.DB.realm.linked_accounts and next(CraftScan.DB.realm.linked_accounts);
 
     local linkAccountControls = self:GetParent().LinkAccountControls;
     if showList then
@@ -1052,7 +1055,8 @@ function CraftScan_LinkedAccountListMixin:Init()
             local linkedAccount = frame.linkedAccount;
             local connectedTo, lastSeen = CraftScanComm:LinkState(linkedAccount.sourceID);
             frame.LinkState:SetText(connectedTo and
-                string.format(L(LID.LINK_ACTIVE), connectedTo, FormatTimeAgo(lastSeen)) or
+                string.format(L(LID.LINK_ACTIVE), CraftScan.NameAndRealmToName(connectedTo, true),
+                    FormatTimeAgo(lastSeen)) or
                 FRIENDS_LIST_OFFLINE);
 
             frame.StatusIcon:SetTexture(connectedTo and FRIENDS_TEXTURE_ONLINE or FRIENDS_TEXTURE_OFFLINE);
@@ -1073,7 +1077,7 @@ function CraftScan_LinkedAccountListMixin:Init()
         nil);
 
     local linkedAccounts = {}
-    for sourceID, info in pairs(CraftScan.DB.settings.linked_accounts) do
+    for sourceID, info in pairs(CraftScan.DB.realm.linked_accounts) do
         table.insert(linkedAccounts, {
             sourceID = sourceID,
             info = info
@@ -1144,7 +1148,13 @@ function CraftScan_LinkedAccountListElementMixin:OnClick()
             do
                 local OnClick = function()
                     local function AddChar(char)
-                        table.insert(CraftScan.DB.settings.linked_accounts[linkedAccount.sourceID].backup_chars, char);
+                        if not CraftScan.State.realmID and string.find(char, "-") == nil then
+                            -- Normalize adding the current realm onto
+                            -- non-connected realms that don't provide it.
+                            char = CraftScan.GetUnitName(char, true);
+                        end
+
+                        table.insert(CraftScan.DB.realm.linked_accounts[linkedAccount.sourceID].backup_chars, char);
                     end
                     CraftScan.Dialog.Show({
                         title = L("Add character"),
@@ -1168,7 +1178,7 @@ function CraftScan_LinkedAccountListElementMixin:OnClick()
         rootDescription:QueueDivider();
         do
             local function DoRename(nickname)
-                CraftScan.DB.settings.linked_accounts[linkedAccount.sourceID].nickname = nickname;
+                CraftScan.DB.realm.linked_accounts[linkedAccount.sourceID].nickname = nickname;
                 CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
             end
 
@@ -1200,7 +1210,7 @@ function CraftScan_LinkedAccountListElementMixin:OnClick()
                         CraftScan.DB.characters[char] = nil;
                     end
                 end
-                CraftScan.DB.settings.linked_accounts[linkedAccount.sourceID] = nil;
+                CraftScan.DB.realm.linked_accounts[linkedAccount.sourceID] = nil;
 
                 CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
                 CraftScan.OnCrafterListModified();

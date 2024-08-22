@@ -411,7 +411,33 @@ CraftScan.OrderToOrderID = function(order)
     return order.customerName .. '-' .. order.responseID
 end
 
-CraftScan.NameAndRealmToName = function(name)
+CraftScan.GetUnitName = function(unit, forceRealm)
+    if CraftScan.State.realmID or forceRealm then
+        local realm = CraftScan.Utils.ShortenRealmName(GetRealmName());
+        return unit .. '-' .. realm;
+    end
+    return unit;
+end
+
+CraftScan.GetPlayerName = function(forceRealm)
+    return CraftScan.GetUnitName(UnitName("player"), forceRealm);
+end
+
+local function ShortenedRealmForDisplay(name)
+    local dash = string.find(name, "-")
+    if dash then
+        return name:sub(1, dash + 3)
+    end
+    return name
+end
+
+CraftScan.NameAndRealmToName = function(name, forDisplay)
+    if CraftScan.State.realmID then
+        if forDisplay then
+            return ShortenedRealmForDisplay(name);
+        end
+        return name; -- On cross-realm servers, never remove realm names.
+    end
     return name:match("^([^-]+)")
 end
 
@@ -426,8 +452,8 @@ CraftScan.ColorizePlayerName = function(name, guid)
 end
 
 CraftScan.ColorizeCrafterName = function(name)
-    if name ~= UnitName("player") then return name end
-    return '|cff00ff00' .. name .. '|r'
+    if name ~= CraftScan.GetPlayerName() then return CraftScan.NameAndRealmToName(name, true) end
+    return '|cff00ff00' .. CraftScan.NameAndRealmToName(name, true) .. '|r'
 end
 
 local lastChatFrameMessages = {}
@@ -505,8 +531,8 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
     local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(profID)
 
-    local crafter = crafterInfo.crafter:match("^([^-]+)")
-    local alt_craft = crafter ~= UnitName("player")
+    local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter);
+    local alt_craft = crafter ~= CraftScan.GetPlayerName();
 
     local function GetGreeting(tag)
         -- We support configured or internationalized greetings. They use the

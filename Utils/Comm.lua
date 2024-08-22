@@ -72,7 +72,7 @@ local function HaveTarget()
 end
 
 local function LinkedAccountsConfigured()
-    if not CraftScan.DB.settings.linked_accounts or not next(CraftScan.DB.settings.linked_accounts) then
+    if not CraftScan.DB.realm.linked_accounts or not next(CraftScan.DB.realm.linked_accounts) then
         return false;
     end
     return true;
@@ -84,11 +84,11 @@ local function CreateInitialTargets()
     for char, charConfig in pairs(CraftScan.DB.characters) do
         if charConfig.sourceID ~= nil and charConfig.sourceID ~= CraftScan.DB.settings.my_uuid then
             targets[charConfig.sourceID] = targets[charConfig.sourceID] or {}
-            targets[charConfig.sourceID][CraftScan.NameAndRealmToName(char)] = true;
+            targets[charConfig.sourceID][char] = true;
         end
     end
 
-    for sourceID, info in pairs(CraftScan.DB.settings.linked_accounts) do
+    for sourceID, info in pairs(CraftScan.DB.realm.linked_accounts) do
         targets[sourceID] = targets[sourceID] or {}
         for _, char in ipairs(info.backup_chars) do
             targets[sourceID][char] = true;
@@ -141,7 +141,7 @@ end
 -- Inquiries include the requester's peer list so the response can be filtered.
 local function MyPeers()
     local peers = {};
-    for peer, _ in pairs(CraftScan.DB.settings.linked_accounts) do
+    for peer, _ in pairs(CraftScan.DB.realm.linked_accounts) do
         table.insert(peers, peer);
     end
     return peers;
@@ -450,7 +450,7 @@ local function GetRejectionMessage(result, data)
 end
 
 local function AcceptPeerRequest_(pending)
-    local linkedAccounts = saved(CraftScan.DB.settings, 'linked_accounts', {});
+    local linkedAccounts = saved(CraftScan.DB.realm, 'linked_accounts', {});
     linkedAccounts[pending.remoteID] = {
         nickname = pending.nickname,
         backup_chars = { pending.character },
@@ -557,8 +557,17 @@ function IgnoreOfflineMessages:new(targets, encoded)
             -- If we've messaged a target successfully already, we try that
             -- target first and test for success before sending to others.
             self.filtered = self.filtered or {};
-            local msg = ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", CraftScan.NameAndRealmToName(target));
-            self.filtered[target] = msg;
+
+            local filter = 
+                ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", target);
+            self.filtered[target] = { filter };
+
+                -- On non-connected realms, something below us auto-removes the
+                -- realm name from the target. It even happens on connected
+                -- realms if the the characters are on the same realm, so we do
+                -- this unconditionally.
+                filter = ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", CraftScan.NameAndRealmToName(target));
+                table.insert(self.filtered[target], filter);
         end
     end
 
@@ -566,8 +575,10 @@ function IgnoreOfflineMessages:new(targets, encoded)
         CraftScan.Utils.printTable("Created chat filter. Ignoring", filtered)
         return function(self, event, msg)
             for char, filter in pairs(filtered) do
-                if msg == filter then
-                    return true;
+                for _, f in ipairs(filter) do
+                    if msg == f then
+                        return true;
+                    end
                 end
             end
         end
@@ -658,7 +669,7 @@ local function ReceiveRemoteTarget(senderID, sender)
 
     -- If we are receiving from a character that is not a crafter, save the name
     -- as a backup so we can find it again during future discovery phases.
-    local backupChars = CraftScan.DB.settings.linked_accounts[senderID].backup_chars;
+    local backupChars = CraftScan.DB.realm.linked_accounts[senderID].backup_chars;
     if not CraftScan.DB.characters[nameAndRealm] and not CraftScan.Utils.Contains(backupChars, sender) then
         table.insert(backupChars, sender);
         CraftScan.Utils.printTable("Updated backupChars", backupChars);
@@ -678,7 +689,7 @@ local function ReceiveDeserialized(msg, sender)
             return;
         end
 
-        local linkedAccounts = CraftScan.DB.settings.linked_accounts;
+        local linkedAccounts = CraftScan.DB.realm.linked_accounts;
         if not linkedAccounts or not linkedAccounts[msg.senderID] then
             CraftScan.Utils.printTable("Ignoring message from unlinked account.", nil)
             return;
@@ -701,6 +712,21 @@ local function ReceiveDeserialized(msg, sender)
 end
 
 function CraftScanComm:OnCommReceived(prefix, payload, distribution, sender)
+    CraftScan.Utils.printTable("Received from", sender);
+    CraftScan.Utils.printTable("distribution", distribution);
+    if not CraftScan.State.realmID or string.find(sender, '-') == nil then
+        -- We're not on a connected realm, so hardcode the sender's realm to our
+        -- own. I'm hitting some weird cases where my chat auto-completes the
+        -- character name to a character of mine by the same name on a different
+        -- realm. On connected realms, we just have to hope the infra puts the
+        -- realm in the sender name already, which it seems to.
+        --
+        -- Even on connected realms, it seems that the sender realm is erased if
+        -- it's the same realm, and then we can't even send a reply, so we also
+        -- check for -
+        sender = CraftScan.GetUnitName(sender, true);
+    end
+
     if prefix ~= CRAFT_SCAN_COMM_PREFIX then return; end
 
     local decoded = LibDeflate:DecodeForWoWAddonChannel(payload);

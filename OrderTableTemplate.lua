@@ -275,7 +275,7 @@ function CraftScanCrafterTableCellProfessionNameMixin:Populate(rowData, dataInde
 
     --if profession and C_CraftingOrders.ShouldShowCraftingOrderTab() and C_TradeSkillUI.IsNearProfessionSpellFocus(profession) then
     local testCraftingOrderApis = false
-    if testCraftingOrderApis and response.crafterName == UnitName("player") then
+    if testCraftingOrderApis and response.crafterName == CraftScan.GetPlayerName() then
         local function SendOrderRequest(request)
             -- Sort orders added to request in the send in case search orders changed from a cached request
             request.primarySort = {
