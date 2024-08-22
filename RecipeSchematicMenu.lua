@@ -560,7 +560,7 @@ local function OnRecipeSelected()
 
     cur.category = C_TradeSkillUI.GetCategoryInfo(cur.recipe.categoryID)
 
-    CraftScan.STATE.professionID = cur.profession.parentProfessionID;
+    CraftScan.State.professionID = cur.profession.parentProfessionID;
     CraftScan.Frames.MainButton:UpdateIcon();
 
     ShowSchematicOptions();

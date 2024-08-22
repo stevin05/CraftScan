@@ -49,12 +49,12 @@ function CraftScanPageButtonMixin:OnLeave()
     self.GlowUp:Hide()
 end
 
-function CraftScanPageButtonMixin:UpdateIcon(profession)
+function CraftScanPageButtonMixin:UpdateIcon(icon)
     -- Set the icon the most appropriate current profession - the one they are
     -- near the table for, the last profession they opened, or as a fallback,
     -- blacksmithing.
-    local profession = profession or CraftScan.Utils.CurrentProfession();
-    self.Portrait:SetTexture(profession and profession.icon or 4620670);
+    local icon = icon or CraftScan.Utils.GetCurrentProfessionIcon();
+    self.Portrait:SetTexture(icon or 4620670);
 end
 
 function CraftScanScannerMenuMixin:UpdateFrameVisibility(...)
@@ -142,18 +142,17 @@ local function UpdateAlertDuration()
     bannerTimeout = setting;
 end
 
-local activeOrder = nil;
 function CraftScanScannerMenuMixin:TriggerAlert(text, order)
-    activeOrder = order;
     UpdateBannerDirection();
     UpdateAlertDuration();
+    self.PageButton:UpdateIcon();
     self.PageButton.AlertText:SetText(text);
     self.PageButton.MinimapAlertAnim:Play();
 end
 
 function CraftScanScannerMenuMixin:ClearAlert(order)
-    if order == activeOrder then
-        activeOrder = nil;
+    if order == CraftScan.State.activeOrder then
+        CraftScan.State.activeOrder = nil;
         self:ClearPulses()
         self.AlertBGButton.HighlightTexture:Hide()
     end
@@ -165,27 +164,22 @@ function CraftScanPageButtonMixin:OnClick(button)
     else
         ShowUIPanel(CraftScan.Frames.OrdersPage);
     end
-
-    local profession = CraftScan.Utils.CurrentProfession();
-    if profession then
-        self:UpdateIcon(profession);
-    end
 end
 
 CraftScanBannerMixin = {}
 
 function CraftScanBannerMixin:OnClick(button)
-    if activeOrder then
-        CraftScan.GreetCustomer(button, activeOrder)
-        self:GetParent():ClearAlert(activeOrder)
+    if CraftScan.State.activeOrder then
+        CraftScan.GreetCustomer(button, CraftScan.State.activeOrder)
+        self:GetParent():ClearAlert(CraftScan.State.activeOrder)
     end
 end
 
 local bannerTooltip = CraftScan.Utils.ChatHistoryTooltip:new();
 function CraftScanBannerMixin:OnEnter()
-    if activeOrder then
-        bannerTooltip:Show("CraftScanChatHistoryBannerTooltip", self, activeOrder,
-            string.format(L("Customer Request"), CraftScan.NameAndRealmToName(activeOrder.customerName)), true);
+    if CraftScan.State.activeOrder then
+        bannerTooltip:Show("CraftScanChatHistoryBannerTooltip", self, CraftScan.State.activeOrder,
+            string.format(L("Customer Request"), CraftScan.NameAndRealmToName(CraftScan.State.activeOrder.customerName)), true);
         self.HighlightTexture:Show()
     end
 end
@@ -195,10 +189,17 @@ function CraftScanBannerMixin:OnLeave()
     self.HighlightTexture:Hide()
 end
 
+function CraftScan.UpdateAlertIconScale()
+    local scale = CraftScan.DB.settings.alert_icon_scale or 100;
+    CraftScanScannerMenu:SetScale(scale / 100);
+end
+
 CraftScan.Utils.onLoad(function()
     local frame = CraftScanScannerMenu
     CraftScan.Frames.MainButton = frame.PageButton;
     CraftScan.Frames.makeMovable(frame.PageButton)
+
+    CraftScan.UpdateAlertIconScale();
 
     frame:SetScript("OnEvent", function(self, event, ...)
         local callbacks = eventCallbacks[event];

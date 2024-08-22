@@ -167,8 +167,8 @@ function CraftScanCraftingOrderPageMixin:OnShow()
     CraftScanScannerMenu:ClearPulses()
     self:ShowGeneric()
 
-    local profession = CraftScan.Utils.CurrentProfession();
-    self:SetPortraitToAsset(profession and profession.icon or 4620670);
+    local icon = CraftScan.Utils.GetCurrentProfessionIcon();
+    self:SetPortraitToAsset(icon or 4620670);
 end
 
 function CraftScanCraftingOrderPageMixin:OnHide()

@@ -247,6 +247,7 @@ CraftScan.CONST.DEFAULT_SETTINGS = {
     auto_reply_delay = 500,
     disabled_addon_whitelist = "None",
     show_button_height = 0,
+    alert_icon_scale = 100,
 };
 
 CraftScan.CONST.PROFESSION_COLORS = {
@@ -259,6 +260,31 @@ CraftScan.CONST.PROFESSION_COLORS = {
     [755] = 'cffff0066', -- JC
     [773] = 'cffffff99', -- Inscription
 }
+
+-- I can't find an API that provides profession icons unless the current
+-- character knows the profession. Hate maintaining things, but  easy enough and
+-- we use the parent professions as a backup.
+CraftScan.CONST.PARENT_PROFESSION_ICONS = {
+    [164] = 136241,         -- Blacksmithing
+    [165] = 136247,         -- Leatherworking
+    [171] = 136240,         -- Alchemy
+    [197] = 136249,         -- Tailoring
+    [202] = 136244,         -- Engineering
+    [333] = 136243,         -- Enchanting
+    [755] = 134071,         -- Jewelcrafting
+    [773] = 237171,         -- Inscription
+}
+
+CraftScan.CONST.TWW_PROFESSION_ICONS = {
+    [3017] = 136240,         -- Alchemy
+    [3021] = 136241,         -- Blacksmithing
+    [3034] = 136244,         -- Enchanting
+    [3037] = 136245,         -- Engineering
+    [3040] = 237171,         -- Inscription
+    [3043] = 134071,         -- Jewelcrafting
+    [3046] = 136247,         -- Leatherworking
+    [3049] = 136249,         -- Tailoring
+};
 
 CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS = {
     [164] = CraftScan.CONST.TEXT.DEFAULT_KEYWORDS_BLACKSMITHING,

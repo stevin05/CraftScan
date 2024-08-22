@@ -586,6 +586,8 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         }
         CraftScan.DB.listed_orders[CraftScan.OrderToOrderID(order)] = order
 
+        CraftScan.State.activeOrder = order;
+
         local ppConfig = ParentProfessionConfig(crafterInfo);
 
         if ppConfig.visual_alert_enabled then

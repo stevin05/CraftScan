@@ -649,14 +649,14 @@ local function doOnce()
         CraftScan.DB.customers = {}
     end
 
-    CraftScan.STATE = {};
+    CraftScan.State = {};
 
     local prof1, prof2 = GetProfessions()
     CraftScan.CONST.PROFESSIONS = {};
     for _, prof in ipairs({ prof1, prof2 }) do
         local _, icon, _, _, _, _, professionID = GetProfessionInfo(prof);
         local professionInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(professionID);
-        CraftScan.STATE.professionID = professionID;
+        CraftScan.State.professionID = professionID;
         table.insert(CraftScan.CONST.PROFESSIONS, {
             professionID = professionID,
             icon = icon,
@@ -671,18 +671,35 @@ local function doOnce()
     once = true
 end
 
-CraftScan.Utils.CurrentProfession = function()
+-- Originally, the 'Chat orders' tab was actually part of the professions frame.
+-- That was a giant memory leak for some reason, so I changed it to its own page
+-- that has a link to both of the characters professions. I was originally
+-- trying to keep the icon in sync with which profession should be opened, but
+-- now that it's neither, the icon doesn't really matter. Instead of associating
+-- it directly with one of the current character's professions, it should now
+-- flip around to match the most recent customer request.
+CraftScan.Utils.GetCurrentProfessionIcon = function()
+    if CraftScan.State.activeOrder then
+        -- If we have an active order, return the icon associated with the
+        -- requested profession to give a good visual queue about the request.
+        local response = CraftScan.OrderToResponse(CraftScan.State.activeOrder)
+        return CraftScan.CONST.TWW_PROFESSION_ICONS[response.professionID] or
+            CraftScan.CONST.PARENT_PROFESSION_ICONS[response.parentProfID];
+    end
+
+    -- Otherwise, fall back to one of our professions - the one that we're near
+    -- the crafting table for if possible.
     local prof = nil;
     for _, p in ipairs(CraftScan.CONST.PROFESSIONS) do
         if C_TradeSkillUI.IsNearProfessionSpellFocus(p.profession) then
-            return p;
-        elseif CraftScan.STATE.professionID == p.professionID then
+            return p.icon;
+        elseif CraftScan.State.professionID == p.professionID then
             prof = p
         elseif not prof then
             prof = p
         end
     end
-    return prof;
+    return prof and prof.icon;
 end
 
 local loginFrame = CreateFrame("Frame")

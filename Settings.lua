@@ -197,6 +197,15 @@ CraftScan.Utils.onLoad(function()
             "When auto replies are enabled, wait this long before replying to make youself seem a little less bot-like.");
     end
     do
+        local options = Settings.CreateSliderOptions(25, 200, 5);
+        options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
+            function(value) return value .. ' %' end);
+        CreateSlider(category, "CRAFTSCAN_ALERT_ICON_SCALE", "alert_icon_scale", L("Alert icon scale"), options, nil,
+            function()
+                CraftScan.UpdateAlertIconScale();
+            end);
+    end
+    do
         local options = Settings.CreateSliderOptions(0, 650, 5);
         options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
             function(value) return value .. ' ' .. L("Pixels") end);

@@ -244,7 +244,8 @@ function CraftScan.LOCAL_EN:GetData()
 
         -- Translations complete above this line
         ["Pixels"]                                    = "Pixels",
-        ["Show Button Height"]                        = "Show Button Height",
+        ["Show button height"]                        = "Show button height",
+        ["Alert icon scale"]                          = "Alert icon scale",
 
 
         -- ChatGPT prompt:
