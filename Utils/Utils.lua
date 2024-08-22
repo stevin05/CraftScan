@@ -7,7 +7,7 @@ end
 
 CraftScan.Frames = {}
 CraftScan.Utils = {}
-CraftScan.Utils.DIAG_PRINT_ENABLED = false
+CraftScan.Utils.DIAG_PRINT_ENABLED = false;
 
 function CraftScan.Utils.Contains(array, value)
     for _, v in ipairs(array) do

@@ -246,6 +246,7 @@ CraftScan.CONST.DEFAULT_SETTINGS = {
     last_loaded_version = 0,
     auto_reply_delay = 500,
     disabled_addon_whitelist = "None",
+    show_button_height = 0,
 };
 
 CraftScan.CONST.PROFESSION_COLORS = {

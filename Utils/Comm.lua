@@ -455,6 +455,16 @@ local function AcceptPeerRequest_(pending)
         nickname = pending.nickname,
         backup_chars = { pending.character },
     }
+
+    if not remoteTargets then
+        -- If this is the first time we're linking to anyone, we didn't
+        -- initialize remoteTargets. We know who we're talking to already, so we
+        -- can fully initialize it.
+        remoteTargets = {
+            [pending.remoteID] = { [pending.character] = time() },
+        };
+    end
+
     CraftScan.Utils.printTable("linkedAccounts:", linkedAccounts)
 end
 

@@ -163,13 +163,24 @@ function CraftScan_CraftScanFrameMixin:ToggleTutorial()
     end
 end
 
+function CraftScan.UpdateShowButtonHeight()
+    if menuShownButton then
+        if CraftScan.DB.settings.show_button_height then
+            menuShownButton:SetPoint("TOPLEFT", ProfessionsFrame.CraftingPage.SchematicForm, "BOTTOMLEFT", 2,
+                -4 + CraftScan.DB.settings.show_button_height);
+        else
+            menuShownButton:SetPoint("TOPLEFT", ProfessionsFrame.CraftingPage.SchematicForm, "BOTTOMLEFT", 2, -4);
+        end
+    end
+end
+
 local menuShownButtonInitialized = false;
 local function CreateMenuShownButton()
     menuShownButton = CreateFrame("Button", "ToggleScannerConfigButton",
         ProfessionsFrame.CraftingPage.SchematicForm,
         "CraftScan_ScannerConfigButtonTemplate");
     menuShownButton:SetText(L(LID.SCANNER_CONFIG_SHOW));
-    menuShownButton:SetPoint("TOPLEFT", ProfessionsFrame.CraftingPage.SchematicForm, "BOTTOMLEFT", 2, -4);
+    CraftScan.UpdateShowButtonHeight();
     menuShownButtonInitialized = true;
 end
 

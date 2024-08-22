@@ -227,7 +227,6 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.RN_LINKED_ACCOUNTS + 4]                  =
         "Demo: https://www.youtube.com/watch?v=x1JLEph6t_c",
 
-        -- Translations complete above this line
         ["Open Settings"]                             = "Open Settings",
         ["Customize Greeting"]                        = "Customize Greeting",
         [LID.CUSTOM_GREETING_INFO]                    =
@@ -243,9 +242,12 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
         "This text must contain %d or fewer %%s placeholders to hold the %s. You have included %d.\n\nCraftScan will work with fewer placeholders, but you likely want to include them for context.",
 
+        -- Translations complete above this line
+        ["Pixels"]                                    = "Pixels",
+        ["Show Button Height"]                        = "Show Button Height",
 
 
         -- ChatGPT prompt:
-        -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.  
+        -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.
     }
 end
