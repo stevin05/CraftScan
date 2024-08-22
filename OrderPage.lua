@@ -23,6 +23,10 @@ local function removeOrder(orders, order)
     local orderID = CraftScan.OrderToOrderID(order)
     local order = orders[orderID]
 
+    if CraftScan.State.activeOrder == order then
+        CraftScan.State.activeOrder = nil;
+    end
+
     -- Wipe out any less granular reponses related to this one
     local response = customerInfo.responses[order.responseID];
     if not response then
