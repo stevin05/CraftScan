@@ -251,7 +251,7 @@ local function idForKeywords(message, profConfig, section)
     end
 
     for id, config in pairs(sectionConfig) do
-        if config.keywords then
+        if (profConfig.all_enabled or section ~= 'recipes' or config.enabled) and config.keywords then
             if HasMatch(message, ParseStringList(config.keywords)) then
                 return id
             end
@@ -503,6 +503,7 @@ local function getCrafterForMessage(customer, message)
         return nil
     end
 
+    local bestMatch = nil;
     for _, crafterInfo in ipairs(config.prof_keywords) do
         if HasMatch(message, crafterInfo.keywords) and not HasMatch(message, crafterInfo.exclusions) then
             -- For profession keywords, we store the parent profession ID,
@@ -533,14 +534,14 @@ local function getCrafterForMessage(customer, message)
                     profID = ppConfig.primary_expansion;
                 end
 
-                if profID ~= nil then
-                    return { crafter = crafterInfo.crafter, profID = profID };
-                end -- Else keep looking for other crafters
+                if profID ~= nil and not bestMatch then
+                    bestMatch = { crafter = crafterInfo.crafter, profID = profID };
+                end -- Keep looking for other crafters with keywords that match something specific.
             end
         end
     end
 
-    return nil;
+    return bestMatch;
 end
 
 local function concatGreetings(lhs, rhs)
@@ -616,7 +617,33 @@ CraftScan.OrderToOrderID = function(order)
     return order.customerName .. '-' .. order.responseID
 end
 
-CraftScan.NameAndRealmToName = function(name)
+CraftScan.GetUnitName = function(unit, forceRealm)
+    if CraftScan.State.realmID or forceRealm then
+        local realm = CraftScan.Utils.ShortenRealmName(GetRealmName());
+        return unit .. '-' .. realm;
+    end
+    return unit;
+end
+
+CraftScan.GetPlayerName = function(forceRealm)
+    return CraftScan.GetUnitName(UnitName("player"), forceRealm);
+end
+
+local function ShortenedRealmForDisplay(name)
+    local dash = string.find(name, "-")
+    if dash then
+        return name:sub(1, dash + 3)
+    end
+    return name
+end
+
+CraftScan.NameAndRealmToName = function(name, forDisplay)
+    if CraftScan.State.realmID then
+        if forDisplay then
+            return ShortenedRealmForDisplay(name);
+        end
+        return name; -- On cross-realm servers, never remove realm names.
+    end
     return name:match("^([^-]+)")
 end
 
@@ -631,13 +658,15 @@ CraftScan.ColorizePlayerName = function(name, guid)
 end
 
 CraftScan.ColorizeCrafterName = function(name)
-    if name ~= UnitName("player") then return name end
-    return '|cff00ff00' .. name .. '|r'
+    if name ~= CraftScan.GetPlayerName() then return CraftScan.NameAndRealmToName(name, true) end
+    return '|cff00ff00' .. CraftScan.NameAndRealmToName(name, true) .. '|r'
 end
 
-local lastChatFrameMessage = { message = '', args = nil };
+local lastChatFrameMessages = {}
+local lastChatFrameIndex = 0; -- Incremented to 1 before use
+local CHAT_FRAME_BUFFER_SIZE = 10;
 
-local function MakeChatHistoryEntry(customer, message)
+local function MakeChatHistoryEntry(customer)
     -- We've hacked together the ChatFrame and the CHAT_MSG_ events, but they
     -- are not guaranteed to line up with eachother because we depend on the
     -- message appearing on ChatFrame1 but it could appear on any (or no) chat
@@ -648,13 +677,38 @@ local function MakeChatHistoryEntry(customer, message)
 
     -- You can test this out by leaving 'Say' chat, then saying an order for
     -- yourself.
-    if string.find(lastChatFrameMessage.message, CraftScan.NameAndRealmToName(customer)) then
-        return {
-            message = lastChatFrameMessage.message,
-            args = lastChatFrameMessage.args,
-        }
+    local function DoIt(index)
+        local lastChatFrameMessage = lastChatFrameMessages[index];
+        if string.find(lastChatFrameMessage.message, CraftScan.NameAndRealmToName(customer)) then
+            return {
+                message = lastChatFrameMessage.message,
+                args = lastChatFrameMessage.args,
+            }
+        end
+        return nil;
     end
 
+    -- We add entries to the circular buffer in increasing order, so start at
+    -- the last added entry and work our way backwards to find the customer's
+    -- message with formatting.
+    if lastChatFrameIndex then
+        for i = lastChatFrameIndex, 1, -1 do
+            local result = DoIt(i);
+            if result then return result; end
+        end
+
+        for i = 2, lastChatFrameIndex - 1, 1 do
+            local result = DoIt(i);
+            if result then return result; end
+        end
+    end
+
+    return nil;
+end
+
+local function MakeChatHistoryEntryDefault(customer, message)
+    local found = MakeChatHistoryEntry(customer);
+    if found then return found; end
     return {
         message = message,
         args = nil,
@@ -683,22 +737,31 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
     local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(profID)
 
-    local crafter = crafterInfo.crafter:match("^([^-]+)")
-    local alt_craft = crafter ~= UnitName("player")
+    local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter);
+    local alt_craft = crafter ~= CraftScan.GetPlayerName();
+
+    local function GetGreeting(tag)
+        -- We support configured or internationalized greetings. They use the
+        -- same naming pattern, so we can look them up by tag.
+        local greeting = CraftScan.DB.settings.greeting;
+        if not greeting then return L(LID[tag]); end
+        return greeting[tag] or L(LID[tag]);
+    end
 
     local greeting = '';
     if alt_craft then
         if itemID then
-            greeting = string.format(L(LID.GREETING_ALT_CAN_CRAFT_ITEM), crafter, itemLink or L(LID.GREETING_LINK_BACKUP));
+            greeting = string.format(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'), crafter,
+                itemLink or L(LID.GREETING_LINK_BACKUP));
         else
-            greeting = string.format(L(LID.GREETING_ALT_HAS_PROF), crafter, profInfo.parentProfessionName);
+            greeting = string.format(GetGreeting('GREETING_ALT_HAS_PROF'), crafter, profInfo.parentProfessionName);
         end
-        greeting = greeting .. ' ' .. L(LID.GREETING_ALT_SUFFIX);
+        greeting = greeting .. ' ' .. GetGreeting('GREETING_ALT_SUFFIX');
     else
         if itemID then
-            greeting = string.format(L(LID.GREETING_I_CAN_CRAFT_ITEM), itemLink or L(LID.GREETING_LINK_BACKUP));
+            greeting = string.format(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'), itemLink or L(LID.GREETING_LINK_BACKUP));
         else
-            greeting = string.format(L(LID.GREETING_I_HAVE_PROF), profInfo.parentProfessionName);
+            greeting = string.format(GetGreeting('GREETING_I_HAVE_PROF'), profInfo.parentProfessionName);
         end
     end
 
@@ -707,7 +770,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
     response.message = SplitResponse(greeting)
     local chat_history = saved(customerInfo, 'chat_history', {})
-    table.insert(chat_history, MakeChatHistoryEntry(customer, message));
+    table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
 
     if categoryID then
         -- Save the request at higher granularities as well so that we don't
@@ -755,6 +818,8 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         }
         CraftScan.DB.listed_orders[CraftScan.OrderToOrderID(order)] = order
 
+        CraftScan.State.activeOrder = order;
+
         local ppConfig = ParentProfessionConfig(crafterInfo);
 
         if ppConfig.visual_alert_enabled then
@@ -781,10 +846,11 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
         CraftScanCraftingOrderPage:ShowGeneric()
     end
+
+    CraftScanComm:ShareCustomerOrder(message, customer, customerInfo.guid, chat_history[#chat_history]);
 end
 
-local function OnMessage(self, event, ...)
-    local message, customer = ...
+function CraftScan.OnMessage(event, message, customer, customerGuid)
     if not message or not customer then
         return false
     end
@@ -794,14 +860,14 @@ local function OnMessage(self, event, ...)
     if event == "CHAT_MSG_WHISPER_INFORM" then
         if customerInfo then
             local chat_history = saved(customerInfo, 'chat_history', {})
-            table.insert(chat_history, MakeChatHistoryEntry(customer, message));
+            table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
         end
         return false
     end
 
     if event == "CHAT_MSG_WHISPER" and customerInfo then
         local chat_history = saved(customerInfo, 'chat_history', {})
-        table.insert(chat_history, MakeChatHistoryEntry(customer, message));
+        table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
 
         for _, response in pairs(customerInfo.responses) do
             if response.greeting_sent then
@@ -819,7 +885,7 @@ local function OnMessage(self, event, ...)
     end
 
     local customerInfo = saved(CraftScan.DB.customers, customer, {})
-    customerInfo.guid = select(12, ...)
+    customerInfo.guid = customerGuid;
 
     if itemID or recipeInfo then
         if not itemID then
@@ -843,18 +909,50 @@ local function OnMessage(self, event, ...)
     return false
 end
 
+local function OnMessage_(self, event, ...)
+    local message, customer = ...;
+    local customerGuid = select(12, ...);
+    CraftScan.OnMessage(event, message, customer, customerGuid);
+end
+
 local frame = CreateFrame("frame")
 
 -- Can't unhook, so we disable it without the table allocation at least.
 local registered = false
 local disableHook = false
+
+local function InsertChatFrame(message, args)
+    if #lastChatFrameMessages < CHAT_FRAME_BUFFER_SIZE then
+        table.insert(lastChatFrameMessages, {});
+    end
+    lastChatFrameIndex = lastChatFrameIndex % CHAT_FRAME_BUFFER_SIZE + 1; -- Wow this looks weird. Thanks Lua 1-basedness
+    local currentChatFrame = lastChatFrameMessages[lastChatFrameIndex];
+
+    currentChatFrame.message = message;
+    currentChatFrame.args = args;
+end
 local function CaptureChatMessage(chatFrame, message, ...)
     if disableHook then return end
 
     -- For Prat integration, we grab the historyBuffer value, which has
     -- the timestamp separately added. 'message' does not include it.
-    lastChatFrameMessage.message = chatFrame.historyBuffer:GetEntryAtIndex(1).message;
-    lastChatFrameMessage.args = SafePack(...);
+    InsertChatFrame(chatFrame.historyBuffer:GetEntryAtIndex(1).message, SafePack(...));
+end
+
+function CraftScan.InjectLastChatFrameMessage(customer, message, last)
+    -- If we didn't see the same message, append it to our history and return
+    -- that we should continue processing it. Otherwise, this account has
+    -- already seen it so we can stop working.
+    local found = MakeChatHistoryEntry(customer);
+    if not found or found.message ~= last.message then
+        CraftScan.Utils.printTable("Inserting", last.message);
+        InsertChatFrame(last.message, last.args);
+        return true;
+    else
+        CraftScan.Utils.printTable("Filtering", last.message);
+        CraftScan.Utils.printTable("Because", found.message);
+    end
+    return false;
 end
 
 local function UpdateScannerEventRegistry(...)
@@ -894,7 +992,7 @@ end
 CraftScan.Utils.onLoad(function()
     CraftScan.Scanner.LoadConfig()
 
-    frame:SetScript("OnEvent", OnMessage)
+    frame:SetScript("OnEvent", OnMessage_);
 
     CraftScan.Utils.RegisterEnableDisableCallback(UpdateScannerEventRegistry)
     hooksecurefunc(_G.ChatFrame1, "AddMessage", CaptureChatMessage);

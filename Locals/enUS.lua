@@ -170,14 +170,87 @@ function CraftScan.LOCAL_EN:GetData()
         ["Proposed Greeting"]                 = "Proposed greeting:",
         [LID.CHAT_BUTTON_BINDING_NAME]        = "Whisper Banner Customer",
         ["Customer Request"]                  = "Request from %s",
-
-        -- Translations complete above this line
         [LID.ADDON_WHITELIST_LABEL]           = "Addon whitelist",
         [LID.ADDON_WHITELIST_TOOLTIP]         =
         "When you hit the button to temporarily disable all addons, keep the addons selected here enabled. CraftScan will always stay enabled. Keep only what you need to craft effectively.",
         [LID.MULTI_SELECT_BUTTON_TEXT]        = "%d selected", -- Count
+        [LID.ACCOUNT_LINK_DESC]               =
+        "Share crafters between multiple accounts.\n\nAt login or after a configuration change, CraftScan will propagate the latest information to and from crafters that have been configured on either account to ensure both sides of a linked account are always in sync.",
+        [LID.ACCOUNT_LINK_PROMPT_CHARACTER]   = "Enter the name of an online character on your other account:",
+        [LID.ACCOUNT_LINK_PROMPT_NICKNAME]    = "Enter a nickname for the other account:",
+        ["Link Account"]                      = "Link Account",
+        ["Linked Accounts"]                   = "Linked Accounts",
+        ["Accept Linked Account"]             = "Accept Linked Account",
+        ["Delete Linked Account"]             = "Delete Linked Account",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]    =
+        "'%s' has sent a request to link accounts.\n\nDO NOT ACCEPT THIS IF YOU DID NOT SEND IT.\n\nEnter a nickname for the other account:",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]   =
+        "|cFF00FF00You have a pending request to link accounts with %s. Click here to accept it.|r",
+        ["OK"]                                = "OK",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]    =
+        "To complete the account link, you must accept the request on the other account. The 'Link Account' button will be replaced with an 'Accept Linked Account' button to complete the operation. If there is an error, it will be displayed next to the 'Link Account' button.",
+        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]   =
+        "|cFFFFA500Waiting for %s to accept the account link request.|r",
+        [LID.VERSION_MISMATCH]                =
+        "|cFFFF0000Error: CraftScan version mismatch. Other account version: %s. Your version: %s.|r",
+
+        [LID.REMOTE_CRAFTER_TOOLTIP]          =
+        "This character belongs to a linked account. It can only be disabled on the account that owns the character. You can completely remove this character via 'Cleanup', but will need to do so manually on all linked accounts, or it will be restored by a linked account on login.",
+        [LID.REMOTE_CRAFTER_SUMMARY]          = "Synced with %s.",
+        ["proxy_send_enabled"]                = "Proxy Orders",
+        ["proxy_send_enabled_tooltip"]        = "When a customer order is detected, send it linked accounts.",
+        ["proxy_receive_enabled"]             = "Receive Proxied Orders",
+        ["proxy_receive_enabled_tooltip"]     =
+        "When another account detects and sends a customer order, this account will receive it. The CraftScan button will be displayed to show the alert banner if necessary.",
+        [LID.LINK_ACTIVE]                     = "|cFF00FF00%s (last seen %s)|r", -- Crafter, Time
+        [LID.LINK_DEAD]                       = "|cFFFF0000Offline|r",
+        [LID.ACCOUNT_LINK_DELETE_INFO]        =
+        "Delete the link to '%s' and delete all imported characters. This account will cease all communication with the other side. The other side will still attempt to establish connections until the link is manually removed there as well.\n\nImported crafters that will be removed:\n%s",
+        [LID.ACCOUNT_LINK_ADD_CHAR]           =
+        "By default, the character you initially linked to, any crafters, and any characters that have logged in while this account was online are known to CraftScan. Add additional characters owned by the other account so that it can be used as well. '/reload' to force sync with the new character if it is online.",
+        ["Backup characters"]                 = "Additional characters",
+        ["Unlink account"]                    = "Unlink account",
+        ["Add"]                               = "Add",
+        ["Remove"]                            = "Remove",
+        ["Rename account"]                    = "Rename account",
+        ["New name"]                          = "New name:",
+
+
+        [LID.RN_LINKED_ACCOUNTS]                      = "Linked Accounts",
+        [LID.RN_LINKED_ACCOUNTS + 1]                  =
+        "Link multiple WoW accounts together to share crafting information and scan for any account from any account.",
+        [LID.RN_LINKED_ACCOUNTS + 2]                  =
+        "Optionally, proxy customer orders from one account to the others so you can park a trial account in town while your main is out and about.",
+        [LID.RN_LINKED_ACCOUNTS + 3]                  =
+        "To get started, click the 'Link Account' button in the bottom left corner of the CraftScan window and follow the instruction.",
+        [LID.RN_LINKED_ACCOUNTS + 4]                  =
+        "Demo: https://www.youtube.com/watch?v=x1JLEph6t_c",
+
+        ["Open Settings"]                             = "Open Settings",
+        ["Customize Greeting"]                        = "Customize Greeting",
+        [LID.CUSTOM_GREETING_INFO]                    =
+        "CraftScan uses these sentences to create the initial greeting sent to customers depending on the situation. Override some or all of them below to create your own greeting.",
+        ["Default"]                                   = "Default",
+        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "Error: Expected %d or fewer %%s placeholders. The provided text has %d.",
+        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Error: Only %s placeholders are supported.",
+
+        ["item link"]                                 = "item link",
+        ["alt name and then item link"]               = "alt name and then an item link",
+        ["profession name"]                           = "profession name",
+        ["alt name and then profession name"]         = "alt name and then the profession name",
+        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
+        "This text must contain %d or fewer %%s placeholders to hold the %s. You have included %d.\n\nCraftScan will work with fewer placeholders, but you likely want to include them for context.",
+
+        -- Translations complete above this line
+        ["Pixels"]                                    = "Pixels",
+        ["Show button height"]                        = "Show button height",
+        ["Alert icon scale"]                          = "Alert icon scale",
         ["Total Seen"]                        = "Total Seen",
         ["Avg Per Day"]                       = "Avg/Day",
         ["Peak Per Hour"]                     = "Peak/Hour",
+
+
+        -- ChatGPT prompt:
+        -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.
     }
 end

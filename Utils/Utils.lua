@@ -7,7 +7,34 @@ end
 
 CraftScan.Frames = {}
 CraftScan.Utils = {}
-CraftScan.Utils.DIAG_PRINT_ENABLED = true
+CraftScan.Utils.DIAG_PRINT_ENABLED = false;
+
+function CraftScan.Utils.Contains(array, value)
+    for _, v in ipairs(array) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
+local function DeepCopy_(original)
+    local copy
+    if type(original) == 'table' then
+        copy = {}
+        for key, value in next, original, nil do
+            copy[DeepCopy_(key)] = DeepCopy_(value)
+        end
+        setmetatable(copy, DeepCopy_(getmetatable(original)))
+    else -- number, string, boolean, etc.
+        copy = original
+    end
+    return copy
+end
+
+function CraftScan.Utils.DeepCopy(original)
+    return DeepCopy_(original);
+end
 
 function CraftScan.Utils.ColorizeText(text, colorCode)
     if colorCode then
@@ -137,7 +164,7 @@ function CraftScan.Utils.printTable(label, tbl, indent)
         innerPrint(tbl, indent + 1)
         diagText = diagText .. '}' .. '\n'
     else
-        diagText = diagText .. "Not a table:" .. tostring(tbl) .. '\n'
+        diagText = diagText .. tostring(tbl) .. '\n'
     end
 
     if not diagPrint then
@@ -170,6 +197,10 @@ function CraftScan.Frames.CreateVerticalLayoutOrganizer(anchor, xPadding, yPaddi
 
     xPadding = xPadding or 0;
     yPadding = yPadding or 0;
+
+    function OrganizerMixin:Empty()
+        return not next(self.entries);
+    end
 
     function OrganizerMixin:Add(frame, xPadding, yPadding, child)
         table.insert(self.entries, {
@@ -366,6 +397,147 @@ function CraftScan.Utils.ToggleSavedAddons()
     end
 end
 
+local function AllocateRealmID()
+    CraftScan_DB.realm_id_seed = CraftScan_DB.realm_id_seed or 0;
+    CraftScan_DB.realm_id_seed = CraftScan_DB.realm_id_seed + 1;
+
+    -- Make it a string so we aren't mixing numeric and string keys in the table,
+    -- making it look wonky.
+    return "_" .. CraftScan_DB.realm_id_seed;
+end
+
+local function UpgradeRealmStorage()
+    -- I was a bit of a dumbass and didn't originally nest realms in an object, so they
+    -- are scattered about at the top level. Everything except 'settings',
+    -- 'connected_realms', and 'realm_id_seed' are realms, so move them on down.
+    local realms = CraftScan.Utils.saved(CraftScan_DB, 'realms', {})
+    for key, value in pairs(CraftScan_DB) do
+        if key ~= 'realms' and
+            key ~= 'connected_realms' and
+            key ~= 'settings' and
+            key ~= 'saved_addons' and
+            key ~= 'realm_id_seed' then
+            realms[key] = value;
+
+            -- Transitioning linked_accounts from a global to a per-realm
+            -- variable since you have to establish initial communication on
+            -- each realm anyway.
+            realms[key].linked_accounts = CraftScan_DB.settings and CraftScan_DB.settings.linked_accounts;
+
+            -- Normalize the realm name stored in the character name on
+            -- connected realms to have no spaces or dashes.
+            local newRealms = nil;
+            for char, info in pairs(value.characters) do
+                charName = char:match("^([^-]+)");
+                local shortenedRealm = CraftScan.Utils.ShortenRealmName(key);
+                if shortenedRealm ~= key then
+                    newRealms = newRealms or {};
+                    newRealms[char] = charName .. '-' .. shortenedRealm;
+                end
+            end
+
+            if newRealms then
+                for old, new in pairs(newRealms) do
+                    value.characters[new] = value.characters[old];
+                    value.characters[old] = nil;
+                end
+            end
+
+            CraftScan_DB[key] = nil;
+        end
+    end
+    if CraftScan_DB.settings then
+        CraftScan_DB.settings.linked_accounts = nil;
+    end
+end
+
+function CraftScan.Utils.ShortenRealmName(realmName)
+    -- Hopefully this is the correct shortening. Stolen from https://github.com/phanx-wow/LibRealmInfo/blob/master/LibRealmInfo.lua
+    local shortenedName = realmName:gsub("[%s%-']", "")
+    return shortenedName
+end
+
+local function UpgradeCrossRealmSupport(realmNames)
+    if #realmNames == 0 then
+        return GetRealmName();
+    end
+
+    CraftScan_DB.realm_ids = nil;
+
+    -- Generate a unique number ID for each set of connected realms. We'll
+    -- use that ID to merge realm data instead of a realm name.
+    local realmID = nil;
+    local connectedRealms = CraftScan.Utils.saved(CraftScan_DB, 'connected_realms', {})
+    for _, realmName in ipairs(realmNames) do
+        if connectedRealms[realmName] then
+            if not realmID then
+                realmID = connectedRealms[realmName];
+                break;
+            end
+        end
+    end
+
+    if not realmID then
+        realmID = AllocateRealmID();
+    end
+
+    for _, realmName in ipairs(realmNames) do
+        if not connectedRealms[realmName] then
+            connectedRealms[realmName] = realmID;
+        elseif realmID ~= connectedRealms[realmName] then
+            print(string.format(
+                "|cFFFF0000CraftScan Error: Connected realm ID problem. Realm: %s. Prior ID: %d. Conflicting ID: %d. Open a github issue.|r",
+                realmName, connectedRealms[realmName], realmID));
+        end
+    end
+
+    local function MergeTablesInPlace(dst, src)
+        for key, value in pairs(src) do
+            if type(value) == "table" and type(dst[key]) == "table" then
+                -- If both dst and src have a table at this key, merge them recursively
+                MergeTablesInPlace(dst[key], value)
+            elseif dst[key] ~= nil then
+                -- Key collision detected, print an error message
+                print("CraftScan: Error upgrading SavedVariables: Key collision detected for key '" ..
+                    tostring(key) .. "'. Overwriting. If your config looks screwed, grab CraftScan.lua.bak and save it.")
+                dst[key] = value
+            else
+                -- No collision, simply assign the value
+                dst[key] = value
+            end
+        end
+    end
+
+    local pending = nil;
+    local realmDB = CraftScan_DB.realms;
+    for dbRealm, info in pairs(realmDB) do
+        local connectedRealm = CraftScan.Utils.ShortenRealmName(dbRealm);
+        CraftScan.Utils.printTable("dbRealm", dbRealm)
+        CraftScan.Utils.printTable("connectedRealm", connectedRealm)
+
+        if connectedRealms[connectedRealm] then
+            pending = pending or {};
+            table.insert(pending, {
+                dbRealm = dbRealm,
+                info = info,
+            });
+        end
+    end
+
+    if pending ~= nil then
+        for _, p in ipairs(pending) do
+            realmDB[realmID] = realmDB[realmID] or {}
+            CraftScan.Utils.printTable("Merging", p.info)
+            CraftScan.Utils.printTable("Into", realmDB[realmID])
+            MergeTablesInPlace(realmDB[realmID], p.info);
+
+            -- And remove the old realm-specific entry.
+            realmDB[p.dbRealm] = nil;
+        end
+    end
+    return realmID;
+end
+
 local function UpgradePersistentConfig()
     -- As we make changes to the SavedVariable format, upgrade it here globally
     -- before anything else runs against it so we don't need conditionals
@@ -393,11 +565,8 @@ local function UpgradePersistentConfig()
                     end
                 else
                     local parentProfConfigs = CraftScan.Utils.saved(charConfig, 'parent_professions', {});
-                    local parentProfConfig = CraftScan.Utils.saved(parentProfConfigs, profInfo.parentProfessionID, {
-                        scanning_enabled = true,
-                        visual_alert_enabled = true,
-                        sound_alert_enabled = false,
-                    })
+                    local parentProfConfig = CraftScan.Utils.saved(parentProfConfigs, profInfo.parentProfessionID,
+                        CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG));
                     profConfig.parentProfID = profInfo.parentProfessionID;
                     profConfig['scanning_enabled'] = nil
                     profConfig['auto_reply'] = nil
@@ -478,10 +647,10 @@ local function CompareVersions(version1, version2)
     return 0
 end
 
-local currentVersion = 'v1.0.10'
+CraftScan.CONST.CURRENT_VERSION = 'v1.2.1';
 
 function CraftScan_RecentUpdatesMixin:OnHide()
-    CraftScan.DB.settings.last_loaded_version = currentVersion;
+    CraftScan.DB.settings.last_loaded_version = CraftScan.CONST.CURRENT_VERSION;
     CraftScanRecentUpdatesFrame = nil;
 end
 
@@ -491,7 +660,7 @@ local function NotifyRecentChanges()
         lastLoadedVersion = 'v0.0.0';
     end
 
-    if CompareVersions(currentVersion, lastLoadedVersion) <= 0 then
+    if CompareVersions(CraftScan.CONST.CURRENT_VERSION, lastLoadedVersion) <= 0 then
         return;
     end
 
@@ -524,7 +693,12 @@ local function NotifyRecentChanges()
             version = 'v1.0.10',
             id = LID.RN_CLEANUP,
         },
+        {
+            version = 'v1.2.0',
+            id = LID.RN_LINKED_ACCOUNTS,
+        },
     };
+
 
     local anchor = AnchorUtil.CreateAnchor("TOP", CraftScanRecentUpdatesFrame.ScrollFrame.Content, "TOP");
     local organizer = CraftScan.Frames.CreateVerticalLayoutOrganizer(anchor, 0, 0);
@@ -555,11 +729,13 @@ local function NotifyRecentChanges()
         end
     end
 
-    organizer:Layout();
-    CraftScan.Frames.makeMovable(CraftScanRecentUpdatesFrame)
-    CraftScanRecentUpdatesFrame.ScrollFrame:SetScrollChild(CraftScanRecentUpdatesFrame.ScrollFrame.Content)
-    CraftScanRecentUpdatesFrame:SetTitle(L("CraftScan Release Notes"));
-    CraftScanRecentUpdatesFrame:Show();
+    if not organizer:Empty() then
+        organizer:Layout();
+        CraftScan.Frames.makeMovable(CraftScanRecentUpdatesFrame)
+        CraftScanRecentUpdatesFrame.ScrollFrame:SetScrollChild(CraftScanRecentUpdatesFrame.ScrollFrame.Content)
+        CraftScanRecentUpdatesFrame:SetTitle(L("CraftScan Release Notes"));
+        CraftScanRecentUpdatesFrame:Show();
+    end
 end
 
 local once = false
@@ -580,21 +756,35 @@ local function doOnce()
     BINDING_NAME_CRAFT_SCAN_DISMISS_CURRENT_CUSTOMER = string.format("%s - %s", L(LID.DISMISS_BUTTON_BINDING_NAME),
         L(LID.CRAFT_SCAN));
 
+
     -- We alias our SavedVariable so we can easily switch to non-persistent mode for testing.
-    CraftScan.DB                                     = {}
-    local persistentMode                             = true
+    CraftScan.DB         = {}
+    CraftScan.State      = {};
+    local persistentMode = true
     if persistentMode then
         CraftScan_DB = CraftScan_DB or {}
+
+        UpgradeRealmStorage();
 
         CraftScan.DB.settings = CraftScan.Utils.saved(CraftScan_DB, 'settings', {})
         CraftScan.DB.settings.inclusions = CraftScan.DB.settings.inclusions or L(LID.GLOBAL_INCLUSION_DEFAULT);
         CraftScan.DB.settings.exclusions = CraftScan.DB.settings.exclusions or L(LID.GLOBAL_EXCLUSION_DEFAULT);
 
-        local realmDB = CraftScan.Utils.saved(CraftScan_DB, GetRealmName(), {})
+        local realmNames = GetAutoCompleteRealms()
+        CraftScan.Utils.printTable("realmNames", realmNames)
+
+        local realmID = UpgradeCrossRealmSupport(realmNames);
+        if #realmNames ~= 0 then
+            CraftScan.State.realmID = realmID;
+            CraftScan.State.realmNames = realmNames;
+        end
+
+        local realmDB = CraftScan.Utils.saved(CraftScan_DB.realms, realmID, {})
         CraftScan.DB.characters = CraftScan.Utils.saved(realmDB, 'characters', {})
         CraftScan.DB.listed_orders = CraftScan.Utils.saved(realmDB, 'listed_orders', {})
         CraftScan.DB.customers = CraftScan.Utils.saved(realmDB, 'customers', {})
         CraftScan.DB.analytics = CraftScan.Utils.saved(realmDB, 'analytics', {})
+        CraftScan.DB.realm = realmDB;
 
         UpgradePersistentConfig()
     else
@@ -607,14 +797,13 @@ local function doOnce()
         CraftScan.DB.analytics = {}
     end
 
-    CraftScan.STATE = {};
 
     local prof1, prof2 = GetProfessions()
     CraftScan.CONST.PROFESSIONS = {};
     for _, prof in ipairs({ prof1, prof2 }) do
         local _, icon, _, _, _, _, professionID = GetProfessionInfo(prof);
         local professionInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(professionID);
-        CraftScan.STATE.professionID = professionID;
+        CraftScan.State.professionID = professionID;
         table.insert(CraftScan.CONST.PROFESSIONS, {
             professionID = professionID,
             icon = icon,
@@ -624,21 +813,40 @@ local function doOnce()
 
     NotifyRecentChanges();
 
+    CraftScanComm:ShareCharacterData();
+
     once = true
 end
 
-CraftScan.Utils.CurrentProfession = function()
+-- Originally, the 'Chat orders' tab was actually part of the professions frame.
+-- That was a giant memory leak for some reason, so I changed it to its own page
+-- that has a link to both of the characters professions. I was originally
+-- trying to keep the icon in sync with which profession should be opened, but
+-- now that it's neither, the icon doesn't really matter. Instead of associating
+-- it directly with one of the current character's professions, it should now
+-- flip around to match the most recent customer request.
+CraftScan.Utils.GetCurrentProfessionIcon = function()
+    if CraftScan.State.activeOrder then
+        -- If we have an active order, return the icon associated with the
+        -- requested profession to give a good visual queue about the request.
+        local response = CraftScan.OrderToResponse(CraftScan.State.activeOrder)
+        return CraftScan.CONST.TWW_PROFESSION_ICONS[response.professionID] or
+            CraftScan.CONST.PARENT_PROFESSION_ICONS[response.parentProfID];
+    end
+
+    -- Otherwise, fall back to one of our professions - the one that we're near
+    -- the crafting table for if possible.
     local prof = nil;
     for _, p in ipairs(CraftScan.CONST.PROFESSIONS) do
         if C_TradeSkillUI.IsNearProfessionSpellFocus(p.profession) then
-            return p;
-        elseif CraftScan.STATE.professionID == p.professionID then
+            return p.icon;
+        elseif CraftScan.State.professionID == p.professionID then
             prof = p
         elseif not prof then
             prof = p
         end
     end
-    return prof;
+    return prof and prof.icon;
 end
 
 local loginFrame = CreateFrame("Frame")

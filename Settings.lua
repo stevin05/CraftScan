@@ -78,7 +78,7 @@ function CraftScanSettingsMultiSelectDropDownMixin:SetupDropdownMenu(button, set
         -- instead of the comma separated list.
         local values = CraftScan.DB.settings[setting.variableKey];
         local count = values and #values or 0;
-        return  string.format(L(LID.MULTI_SELECT_BUTTON_TEXT), count);
+        return string.format(L(LID.MULTI_SELECT_BUTTON_TEXT), count);
     end);
     self.Control.Dropdown:GenerateMenu(); -- Apply our custom selection text immediately.
     self.Control.IncrementButton:Hide();
@@ -88,7 +88,7 @@ end
 local function CreateMultiSelectDropdown(category, variable, key, name, options, tooltip)
     local function GetValue()
         -- No-op. It's done by the menu checkbox get/sets
-        return nil;
+        return "";
     end
 
     local function SetValue(value)
@@ -109,10 +109,14 @@ local function CreateMultiSelectDropdown(category, variable, key, name, options,
     initializer:AddSearchTags(L(LID.CRAFT_SCAN));
 end
 
-local function CreateSlider(category, variable, name, options, tooltip)
-    local default = CraftScan.CONST.DEFAULT_SETTINGS[variable];
-    local setting = Settings.RegisterAddOnSetting(category, variable, variable, CraftScan.DB.settings, type(default),
+local function CreateSlider(category, variable, key, name, options, tooltip, OnValueChanged)
+    local default = CraftScan.CONST.DEFAULT_SETTINGS[key];
+    local setting = Settings.RegisterAddOnSetting(category, variable, key, CraftScan.DB.settings, type(default),
         name, default);
+    if OnValueChanged then
+        setting:SetValueChangedCallback(OnValueChanged);
+    end
+
     local initializer = Settings.CreateSlider(category, setting, options, tooltip);
     initializer:AddSearchTags(L(LID.CRAFT_SCAN));
 end
@@ -175,23 +179,43 @@ CraftScan.Utils.onLoad(function()
         local options = Settings.CreateSliderOptions(1, 10, 1);
         options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
             function(value) return value .. ' ' .. (value == 1 and L("Minute") or L("Minutes")) end);
-        CreateSlider(category, "customer_timeout", L(LID.CUSTOMER_TIMEOUT_LABEL), options,
+        CreateSlider(category, "CRAFTSCAN_CUSTOMER_TIMEOUT", "customer_timeout", L(LID.CUSTOMER_TIMEOUT_LABEL), options,
             L(LID.CUSTOMER_TIMEOUT_TOOLTIP));
     end
     do
         local options = Settings.CreateSliderOptions(1, 60, 1);
         options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
             function(value) return value .. ' ' .. (value == 1 and L("Second") or L("Seconds")) end);
-        CreateSlider(category, "banner_timeout", L(LID.BANNER_TIMEOUT_LABEL), options,
+        CreateSlider(category, "CRAFTSCAN_BANNER_TIMEOU", "banner_timeout", L(LID.BANNER_TIMEOUT_LABEL), options,
             L(LID.BANNER_TIMEOUT_TOOLTIP));
     end
     if CraftScan.CONST.AUTO_REPLIES_SUPPORTED then
         local options = Settings.CreateSliderOptions(250, 2000, 100);
         options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
             function(value) return value .. ' ' .. (value == 1 and L("Millisecond") or L("Milliseconds")) end);
-        CreateSlider(category, "auto_reply_delay", "Auto reply delay", options,
+        CreateSlider(category, "CRAFTSCAN_AUTO_REPLY_DELAY", "auto_reply_delay", "Auto reply delay", options,
             "When auto replies are enabled, wait this long before replying to make youself seem a little less bot-like.");
     end
+    do
+        local options = Settings.CreateSliderOptions(25, 200, 5);
+        options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
+            function(value) return value .. ' %' end);
+        CreateSlider(category, "CRAFTSCAN_ALERT_ICON_SCALE", "alert_icon_scale", L("Alert icon scale"), options, nil,
+            function()
+                CraftScan.UpdateAlertIconScale();
+            end);
+    end
+    do
+        local options = Settings.CreateSliderOptions(0, 650, 5);
+        options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
+            function(value) return value .. ' ' .. L("Pixels") end);
+        CreateSlider(category, "CRAFTSCAN_BUTTON_HEIGHT", "show_button_height", L("Show button height"), options, nil,
+            function()
+                CraftScan.UpdateShowButtonHeight();
+            end);
+        --L(LID.CUSTOMER_TIMEOUT_TOOLTIP));
+    end
+
 
     Settings.RegisterAddOnCategory(category);
 end)

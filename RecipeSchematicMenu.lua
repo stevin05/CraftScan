@@ -12,6 +12,7 @@ CRAFT_SCAN_GREETING_INSTRUCTIONS = L(LID.GREETING_INSTRUCTIONS)
 -- References to our saved variables. These are populated as we get the
 -- information needed to populate them.
 local cur = {}
+local playerNameWithRealm = nil;
 local db_player = nil
 local db_prof = nil
 local db_parent_prof = nil
@@ -162,13 +163,24 @@ function CraftScan_CraftScanFrameMixin:ToggleTutorial()
     end
 end
 
+function CraftScan.UpdateShowButtonHeight()
+    if menuShownButton then
+        if CraftScan.DB.settings.show_button_height then
+            menuShownButton:SetPoint("TOPLEFT", ProfessionsFrame.CraftingPage.SchematicForm, "BOTTOMLEFT", 2,
+                -4 + CraftScan.DB.settings.show_button_height);
+        else
+            menuShownButton:SetPoint("TOPLEFT", ProfessionsFrame.CraftingPage.SchematicForm, "BOTTOMLEFT", 2, -4);
+        end
+    end
+end
+
 local menuShownButtonInitialized = false;
 local function CreateMenuShownButton()
     menuShownButton = CreateFrame("Button", "ToggleScannerConfigButton",
         ProfessionsFrame.CraftingPage.SchematicForm,
         "CraftScan_ScannerConfigButtonTemplate");
     menuShownButton:SetText(L(LID.SCANNER_CONFIG_SHOW));
-    menuShownButton:SetPoint("TOPLEFT", ProfessionsFrame.CraftingPage.SchematicForm, "BOTTOMLEFT", 2, -4);
+    CraftScan.UpdateShowButtonHeight();
     menuShownButtonInitialized = true;
 end
 
@@ -176,6 +188,11 @@ CraftScan_CloseCraftScanFrameMixin = {}
 
 function CraftScan_CloseCraftScanFrameMixin:OnClick(button)
     menuShownButton:OnClick();
+end
+
+local function OnConfigChange()
+    CraftScanComm:ShareCharacterModification(playerNameWithRealm, cur.profession.parentProfessionID);
+    CraftScan.Scanner.LoadConfig()
 end
 
 -- Create and position the frames we'll need for user input.
@@ -191,7 +208,7 @@ local function initMenu()
         function(self, button, down)
             saved(db_recipes, cur.recipe.recipeID, {}).enabled = self:GetChecked()
             onSchematicChange()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             local db_recipe = cur.recipe and saved(db_recipes, cur.recipe.recipeID)
             local isChecked = db_recipe and db_recipe.enabled;
@@ -221,7 +238,7 @@ local function initMenu()
         CraftScan.DB.settings.exclusions,
         "CraftScan_Exclusions", function(self)
             CraftScan.DB.settings.exclusions = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end,
         nil,
         scrollFrame);
@@ -230,7 +247,7 @@ local function initMenu()
         "CraftScan_Keywords",
         function(self)
             CraftScan.DB.settings.inclusions = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end,
         nil,
         scrollFrame)
@@ -240,7 +257,7 @@ local function initMenu()
         "CraftScan_Keywords",
         function(self)
             db_parent_prof.keywords = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             return db_parent_prof.keywords or
                 L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID])
@@ -251,7 +268,7 @@ local function initMenu()
         "CraftScan_Exclusions",
         function(self)
             db_parent_prof.exclusions = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             return db_parent_prof.exclusions or ""
         end,
@@ -268,7 +285,7 @@ local function initMenu()
                 clearEmptyRecipes()
             end
             onSchematicChange()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             return db_prof.all_enabled, true
         end)
@@ -276,7 +293,7 @@ local function initMenu()
         function(self, button, down)
             local isChecked = self:GetChecked()
             db_parent_prof.primary_expansion = isChecked and cur.profession.professionID or nil
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             return db_parent_prof.primary_expansion and db_parent_prof.primary_expansion == cur.profession.professionID,
                 true
@@ -285,7 +302,7 @@ local function initMenu()
         "CraftScan_Greeting",
         function(self)
             db_prof.greeting = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             return db_prof.greeting or ""
         end,
@@ -296,7 +313,7 @@ local function initMenu()
         "CraftScan_Keywords",
         function(self)
             dbCat(true).keywords = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             local db_cat = dbCat()
             return db_cat and db_cat.keywords or ""
@@ -306,7 +323,7 @@ local function initMenu()
         "CraftScan_Greeting",
         function(self)
             dbCat(true).greeting = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             local db_cat = dbCat()
             return db_cat and db_cat.greeting or ""
@@ -315,7 +332,7 @@ local function initMenu()
     local catOverride = CraftScan.Frames.createCheckBox(L("Override greeting"), contentFrame,
         function(self, button, down)
             dbCat(true).override = self:GetChecked()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             local db_cat = dbCat()
             return db_cat and db_cat.override, true
@@ -326,7 +343,7 @@ local function initMenu()
         "CraftScan_Keywords",
         function(self)
             saved(db_recipes, cur.recipe.recipeID, {}).keywords = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             local db_recipe = saved(db_recipes, cur.recipe.recipeID)
             return db_recipe and db_recipe.keywords or ""
@@ -336,7 +353,7 @@ local function initMenu()
         "CraftScan_Greeting",
         function(self)
             saved(db_recipes, cur.recipe.recipeID, {}).greeting = self:GetText()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             local db_recipe = saved(db_recipes, cur.recipe.recipeID)
             return db_recipe and db_recipe.greeting or ""
@@ -345,7 +362,7 @@ local function initMenu()
     local itemOverride = CraftScan.Frames.createCheckBox(L("Override greeting"), contentFrame,
         function(self, button, down)
             saved(db_recipes, cur.recipe.recipeID, {}).override = self:GetChecked()
-            CraftScan.Scanner.LoadConfig()
+            OnConfigChange();
         end, function()
             local db_recipe = saved(db_recipes, cur.recipe.recipeID)
             return db_recipe and db_recipe.override, true
@@ -514,16 +531,19 @@ local function OnRecipeSelected()
 
     -- At this point, the player has opened a tradeskill window, so it makes
     -- sense to start tracking that character. Initialize the saved variables.
-    local player = GetUnitName("player")
-    local playerNameWithRealm = player .. "-" .. GetRealmName()
+    playerNameWithRealm = CraftScan.GetPlayerName(true)
     db_player = saved(CraftScan.DB.characters, playerNameWithRealm, {})
 
+    -- my_uuid is initialized when linked to a new account, at which point all
+    -- current characters are tagged. If this character is added after account
+    -- linking, tag it as well.
+    if not db_player.sourceID and CraftScan.DB.settings.my_uuid then
+        db_player.sourceID = CraftScan.DB.settings.my_uuid;
+    end
+
     db_player.parent_professions = db_player.parent_professions or {}
-    db_parent_prof = saved(db_player.parent_professions, cur.profession.parentProfessionID, {
-        scanning_enabled = true,
-        visual_alert_enabled = true,
-        sound_alert_enabled = false,
-    })
+    db_parent_prof = saved(db_player.parent_professions, cur.profession.parentProfessionID,
+        CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG));
 
     if db_parent_prof.character_disabled then
         HideSchematicOptions();
@@ -545,7 +565,7 @@ local function OnRecipeSelected()
 
     cur.category = C_TradeSkillUI.GetCategoryInfo(cur.recipe.categoryID)
 
-    CraftScan.STATE.professionID = cur.profession.parentProfessionID;
+    CraftScan.State.professionID = cur.profession.parentProfessionID;
     CraftScan.Frames.MainButton:UpdateIcon();
 
     ShowSchematicOptions();
@@ -573,6 +593,9 @@ function CraftScan_ScannerConfigButtonMixin:OnClick(button)
         self.isEnabled = true;
         self.isSelected = false;
         db_parent_prof.character_disabled = false;
+
+        CraftScanComm:ShareCharacterModification(playerNameWithRealm, cur.profession.parentProfessionID);
+
         OnRecipeSelected();
     else
         self.isSelected = not self.isSelected;
