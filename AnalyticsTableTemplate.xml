@@ -34,24 +34,13 @@
 	</Frame>
 	<Frame name="CraftScanAnalyticsTableCellProfessionNameTemplate" mixin="CraftScanAnalyticsTableCellProfessionNameMixin" inherits="CraftScanTableCellTextTemplate" virtual="true"/>
 	<Frame name="CraftScanAnalyticsTableCellTotalSeenTemplate" mixin="CraftScanAnalyticsTableCellTotalSeenMixin" inherits="CraftScanTableCellTextTemplate" virtual="true"/>
+	<Frame name="CraftScanAnalyticsTableCellTotalSeenFilteredTemplate" mixin="CraftScanAnalyticsTableCellTotalSeenFilteredMixin" inherits="CraftScanTableCellTextTemplate" virtual="true"/>
 	<Frame name="CraftScanAnalyticsTableCellAveragePerDayTemplate" mixin="CraftScanAnalyticsTableCellAveragePerDayMixin" inherits="CraftScanTableCellTextTemplate" virtual="true"/>
 	<Frame name="CraftScanAnalyticsTableCellPeakPerHourTemplate" mixin="CraftScanAnalyticsTableCellPeakPerHourMixin" inherits="CraftScanTableCellTextTemplate" virtual="true"/>
-<!-- 
-	<Frame name="CraftScanCrafterTableCellTimeTemplate" mixin="CraftScanCrafterTableCellTimeMixin" passThroughButtons="LeftButton, RightButton" virtual="true">
-		<Size x="0" y="16"/>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<FontString parentKey="Text" inherits="Number14FontGray" justifyH="RIGHT">
-					<Anchors>
-						<Anchor point="TOPLEFT" x="-15" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="-20" y="0"/>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-	</Frame>
+	<Frame name="CraftScanAnalyticsTableCellMedianPerCustomerTemplate" mixin="CraftScanAnalyticsTableCellMedianPerCustomerMixin" inherits="CraftScanTableCellTextTemplate" virtual="true"/>
+	<Frame name="CraftScanAnalyticsTableCellMedianPerCustomerFilteredTemplate" mixin="CraftScanAnalyticsTableCellMedianPerCustomerFilteredMixin" inherits="CraftScanTableCellTextTemplate" virtual="true"/>
 
-	<Button name="CraftScanCrafterTableHeaderStringTemplate" mixin="CraftScanCrafterTableHeaderStringMixin" inherits="ColumnDisplayButtonShortTemplate" virtual="true">
+	<Button name="CraftScanAnalyticsTableHeaderStringTemplate" mixin="CraftScanAnalyticsTableHeaderStringMixin" inherits="ColumnDisplayButtonShortTemplate" virtual="true">
 		<Size x="0" y="19"/>
 		<Layers>
 			<Layer level="OVERLAY">
@@ -64,28 +53,8 @@
 		</Layers>
 		<Scripts>
 			<OnClick method="OnClick"/>
+			<OnEnter method="OnEnter"/>
+			<OnLeave method="OnLeave"/>
 		</Scripts>
 	</Button>
-
-	<Button name="CraftScanOutputButtonTemplate" inherits="CircularGiantItemButtonTemplate" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
-		<Size x="47" y="47"/>
-		<Layers>
-			<Layer level="OVERLAY" textureSubLevel="5">
-				<FontString parentKey="Count" inherits="NumberFontNormalLarge" justifyH="RIGHT">
-					<Anchors>
-						<Anchor point="BOTTOM" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-4" y="1"/>
-					</Anchors>
-				</FontString>
-			</Layer>
-			<Layer level="OVERLAY" textureSubLevel="3">
-				<Texture parentKey="CountShadow" atlas="BattleBar-SwapPetShadow" alpha=".8">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeKey="$parent.Count" relativePoint="TOPLEFT" x="-10" y="10"/>
-						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Count" relativePoint="BOTTOMRIGHT" x="10" y="-10"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-	</Button>
- -->
 </Ui>

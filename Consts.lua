@@ -82,21 +82,34 @@ CraftScan.CONST.TEXT = {
     ACCOUNT_LINK_DESC                       = 74,
     ACCOUNT_LINK_PROMPT_CHARACTER           = 75,
     ACCOUNT_LINK_PROMPT_NICKNAME            = 76,
-    ACCOUNT_LINK_ACCEPT_SRC_INFO            = 77,
-    ACCOUNT_LINK_ACCEPT_SRC_LABEL           = 78,
     ACCOUNT_LINK_ACCEPT_DST_INFO            = 79,
-    ACCOUNT_LINK_ACCEPT_DST_LABEL           = 80,
+    LINKED_ACCOUNT_REJECTED                 = 80,
     VERSION_MISMATCH                        = 81,
     REMOTE_CRAFTER_TOOLTIP                  = 83,
     REMOTE_CRAFTER_SUMMARY                  = 84,
     LINK_ACTIVE                             = 85,
-    LINK_DEAD                               = 86,
     ACCOUNT_LINK_DELETE_INFO                = 87,
     ACCOUNT_LINK_ADD_CHAR                   = 88,
     CUSTOM_GREETING_INFO                    = 89,
     WRONG_NUMBER_OF_PLACEHOLDERS            = 90,
     WRONG_TYPE_OF_PLACEHOLDERS              = 91,
     WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION = 92,
+    ANALYTICS_ITEM_TOOLTIP                  = 93,
+    ANALYTICS_PROFESSION_TOOLTIP            = 94,
+    ANALYTICS_TOTAL_TOOLTIP                 = 95,
+    ANALYTICS_REPEAT_TOOLTIP                = 96,
+    ANALYTICS_AVERAGE_TOOLTIP               = 97,
+    ANALYTICS_PEAK_TOOLTIP                  = 98,
+    ANALYTICS_MEDIAN_TOOLTIP                = 99,
+    ANALYTICS_MEDIAN_TOOLTIP_FILTERED       = 100,
+    LINKED_ACCOUNT_USER_REJECTED            = 101,
+    LINKED_ACCOUNT_PERMISSION_FULL          = 102,
+    LINKED_ACCOUNT_PERMISSION_ANALYTICS     = 103,
+    ACCOUNT_LINK_PERMISSIONS_DESC           = 104,
+    ACCOUNT_LINK_FULL_CONTROL_DESC          = 105,
+    ACCOUNT_LINK_ANALYTICS_DESC             = 106,
+    ANALYTICS_PROF_MISMATCH                 = 107,
+
 
 
 
@@ -109,6 +122,7 @@ CraftScan.CONST.TEXT = {
     RN_KEYBINDS = 10500,
     RN_CLEANUP = 10600,
     RN_LINKED_ACCOUNTS = 10700,
+    RN_ANALYTICS = 10800,
 }
 
 CraftScan.CONST.LOCALES = {
@@ -265,25 +279,25 @@ CraftScan.CONST.PROFESSION_COLORS = {
 -- character knows the profession. Hate maintaining things, but  easy enough and
 -- we use the parent professions as a backup.
 CraftScan.CONST.PARENT_PROFESSION_ICONS = {
-    [164] = 136241,         -- Blacksmithing
-    [165] = 136247,         -- Leatherworking
-    [171] = 136240,         -- Alchemy
-    [197] = 136249,         -- Tailoring
-    [202] = 136244,         -- Engineering
-    [333] = 136243,         -- Enchanting
-    [755] = 134071,         -- Jewelcrafting
-    [773] = 237171,         -- Inscription
+    [164] = 136241, -- Blacksmithing
+    [165] = 136247, -- Leatherworking
+    [171] = 136240, -- Alchemy
+    [197] = 136249, -- Tailoring
+    [202] = 136244, -- Engineering
+    [333] = 136243, -- Enchanting
+    [755] = 134071, -- Jewelcrafting
+    [773] = 237171, -- Inscription
 }
 
 CraftScan.CONST.TWW_PROFESSION_ICONS = {
-    [3017] = 136240,         -- Alchemy
-    [3021] = 136241,         -- Blacksmithing
-    [3034] = 136244,         -- Enchanting
-    [3037] = 136245,         -- Engineering
-    [3040] = 237171,         -- Inscription
-    [3043] = 134071,         -- Jewelcrafting
-    [3046] = 136247,         -- Leatherworking
-    [3049] = 136249,         -- Tailoring
+    [3017] = 136240, -- Alchemy
+    [3021] = 136241, -- Blacksmithing
+    [3034] = 136244, -- Enchanting
+    [3037] = 136245, -- Engineering
+    [3040] = 237171, -- Inscription
+    [3043] = 134071, -- Jewelcrafting
+    [3046] = 136247, -- Leatherworking
+    [3049] = 136249, -- Tailoring
 };
 
 CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS = {

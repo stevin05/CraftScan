@@ -29,6 +29,7 @@
 			<OnEnter method="OnEnter"/>
 			<OnLeave method="OnLeave"/>
 			<OnClick method="OnClick"/>
+			<OnHide method="OnHide"/>
 		</Scripts>
 	</Button>
 
@@ -54,7 +55,7 @@
 	<CheckButton name="CraftScan_ProxyEnabledTemplate" mixin="CraftScan_ProxyEnabledMixin" virtual="true">
 		<Size x="18" y="18"/>
 		<Scripts>
-			<OnShow method="OnLoad"/>
+			<OnShow method="OnShow"/>
 			<OnClick method="OnClick"/>
 			<OnEnter method="OnEnter"/>
 			<OnLeave method="OnLeave"/>
@@ -300,16 +301,6 @@
 											<OnLoad method="OnLoad"/>
 											<OnClick method="OnClick"/>
 										</Scripts>
-										<Layers>
-											<Layer level="OVERLAY">
-												<FontString parentKey="PendingAlert" inherits="GameFontNormal" hidden="true">
-													<Size y="22"/>
-													<Anchors>
-														<Anchor point="LEFT" relativeKey="$parent.$parent.$parent" relativePoint="BOTTOMRIGHT" x="4" y="10"/>
-													</Anchors>
-												</FontString>
-											</Layer>
-										</Layers>
 									</Button>
 
 									<CheckButton parentKey="ProxyReceiveEnabled" inherits="CraftScan_ProxyEnabledTemplate" hidden="true">
@@ -438,11 +429,12 @@
 					</Frame>
 
 					<Frame parentKey="OrderList">
+						<Size y="250"/>
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.LeftPanel" relativePoint="TOPRIGHT"/>
-							<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" y="5"/>
-							<Anchor point="TOPRIGHT"/>
-							<Anchor point="RIGHT"/>
+							<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT"/>
+							<!-- <Anchor point="BOTTOMLEFT" relativeKey="$parent.LeftPanel" relativePoint="RIGHT"/> -->
+							<!-- <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="RIGHT"/> -->
 						</Anchors>
 						<Layers>
 							<Layer>
@@ -480,16 +472,9 @@
 							<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox" relativePoint="TOPRIGHT" x="0" y="-2"/>
-									<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="0" y="2"/>
+									<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="0" y="18"/>
 								</Anchors>
 							</EventFrame>
-							<Frame parentKey="ContextMenu" inherits="UIDropDownMenuTemplate" enableMouse="true"/>
-							<Frame parentKey="LoadingSpinner" inherits="SpinnerTemplate" hidden="true" frameLevel="2000">
-								<Size x="80" y="80"/>
-								<Anchors>
-									<Anchor point="CENTER" x="0" y="0"/>
-								</Anchors>
-							</Frame>
 						</Frames>
 						<Layers>
 							<Layer level="OVERLAY">
@@ -526,7 +511,7 @@
 						<Size x="140" y="22"/>
 
 						<Anchors>
-							<Anchor point="TOPLEFT" relativeKey="$parent.AddonToggleButton" relativePoint="TOPRIGHT" x="5" y="5"/>
+							<Anchor point="TOPLEFT" relativeKey="$parent.AddonToggleButton" relativePoint="TOPRIGHT" x="5" y="0"/>
 						</Anchors>
 						<Scripts>
 							<OnLoad method="OnLoad"/>
@@ -547,9 +532,25 @@
 						</Scripts>
 					</Button>
 
+					<DropdownButton parentKey="ResetAnalyticsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_ResetAnalyticsButtonMixin">
+						<Size x="120" y="22"/>
+						<Anchors>
+							<Anchor point="RIGHT" relativeKey="$parent.CustomGreetingButton" relativePoint="LEFT" x="-5" y="0"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+						</Scripts>
+					</DropdownButton>
+
 
 					<Frame parentKey="AnalyticsTable" mixin="CraftScanAnalyticsTableMixin">
 						<Size x="300" y="250"/>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.OrderList" relativePoint="BOTTOMLEFT" />
+							<Anchor point="TOPRIGHT" relativeKey="$parent.OrderList" relativePoint="BOTTOMRIGHT" />
+							<Anchor point="BOTTOMLEFT" y="6" />
+							<Anchor point="BOTTOMRIGHT" y="6" />
+						</Anchors>
 						<Layers>
 							<Layer>
 								<Texture parentKey="Background" atlas="auctionhouse-background-index" useAtlasSize="false">
@@ -589,26 +590,42 @@
 									<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="0" y="2"/>
 								</Anchors>
 							</EventFrame>
-							<Frame parentKey="ContextMenu" inherits="UIDropDownMenuTemplate" enableMouse="true"/>
-							<Frame parentKey="LoadingSpinner" inherits="SpinnerTemplate" hidden="true" frameLevel="2000">
-								<Size x="80" y="80"/>
-								<Anchors>
-									<Anchor point="CENTER" x="0" y="0"/>
-								</Anchors>
-							</Frame>
 						</Frames>
-						<Anchors>
-							<Anchor point="TOPLEFT" relativeKey="$parent.OrderList" relativePoint="BOTTOMLEFT"/>
-							<Anchor point="BOTTOMLEFT" relativeKey="$parent.CrafterList" relativePoint="BOTTOMRIGHT"/>
-							<Anchor point="TOPRIGHT" relativeKey="$parent.OrderList" relativePoint="BOTTOMRIGHT"/>
-							<Anchor point="BOTTOMRIGHT"/>
-						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString parentKey="ResultsText" inherits="GameFontNormal" hidden="true">
+									<Anchors>
+										<Anchor point="TOP" relativeKey="$parent.ScrollBox" relativePoint="TOP" x="0" y="-20"/>
+										<Anchor point="LEFT" x="45"/>
+										<Anchor point="RIGHT" x="-67"/>
+									</Anchors>
+									<Shadow>
+										<Offset>
+											<AbsDimension x="1" y="-1"/>
+										</Offset>
+										<Color r="0" g="0" b="0"/>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
 						<Scripts>
 							<OnShow method="OnShow"/>
 						</Scripts>
 					</Frame>
 
-
+					<Button parentKey="ResizeButton" mixin="CraftScan_ResizeOrderListButtonMixin" frameStrata="HIGH" toplevel="true" hidden="false">
+						<Size x="16" y="16"/>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.OrderList" x="-5" y="0"/>
+						</Anchors>
+						<Scripts>
+							<OnMouseDown method="OnMouseDown"/>
+							<OnMouseUp method="OnMouseUp"/>
+						</Scripts>
+						<NormalTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up"/>
+						<HighlightTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight"/>
+						<PushedTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down"/>
+					</Button>
 
 				</Frames>
 			</Frame>

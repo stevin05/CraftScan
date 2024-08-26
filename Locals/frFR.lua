@@ -184,15 +184,7 @@ function CraftScan.LOCAL_FR:GetData()
         ["Linked Accounts"]                           = "Comptes liés",
         ["Accept Linked Account"]                     = "Accepter le compte lié",
         ["Delete Linked Account"]                     = "Supprimer le compte lié",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
-        "'%s' a envoyé une demande de liaison de compte.\n\nNE L'ACCEPTEZ PAS SI VOUS NE L'AVEZ PAS ENVOYÉ.\n\nEntrez un surnom pour l'autre compte :",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]           =
-        "|cFF00FF00Vous avez une demande en attente pour lier des comptes avec %s. Cliquez ici pour l'accepter.|r",
         ["OK"]                                        = "OK",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]            =
-        "Pour terminer la liaison des comptes, vous devez accepter la demande sur l'autre compte. Le bouton 'Lier le compte' sera remplacé par un bouton 'Accepter le compte lié' pour terminer l'opération. En cas d'erreur, elle sera affichée à côté du bouton 'Lier le compte'.",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]           =
-        "|cFFFFA500En attente de %s pour accepter la demande de liaison de compte.|r",
         [LID.VERSION_MISMATCH]                        =
         "|cFFFF0000Erreur : incompatibilité de version de CraftScan. Version de l'autre compte : %s. Votre version : %s.|r",
 
@@ -205,7 +197,6 @@ function CraftScan.LOCAL_FR:GetData()
         ["proxy_receive_enabled_tooltip"]             =
         "Lorsqu'un autre compte détecte et envoie une commande client, ce compte la recevra. Le bouton CraftScan s'affichera pour montrer la bannière d'alerte si nécessaire.",
         [LID.LINK_ACTIVE]                             = "|cFF00FF00%s (vu pour la dernière fois %s)|r", -- Crafter, Time
-        [LID.LINK_DEAD]                               = "|cFFFF0000Hors ligne|r",
         [LID.ACCOUNT_LINK_DELETE_INFO]                =
         "Supprimez la liaison avec '%s' et supprimez tous les personnages importés. Ce compte cessera toute communication avec l'autre côté. L'autre côté continuera à essayer d'établir des connexions jusqu'à ce que la liaison soit manuellement supprimée également.\n\nArtisans importés qui seront supprimés :\n%s",
         [LID.ACCOUNT_LINK_ADD_CHAR]                   =

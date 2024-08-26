@@ -48,6 +48,12 @@ function CraftScan.Utils.ColorizeProfessionName(profID, professionName)
     return CraftScan.Utils.ColorizeText(professionName, color);
 end
 
+function CraftScan.Utils.ColorizedProfessionNameByID(professionID)
+    local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(professionID);
+    return CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
+        profInfo.professionName)
+end
+
 function CraftScan.Utils.SendResponses(responses, customer)
     for _, response in pairs(responses) do
         SendChatMessage(response, "WHISPER", GetDefaultLanguage("player"), customer)
@@ -131,6 +137,25 @@ end
 local diagPrintFrame = nil
 local diagPrint      = nil
 local diagText       = ''
+
+local function DisplayDiagText()
+    if not diagPrint then
+        diagPrintFrame = CreateFrame("Frame", "Section", UIParent, "CraftScan_DebugFrame")
+        diagPrint = CraftScan.Frames.createTextInput("Frame", diagPrintFrame, 400, 800,
+            "https://github.com/stevin05/CraftScan", nil, "CraftScan_Debug",
+            nil,
+            function()
+                return diagText
+            end)
+        diagPrintFrame:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -250, -115)
+        diagPrintFrame:SetTitle("CraftScan Debug Log");
+        diagPrint:SetPoint("TOPLEFT", diagPrintFrame, "TOPLEFT", 15, -25)
+    else
+        diagPrintFrame:Show()
+        diagPrint.updateDisplay()
+    end
+end
+
 function CraftScan.Utils.printTable(label, tbl, indent)
     if not CraftScan.Utils.DIAG_PRINT_ENABLED then
         return
@@ -167,21 +192,12 @@ function CraftScan.Utils.printTable(label, tbl, indent)
         diagText = diagText .. tostring(tbl) .. '\n'
     end
 
-    if not diagPrint then
-        diagPrintFrame = CreateFrame("Frame", "Section", UIParent, "CraftScan_DebugFrame")
-        diagPrint = CraftScan.Frames.createTextInput("Frame", diagPrintFrame, 400, 800,
-            "https://github.com/stevin05/CraftScan", nil, "CraftScan_Debug",
-            nil,
-            function()
-                return diagText
-            end)
-        diagPrintFrame:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -250, -115)
-        diagPrintFrame:SetTitle("CraftScan Debug Log");
-        diagPrint:SetPoint("TOPLEFT", diagPrintFrame, "TOPLEFT", 15, -25)
-    else
-        diagPrintFrame:Show()
-        diagPrint.updateDisplay()
-    end
+    DisplayDiagText();
+end
+
+function CraftScan.Utils.DumpCopyableText(value)
+    diagText = value;
+    DisplayDiagText();
 end
 
 function CraftScan.Utils.debug_print(...)
@@ -618,6 +634,14 @@ local function UpgradePersistentConfig()
             end
         end
     end
+
+    if CraftScan.DB.realm.linked_accounts then
+        for _, info in pairs(CraftScan.DB.realm.linked_accounts) do
+            if not info.permissions then
+                info.permissions = { CraftScanComm.Permissions.Full };
+            end
+        end
+    end
 end
 
 function CraftScan.Utils.GetSetting(key)
@@ -647,7 +671,7 @@ local function CompareVersions(version1, version2)
     return 0
 end
 
-CraftScan.CONST.CURRENT_VERSION = 'v1.2.1';
+CraftScan.CONST.CURRENT_VERSION = 'v1.2.2';
 
 function CraftScan_RecentUpdatesMixin:OnHide()
     CraftScan.DB.settings.last_loaded_version = CraftScan.CONST.CURRENT_VERSION;
@@ -696,6 +720,10 @@ local function NotifyRecentChanges()
         {
             version = 'v1.2.0',
             id = LID.RN_LINKED_ACCOUNTS,
+        },
+        {
+            version = 'v1.2.2',
+            id = LID.RN_ANALYTICS,
         },
     };
 
@@ -1024,22 +1052,4 @@ function CraftScan.Utils.ChatHistoryTooltip:Show(name, anchor, order, header, in
     tooltip:SetMinimumWidth(math.min(GetMaxTextLeftWidth(name), ChatFrame1:GetWidth()));
 
     tooltip:Show();
-end
-
-local LibSerialize = LibStub("LibSerialize")
-local LibDeflate = LibStub("LibDeflate")
-
--- With compression (recommended):
-function CraftScan.Utils:Transmit(data)
-    local serialized = LibSerialize:Serialize(data)
-    local compressed = LibDeflate:CompressDeflate(serialized)
-    return compressed;
-end
-
-function CraftScan.Utils:OnCommReceived(compressed)
-    local decompressed = LibDeflate:DecompressDeflate(compressed)
-    if not decompressed then return end
-    local success, data = LibSerialize:Deserialize(decompressed)
-    if not success then return end
-    return data;
 end

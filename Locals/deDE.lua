@@ -186,15 +186,7 @@ function CraftScan.LOCAL_DE:GetData()
         ["Linked Accounts"]                           = "Verlinkte Accounts",
         ["Accept Linked Account"]                     = "Verlinkten Account akzeptieren",
         ["Delete Linked Account"]                     = "Verlinkten Account löschen",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
-        "'%s' hat eine Anfrage zur Verlinkung von Accounts gesendet.\n\nNICHT AKZEPTIEREN, WENN DU ES NICHT SELBST ANGEFORDERT HAST.\n\nGib einen Spitznamen für den anderen Account ein:",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]           =
-        "|cFF00FF00Du hast eine ausstehende Anfrage zur Verlinkung von Accounts mit %s. Klicke hier, um sie zu akzeptieren.|r",
         ["OK"]                                        = "OK",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]            =
-        "Um die Account-Verlinkung abzuschließen, musst du die Anfrage auf dem anderen Account akzeptieren. Der 'Account verlinken'-Button wird durch einen 'Verlinkten Account akzeptieren'-Button ersetzt, um den Vorgang abzuschließen. Falls ein Fehler auftritt, wird er neben dem 'Account verlinken'-Button angezeigt.",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]           =
-        "|cFFFFA500Warte auf %s, um die Account-Verlinkungsanfrage zu akzeptieren.|r",
         [LID.VERSION_MISMATCH]                        =
         "|cFFFF0000Fehler: CraftScan-Version nicht kompatibel. Andere Account-Version: %s. Deine Version: %s.|r",
 
@@ -207,7 +199,6 @@ function CraftScan.LOCAL_DE:GetData()
         ["proxy_receive_enabled_tooltip"]             =
         "Wenn ein anderer Account eine Kundenbestellung erkennt und sendet, empfängt dieser Account sie. Der CraftScan-Button wird angezeigt, um bei Bedarf das Benachrichtigungsbanner zu zeigen.",
         [LID.LINK_ACTIVE]                             = "|cFF00FF00%s (zuletzt gesehen %s)|r", -- Crafter, Time
-        [LID.LINK_DEAD]                               = "|cFFFF0000Offline|r",
         [LID.ACCOUNT_LINK_DELETE_INFO]                =
         "Lösche die Verlinkung zu '%s' und alle importierten Charaktere. Dieser Account wird jegliche Kommunikation mit der anderen Seite einstellen. Die andere Seite wird weiterhin versuchen, Verbindungen herzustellen, bis die Verlinkung auch dort manuell entfernt wird.\n\nEntfernte importierte Handwerker:\n%s",
         [LID.ACCOUNT_LINK_ADD_CHAR]                   =

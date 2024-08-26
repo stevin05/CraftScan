@@ -173,11 +173,7 @@ function CraftScan.LOCAL_CN:GetData()
         ["Linked Accounts"]                           = "已链接帐户",
         ["Accept Linked Account"]                     = "接受已链接帐户",
         ["Delete Linked Account"]                     = "删除已链接帐户",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            = "'%s'发出了链接帐户的请求。\n\n如果您没有发送此请求，请勿接受。\n\n为另一个帐户输入一个昵称：",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]           = "|cFF00FF00你有一个挂起的请求与%s链接帐户。点击此处接受。|r",
         ["OK"]                                        = "确定",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]            = "要完成帐户链接，你需要在另一个帐户上接受请求。'链接帐户'按钮将被'接受已链接帐户'按钮替换以完成操作。如果有错误，它将显示在'链接帐户'按钮旁边。",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]           = "|cFFFFA500正在等待%s接受帐户链接请求。|r",
         [LID.VERSION_MISMATCH]                        = "|cFFFF0000错误：CraftScan版本不兼容。另一个帐户的版本：%s。您的版本：%s。|r",
 
         [LID.REMOTE_CRAFTER_TOOLTIP]                  =
@@ -188,7 +184,6 @@ function CraftScan.LOCAL_CN:GetData()
         ["proxy_receive_enabled"]                     = "接收代理订单",
         ["proxy_receive_enabled_tooltip"]             = "当另一个帐户检测到并发送客户订单时，此帐户将接收它。如果需要，CraftScan按钮将显示警告横幅。",
         [LID.LINK_ACTIVE]                             = "|cFF00FF00%s（上次看到%s）|r", -- Crafter, Time
-        [LID.LINK_DEAD]                               = "|cFFFF0000离线|r",
         [LID.ACCOUNT_LINK_DELETE_INFO]                =
         "删除与'%s'的链接并删除所有导入的角色。此帐户将停止与另一方的所有通信。另一方将继续尝试建立连接，直到在该处手动删除链接为止。\n\n将被删除的导入制造者：\n%s",
         [LID.ACCOUNT_LINK_ADD_CHAR]                   =

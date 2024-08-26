@@ -8,13 +8,23 @@ local dialogPool = CreateFramePool("Frame", UIParent, "CraftScanDialogTemplate")
 local textPool = CreateFramePool("Frame", nil, "CraftScanDialogTextTemplate")
 local editBoxPool = CreateFramePool("EditBox", nil, "CraftScanDialogTextInputTemplate")
 local defaultButtonPool = CreateFramePool("Button", nil, "CraftScan_DialogDefaultButtonTemplate")
+local checkButtonPool = CreateFramePool("CheckButton", nil, "CraftScanDialogCheckButtonTemplate")
 
 CraftScan.Dialog = {}
 
 CraftScan.Dialog.Element = {
     EditBox = 1,
     Text = 2,
+    CheckButton = 3,
+
+    DefaultButton = 4,
 };
+
+CraftScan_DialogCheckButtonMixin = {}
+
+function CraftScan_DialogCheckButtonMixin:OnClick()
+    self:GetParent():CheckEnableSubmit()
+end
 
 CraftScan_DialogDefaultButtonMixin = {}
 
@@ -32,6 +42,19 @@ function CraftScan_DialogDefaultButtonMixin:Refresh()
     end
 end
 
+local function CreateArgs(dialog)
+    local args = {};
+    for _, frame in ipairs(dialog.frames) do
+        if frame.type == CraftScan.Dialog.Element.EditBox then
+            table.insert(args, frame:GetText());
+        end
+        if frame.type == CraftScan.Dialog.Element.CheckButton then
+            table.insert(args, frame:GetChecked())
+        end
+    end
+    return unpack(args);
+end
+
 CraftScanDialogMixin = {};
 
 function CraftScanDialogMixin:CheckEnableSubmit()
@@ -43,19 +66,50 @@ function CraftScanDialogMixin:CheckEnableSubmit()
             end
         end
     end
-    self.SubmitButton:SetEnabled(true);
+
+    local enabled = true;
+    if self.Validator then
+        enabled = self.Validator(CreateArgs(self));
+    end
+
+    self.SubmitButton:SetEnabled(enabled);
 end
 
+local uniq = {};
+
 function CraftScanDialogMixin:OnHide()
-    for _, frame in ipairs(self.frames) do
-        if frame.type == CraftScan.Dialog.Element.EditBox then
-            editBoxPool:Release(frame);
-        else
-            textPool:Release(frame);
+    if self.initialized then
+        if not self.accepted and self.OnReject then
+            self.OnReject();
         end
+
+        if self.frames then
+            for _, frame in ipairs(self.frames) do
+                if frame.type == CraftScan.Dialog.Element.EditBox then
+                    frame:SetText("");
+                    editBoxPool:Release(frame);
+                elseif frame.type == CraftScan.Dialog.Element.DefaultButton then
+                    defaultButtonPool:Release(frame);
+                elseif frame.type == CraftScan.Dialog.Element.CheckButton then
+                    checkButtonPool:Release(frame);
+                else
+                    textPool:Release(frame);
+                end
+            end
+            self.frames = nil;
+        end
+        self.accepted = nil;
+        self.initialized = nil;
+        if self.key then
+            uniq[self.key] = nil;
+        end
+        CraftScan.Utils.printTable("Hiding dialog", self.key);
+        self.key = nil;
+        self.OnAccept = nil;
+        self.OnReject = nil;
+        self.Validator = nil;
+        dialogPool:Release(self);
     end
-    self.frames = nil;
-    dialogPool:Release(self);
 end
 
 CraftScanDialogSubmitMixin = {};
@@ -63,14 +117,9 @@ CraftScanDialogSubmitMixin = {};
 function CraftScanDialogSubmitMixin:OnClick()
     local dialog = self:GetParent();
     if dialog.OnAccept then
-        local args = {};
-        for _, frame in ipairs(dialog.frames) do
-            if frame.type == CraftScan.Dialog.Element.EditBox then
-                table.insert(args, frame:GetText());
-            end
-        end
-        dialog.OnAccept(unpack(args));
+        dialog.OnAccept(CreateArgs(dialog));
     end
+    dialog.accepted = true;
     dialog:Hide();
 end
 
@@ -167,36 +216,43 @@ function CraftScanDialogTextInputMixin:OnEditFocusLost(...)
 end
 
 function LayoutFramesVertically(frames, parent, padding)
-    local lastFrame;
     local totalHeight = 0;
     for _, frame in ipairs(frames) do
-        frame:ClearAllPoints(); -- Clear any previous points to avoid conflicts
-        local totalPadding = (frame.padding or 0) + padding;
-        if frame.alignLeft then
-            frame.alignLeft = nil;
-            frame:SetPoint("TOPLEFT", parent, frame.relativePoint or "TOPLEFT", 25,
-                -totalHeight - totalPadding - 28);
-        else
-            frame:SetPoint("TOP", parent, "TOP", 0, -totalHeight - totalPadding - 28);
+        if frame.type ~= CraftScan.Dialog.Element.DefaultButton then
+            frame:ClearAllPoints(); -- Clear any previous points to avoid conflicts
+            local totalPadding = (frame.padding or 0) + padding;
+            if frame.alignLeft then
+                frame.alignLeft = nil;
+                frame:SetPoint("TOPLEFT", parent, frame.relativePoint or "TOPLEFT", 25,
+                    -totalHeight - totalPadding - 28);
+            else
+                frame:SetPoint("TOP", parent, "TOP", 0, -totalHeight - totalPadding - 28);
+            end
+            totalHeight = totalHeight + frame:GetHeight() + totalPadding;
         end
-        lastFrame = frame;
-        totalHeight = totalHeight + frame:GetHeight() + totalPadding;
     end
     return totalHeight;
 end
 
 function CraftScan.Dialog.Show(config)
-    local dialog = dialogPool:Acquire();
-    if config.width then
-        dialog:SetWidth(config.width);
+    if config.key and uniq[config.key] then
+        return;
     end
+
+    local dialog = dialogPool:Acquire();
+
+    dialog:SetWidth(config.width or 300);
 
     local elementWidth = dialog:GetWidth() - 40;
 
     local firstEditBox = nil;
     local editBoxIndex = 1;
     dialog.frames = {};
+    local nextPadding = 0;
     for _, entry in ipairs(config.elements) do
+        local np = nextPadding;
+        nextPadding = 0;
+
         local widthAdjust = 0;
         local frame;
         if entry.type == CraftScan.Dialog.Element.EditBox then
@@ -226,7 +282,25 @@ function CraftScan.Dialog.Show(config)
                 defaultButton:Show();
                 widthAdjust = -defaultButton:GetWidth();
                 frame.alignLeft = true;
+                defaultButton.type = CraftScan.Dialog.Element.DefaultButton;
+                table.insert(dialog.frames, defaultButton);
             end
+        elseif entry.type == CraftScan.Dialog.Element.CheckButton then
+            frame = checkButtonPool:Acquire();
+            frame.Text:SetText(entry.text);
+            frame:SetChecked(entry.default or false);
+            if entry.description then
+                frame.Description:SetHeight(1000); -- ALlow textwrapping to work, then resize to fit
+                frame.Description:SetWidth(elementWidth - 35);
+                frame.Description:SetJustifyH("LEFT");
+                frame.Description:SetText(entry.description);
+                local height = frame.Description:GetStringHeight();
+                frame.Description:SetHeight(height + 25);
+                nextPadding = height + 10;
+            else
+                frame:SetHeight(18);
+            end
+            frame.alignLeft = true;
         elseif entry.type == CraftScan.Dialog.Element.Text then
             frame = textPool:Acquire();
             frame.Text:SetHeight(1000); -- ALlow textwrapping to work, then resize to fit
@@ -237,8 +311,12 @@ function CraftScan.Dialog.Show(config)
             frame:SetHeight(height);
         end
         frame.type = entry.type;
-        frame.padding = entry.padding;
-        frame:SetWidth(elementWidth + widthAdjust)
+        if entry.padding or np ~= 0 then
+            frame.padding = (entry.padding or 0) + np;
+        end
+        if entry.type ~= CraftScan.Dialog.Element.CheckButton then
+            frame:SetWidth(elementWidth + widthAdjust)
+        end
         frame:Show();
         frame:SetParent(dialog);
         table.insert(dialog.frames, frame);
@@ -250,6 +328,8 @@ function CraftScan.Dialog.Show(config)
     dialog.SubmitButton:FitToText();
     dialog:CheckEnableSubmit();
     dialog.OnAccept = config.OnAccept;
+    dialog.OnReject = config.OnReject;
+    dialog.Validator = config.Validator;
 
 
     for _, frame in ipairs(dialog.frames) do
@@ -262,6 +342,10 @@ function CraftScan.Dialog.Show(config)
 
     CraftScan.Frames.makeMovable(dialog);
     dialog:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+    dialog.initialized = true;
+    dialog.key = config.key;
+    uniq[config.key] = dialog;
+    CraftScan.Utils.printTable("Showing dialog", config.key);
     dialog:Show();
 
     if firstEditBox then

@@ -180,15 +180,7 @@ function CraftScan.LOCAL_MX:GetData()
         ["Linked Accounts"]                           = "Cuentas vinculadas",
         ["Accept Linked Account"]                     = "Aceptar cuenta vinculada",
         ["Delete Linked Account"]                     = "Eliminar cuenta vinculada",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
-        "'%s' ha enviado una solicitud para vincular cuentas.\n\nNO ACEPTES ESTO SI NO LO ENVIASTE TÚ.\n\nIngresa un apodo para la otra cuenta:",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]           =
-        "|cFF00FF00Tienes una solicitud pendiente para vincular cuentas con %s. Haz clic aquí para aceptarla.|r",
         ["OK"]                                        = "OK",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]            =
-        "Para completar la vinculación de cuentas, debes aceptar la solicitud en la otra cuenta. El botón 'Vincular cuenta' se reemplazará con un botón 'Aceptar cuenta vinculada' para completar la operación. Si hay un error, se mostrará junto al botón 'Vincular cuenta'.",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]           =
-        "|cFFFFA500Esperando que %s acepte la solicitud de vinculación de cuentas.|r",
         [LID.VERSION_MISMATCH]                        =
         "|cFFFF0000Error: incompatibilidad de versión de CraftScan. Versión de la otra cuenta: %s. Tu versión: %s.|r",
 
@@ -201,7 +193,6 @@ function CraftScan.LOCAL_MX:GetData()
         ["proxy_receive_enabled_tooltip"]             =
         "Cuando otra cuenta detecta y envía un pedido de cliente, esta cuenta lo recibirá. El botón CraftScan se mostrará para mostrar la alerta si es necesario.",
         [LID.LINK_ACTIVE]                             = "|cFF00FF00%s (visto por última vez %s)|r", -- Crafter, Time
-        [LID.LINK_DEAD]                               = "|cFFFF0000Desconectado|r",
         [LID.ACCOUNT_LINK_DELETE_INFO]                =
         "Elimina el enlace a '%s' y todos los personajes importados. Esta cuenta dejará de comunicarse con la otra parte. La otra parte seguirá intentando establecer conexiones hasta que el enlace también se elimine manualmente allí.\n\nArtesanos importados que se eliminarán:\n%s",
         [LID.ACCOUNT_LINK_ADD_CHAR]                   =

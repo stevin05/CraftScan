@@ -104,7 +104,7 @@ function CraftScanTableBuilderMixin:AddColumnInternal(owner, sortOrder, cellTemp
 
     if sortOrder then
         local headerName = self:GetHeaderNameFromSortOrder(sortOrder);
-        column:ConstructHeader("BUTTON", "CraftScanCrafterTableHeaderStringTemplate", owner, headerName,
+        column:ConstructHeader("BUTTON", self.header_template or "CraftScanCrafterTableHeaderStringTemplate", owner, headerName,
             sortOrder);
     end
 
@@ -116,7 +116,7 @@ end
 function CraftScanTableBuilderMixin:AddUnsortableColumnInternal(owner, headerText, cellTemplate, ...)
     local column = self:AddColumn();
     local sortOrder = nil;
-    column:ConstructHeader("BUTTON", "CraftScanCrafterTableHeaderStringTemplate", owner, headerText, sortOrder);
+    column:ConstructHeader("BUTTON", self.header_template or "CraftScanCrafterTableHeaderStringTemplate", owner, headerText, sortOrder);
     column:ConstructCells("FRAME", cellTemplate, owner, ...);
     return column;
 end

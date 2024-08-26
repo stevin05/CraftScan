@@ -30,12 +30,6 @@ local function GetSortedProfessions()
     return result;
 end
 
-local function ColorizedProfessionName(professionID)
-    local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(professionID);
-    return CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
-        profInfo.professionName)
-end
-
 function CraftScanCrafterOrderListElementMixin:Init(elementData)
     self.order = elementData.order
     -- self.browseType = elementData.browseType;
@@ -145,38 +139,51 @@ function CraftScanCrafterOrderListElementMixin:OnLineLeave()
     ResetCursor();
 end
 
+local function CreateAcceptLinkedAccountDialog()
+    if not CraftScanComm:HavePendingPeerRequest() then
+        return;
+    end
+
+    local OnAccept = function(nickname)
+        CraftScanComm:AcceptPeerRequest(nickname);
+    end
+    local OnReject = function()
+        CraftScanComm:RejectPeerRequest();
+    end
+    CraftScan.Dialog.Show({
+        key = "accept_linked_account",
+        title = L("Accept Linked Account"),
+        submit = L("Accept Linked Account"),
+        OnAccept = OnAccept,
+        OnReject = OnReject,
+        elements = {
+            {
+                type = CraftScan.Dialog.Element.Text,
+                text = string.format(L(LID.ACCOUNT_LINK_ACCEPT_DST_INFO),
+                    CraftScanComm:GetPendingPeerRequestCharacter(),
+                    CraftScanComm:GetPendingPeerRequestPermissions()),
+            },
+            {
+                type = CraftScan.Dialog.Element.EditBox,
+            },
+        },
+    })
+end
+
 CraftScanCraftingOrderPageMixin = {} --CreateFromMixins(ProfessionsRecipeListPanelMixin);
 
 function CraftScanCraftingOrderPageMixin:InitOrderListTable()
+    local orderList = self.BrowseFrame.OrderList;
+    orderList:SetHeight(CraftScan.DB.settings.order_list_height or 200);
+
     local pad = 5;
     local spacing = 1;
     local view = CreateScrollBoxListLinearView(pad, pad, pad, pad, spacing);
     view:SetElementInitializer("CraftScanCrafterOrderListElementTemplate", function(button, elementData)
         button:Init(elementData);
     end);
-    ScrollUtil.InitScrollBoxListWithScrollBar(self.BrowseFrame.OrderList.ScrollBox,
-        self.BrowseFrame.OrderList.ScrollBar, view);
-
-    UIDropDownMenu_SetInitializeFunction(self.BrowseFrame.OrderList.ContextMenu,
-        GenerateClosure(self.InitContextMenu, self));
-    UIDropDownMenu_SetDisplayMode(self.BrowseFrame.OrderList.ContextMenu, "MENU");
+    ScrollUtil.InitScrollBoxListWithScrollBar(orderList.ScrollBox, orderList.ScrollBar, view);
 end
-
---function CraftScanCraftingOrderPageMixin:InitButtons()
--- self.BrowseFrame.SearchButton:SetScript("OnClick", function()
--- local selectedRecipe = nil;
--- local searchFavorites = false;
--- local initialNonPublicSearch = false;
--- self:RequestOrders(selectedRecipe, searchFavorites, initialNonPublicSearch);
--- end);
-
--- self.BrowseFrame.BackButton:SetScript("OnClick", function()
--- if self.lastBucketRequest then
--- self:ResetSortOrder();
--- self:SendOrderRequest(self.lastBucketRequest);
--- end
--- end);
---end
 
 function CraftScanCraftingOrderPageMixin:UpdateFilterResetVisibility()
     self.BrowseFrame.LeftPanel.CrafterList.FilterButton.ResetButton:SetShown(
@@ -188,10 +195,12 @@ function CraftScanCraftingOrderPageMixin:GetDesiredPageWidth()
 end
 
 function CraftScanCraftingOrderPageMixin:OnLoad()
-    self:ResetSortOrder() -- self.InitButtons()
-    self:InitOrderListTable()
-    self:SetupOrderListTable()
-    self.BrowseFrame.AnalyticsTable:Init()
+    CraftScan.Utils.onLoad(function()
+        self:ResetSortOrder() -- self.InitButtons()
+        self:InitOrderListTable()
+        self:SetupOrderListTable()
+        self.BrowseFrame.AnalyticsTable:Init()
+    end);
 end
 
 function CraftScanCraftingOrderPageMixin:OnShow()
@@ -200,6 +209,11 @@ function CraftScanCraftingOrderPageMixin:OnShow()
 
     local icon = CraftScan.Utils.GetCurrentProfessionIcon();
     self:SetPortraitToAsset(icon or 4620670);
+
+    -- Since we are a UIPanel, Bliz tries to close all other windows, including
+    -- the dialog we might try to open, so wait a sec then open any incoming
+    -- requests.
+    C_Timer.After(1, CreateAcceptLinkedAccountDialog);
 end
 
 function CraftScanCraftingOrderPageMixin:OnHide()
@@ -304,7 +318,6 @@ function CraftScanCraftingOrderPageMixin:UpdateAnalytics()
 end
 
 function CraftScanCraftingOrderPageMixin:ShowGeneric()
-    self.BrowseFrame.OrderList.LoadingSpinner:Hide();
     self.BrowseFrame.OrderList.ScrollBox:Show();
 
     local dataProvider = CreateDataProvider();
@@ -598,7 +611,6 @@ function CraftScan_CrafterToggleMixin:OnClick(button)
         UpdateAllCheckBox(crafterListAll[self:GetName()])
 
         local ppChangeOnly = true;
-        CraftScan.Utils.printTable("crafterInfo", crafterInfo);
         CraftScanComm:ShareCharacterModification(crafterInfo.name, crafterInfo.parentProfessionID, ppChangeOnly);
     end
     if GameTooltip:IsShown() then
@@ -629,15 +641,48 @@ function CraftScan_CrafterToggleMixin:OnLeave()
     GameTooltip:Hide();
 end
 
+local function AddClearAnalytics(rootDescription, itemID)
+    local intervals = {
+        { L("1 minute"),    60 },
+        { L("15 minutes "), 15 * 60 },
+        { L("1 hour"),      60 * 60 },
+        { L("1 day"),       24 * 60 * 60 },
+        { L("1 week "),     7 * 24 * 60 * 60 },
+        { L("30 days"),     30 * 24 * 60 * 60 },
+        { L("180 days"),    180 * 24 * 60 * 60 },
+        { L("1 year"),      365 * 24 * 60 * 60 },
+    };
+
+    local recentData = rootDescription:CreateButton(L("Clear recent data"));
+    recentData:CreateTitle(L("Newer than"))
+    recentData:QueueDivider();
+    local function ClearItem(clearInfo)
+        if CraftScan.Analytics:ClearAnalyticsForItem(itemID, clearInfo) then
+            CraftScanCraftingOrderPage:UpdateAnalytics()
+        end
+    end
+    for _, interval in ipairs(intervals) do
+        recentData:CreateButton(interval[1], ClearItem, { seconds = interval[2], recent = true });
+    end
+
+    local oldData = rootDescription:CreateButton(L("Clear old data"));
+    oldData:CreateTitle(L("Older than"))
+    oldData:QueueDivider();
+    for i = #intervals, 1, -1 do
+        local interval = intervals[i];
+        oldData:CreateButton(interval[1], ClearItem, { seconds = interval[2], recent = false });
+    end
+end
+
 CraftScanAnalyticsTableListElementMixin = CreateFromMixins(TableBuilderRowMixin);
 
 function CraftScanAnalyticsTableListElementMixin:OnClick(button)
+    if button == "LeftButton" then
+        CraftScan.Utils.ShowTooltipPlot(self, self.item.itemID, self.item.times, true);
+    end
+
     if button == "RightButton" then
         MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
-            --CraftScan.Utils.DIAG_PRINT_ENABLED = true;
-            --CraftScan.Utils.printTable("rootDescription", rootDescription);
-            --CraftScan.Utils.printTable("item", owner.item);
-
             rootDescription:CreateTitle(owner.item.name);
 
             local professionAssignment = rootDescription:CreateButton("Assign Profession");
@@ -652,33 +697,7 @@ function CraftScanAnalyticsTableListElementMixin:OnClick(button)
                     profession.ppID);
             end
 
-            local intervals = {
-                { "10 seconds",  10 },
-                { "15 minutes ", 15 * 60 },
-                { "1 hour",      60 * 60 },
-                { "1 day",       24 * 60 * 60 },
-                { "1 week ",     7 * 24 * 60 * 60 },
-                { "30 days",     30 * 24 * 60 * 60 },
-            };
-
-            local recentData = rootDescription:CreateButton("Clear recent data");
-            recentData:CreateTitle(L("newer than"))
-            recentData:QueueDivider();
-            local function ClearItem(clearInfo)
-                if CraftScan.Analytics:ClearAnalyticsForItem(owner.item.itemID, clearInfo) then
-                    CraftScanCraftingOrderPage:UpdateAnalytics()
-                end
-            end
-            for _, interval in ipairs(intervals) do
-                recentData:CreateButton(interval[1], ClearItem, { seconds = interval[2], recent = true });
-            end
-
-            local oldData = rootDescription:CreateButton("Clear old data");
-            oldData:CreateTitle(L("older than"))
-            oldData:QueueDivider();
-            for _, interval in ipairs(intervals) do
-                oldData:CreateButton(interval[1], ClearItem, { seconds = interval[2], recent = false });
-            end
+            AddClearAnalytics(rootDescription, owner.item.itemID);
         end);
     end
 end
@@ -688,11 +707,17 @@ function CraftScanAnalyticsTableListElementMixin:OnLineEnter()
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
     GameTooltip:SetItemByID(self.item.itemID);
     GameTooltip:Show();
+    CraftScan.Utils.ShowTooltipPlot(self, self.item.itemID, self.item.times);
 end
 
 function CraftScanAnalyticsTableListElementMixin:OnLineLeave()
     self.HighlightTexture:Hide();
     GameTooltip:Hide();
+    CraftScan.Utils.HideTooltipPlot();
+end
+
+function CraftScanAnalyticsTableListElementMixin:OnHide()
+    CraftScan.Utils.ForceHideTooltipPlot()
 end
 
 function CraftScanAnalyticsTableListElementMixin:Init(elementData)
@@ -713,12 +738,6 @@ function CraftScanAnalyticsTableMixin:Init()
         button:Init(elementData);
     end);
     ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view);
-
-    -- TODO, these and the corresponding ones in the OrderTable are likely not
-    -- needed - right click is intercepted and dismissed, so there is no context
-    -- menu available.
-    UIDropDownMenu_SetInitializeFunction(self.ContextMenu, GenerateClosure(self.InitContextMenu, self));
-    UIDropDownMenu_SetDisplayMode(self.ContextMenu, "MENU");
 
     if not self.tableBuilder then
         self.tableBuilder = CreateTableBuilder(nil, CraftScanAnalyticsTableBuilderMixin);
@@ -753,6 +772,11 @@ function CraftScanAnalyticsTableMixin:Init()
         ATC.TotalSeen.RightCellPadding, CraftScan.AnalyticsTableSortOrder.TotalSeen,
         "CraftScanAnalyticsTableCellTotalSeenTemplate");
 
+    self.tableBuilder:AddFixedWidthColumn(self, ATC.NoPadding, ATC.TotalSeenFiltered.Width,
+        ATC.TotalSeenFiltered.LeftCellPadding,
+        ATC.TotalSeenFiltered.RightCellPadding, CraftScan.AnalyticsTableSortOrder.TotalSeenFiltered,
+        "CraftScanAnalyticsTableCellTotalSeenFilteredTemplate");
+
     self.tableBuilder:AddFixedWidthColumn(self, ATC.NoPadding, ATC.AveragePerDay.Width, ATC.AveragePerDay
         .LeftCellPadding,
         ATC.AveragePerDay.RightCellPadding, CraftScan.AnalyticsTableSortOrder.AveragePerDay,
@@ -761,6 +785,16 @@ function CraftScanAnalyticsTableMixin:Init()
     self.tableBuilder:AddFixedWidthColumn(self, ATC.NoPadding, ATC.PeakPerHour.Width, ATC.PeakPerHour.LeftCellPadding,
         ATC.PeakPerHour.RightCellPadding, CraftScan.AnalyticsTableSortOrder.PeakPerHour,
         "CraftScanAnalyticsTableCellPeakPerHourTemplate");
+
+    self.tableBuilder:AddFixedWidthColumn(self, ATC.NoPadding, ATC.MedianPerCustomer.Width,
+        ATC.MedianPerCustomer.LeftCellPadding,
+        ATC.MedianPerCustomer.RightCellPadding, CraftScan.AnalyticsTableSortOrder.MedianPerCustomer,
+        "CraftScanAnalyticsTableCellMedianPerCustomerTemplate");
+
+    self.tableBuilder:AddFixedWidthColumn(self, ATC.NoPadding, ATC.MedianPerCustomerFiltered.Width,
+        ATC.MedianPerCustomerFiltered.LeftCellPadding,
+        ATC.MedianPerCustomerFiltered.RightCellPadding, CraftScan.AnalyticsTableSortOrder.MedianPerCustomerFiltered,
+        "CraftScanAnalyticsTableCellMedianPerCustomerFilteredTemplate");
 
     self.tableBuilder:Arrange();
 end
@@ -813,23 +847,28 @@ function CraftScanAnalyticsTableMixin:OnShow()
 end
 
 local function ApplyAnalyticsSortOrder(sortOrder, lhsItem, rhsItem)
-    -- CraftScan.AnalyticsTableSortOrder = EnumUtil.MakeEnum("ItemName", "ProfessionName", "TotalSeen", "AveragePerDay", "PeakPerHour");
     if sortOrder == CraftScan.AnalyticsTableSortOrder.ItemName then
         return SortUtil.CompareUtf8i(lhsItem.name, rhsItem.name);
     elseif sortOrder == CraftScan.AnalyticsTableSortOrder.ProfessionName then
         return SortUtil.CompareUtf8i(lhsItem.profession, rhsItem.profession);
     elseif sortOrder == CraftScan.AnalyticsTableSortOrder.TotalSeen then
         return SortUtil.CompareNumeric(lhsItem.totalSeen, rhsItem.totalSeen);
+    elseif sortOrder == CraftScan.AnalyticsTableSortOrder.TotalSeenFiltered then
+        return SortUtil.CompareNumeric(lhsItem.totalSeenFiltered, rhsItem.totalSeenFiltered);
     elseif sortOrder == CraftScan.AnalyticsTableSortOrder.AveragePerDay then
         return SortUtil.CompareNumeric(lhsItem.averagePerDay, rhsItem.averagePerDay);
     elseif sortOrder == CraftScan.AnalyticsTableSortOrder.PeakPerHour then
         return SortUtil.CompareNumeric(lhsItem.peakPerHour, rhsItem.peakPerHour);
+    elseif sortOrder == CraftScan.AnalyticsTableSortOrder.MedianPerCustomer then
+        return SortUtil.CompareNumeric(lhsItem.medianPerCustomer, rhsItem.medianPerCustomer);
+    elseif sortOrder == CraftScan.AnalyticsTableSortOrder.MedianPerCustomerFiltered then
+        return SortUtil.CompareNumeric(lhsItem.medianPerCustomerFiltered, rhsItem.medianPerCustomerFiltered);
     end
     return 0;
 end
 
 local function GetTimeStamp(timeEntry)
-    return CraftScan.Analytics:GetTimeStamp(timeEntry);
+    return CraftScan.Analytics.GetTimeStamp(timeEntry);
 end
 
 local function CalculateAveragePerDay(times)
@@ -839,7 +878,7 @@ local function CalculateAveragePerDay(times)
     return totalTimes / numberOfDays;
 end
 
-local function CalculateMedianRepeats(times)
+local function CalculateMedianPerCustomer(times)
     local indices = {}
     local n = #times;
     for i = 1, n do
@@ -853,7 +892,7 @@ local function CalculateMedianRepeats(times)
     end)
 
     -- Ignoring full correctness for simplicity, median is half way ignoring odd/even count.
-    local medianRepeats = times[indices[math.ceil(n / 2)]]
+    local medianPerCustomer = times[indices[math.ceil(n / 2)]]
 
     -- Count the number of entries that included a repeat count, then get the
     -- median of those. We're sorted low-high with raw timestamps first. Walk
@@ -868,10 +907,10 @@ local function CalculateMedianRepeats(times)
     end
 
     local filteredTotal = n - begin;
-    local medianRepeatsFiltered = times[indices[math.ceil(filteredTotal / 2) + begin]]
+    local medianPerCustomerFiltered = times[indices[math.ceil(filteredTotal / 2) + begin]]
 
-    return type(medianRepeats) == "table" and medianRepeats.c or 1,
-        type(medianRepeatsFiltered) == "table" and medianRepeatsFiltered.c or 1;
+    return type(medianPerCustomer) == "table" and medianPerCustomer.c or 1,
+        type(medianPerCustomerFiltered) == "table" and medianPerCustomerFiltered.c or 1;
 end
 
 local function CalculatePeakPerHour(times)
@@ -896,6 +935,24 @@ local function CalculatePeakPerHour(times)
     return peakCount, peakHour;
 end
 
+function CountDuplicates(array)
+    local count = 0
+    for _, value in ipairs(array) do
+        if type(value) == "table" and value.c and value.c > 1 then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+function TableSize(tbl)
+    local count = 0
+    for _, _ in pairs(tbl) do
+        count = count + 1
+    end
+    return count
+end
+
 function CraftScanAnalyticsTableMixin:Refresh()
     self.ScrollBox:Show();
 
@@ -903,43 +960,123 @@ function CraftScanAnalyticsTableMixin:Refresh()
     self.ScrollBox:SetDataProvider(dataProvider);
 
     local seenItems = CraftScan.DB.analytics.seen_items;
-    if not seenItems then
-        -- TODO Fix this text
-        self.LoadingSpinner:Show();
+    if not seenItems or not next(seenItems) then
+        self.ResultsText:SetText(L("No analytics data"));
+        self.ResultsText:Show();
         return;
+    else
+        self.ResultsText:Hide();
     end
-    self.LoadingSpinner:Hide();
 
     local items = {}
     for itemID, itemInfo in pairs(seenItems) do
         item = Item:CreateFromItemID(itemID);
         item:ContinueOnItemLoad(function()
             local peakPerHour, peakHour = CalculatePeakPerHour(itemInfo.times);
-            local medianRepeats, medianRepeatsFiltered = CalculateMedianRepeats(itemInfo.times);
+            local medianPerCustomer, medianPerCustomerFiltered = CalculateMedianPerCustomer(itemInfo.times);
             table.insert(items, {
                 itemID = itemID,
+                times = itemInfo.times,
                 name = item:GetItemName(),
-                profession = itemInfo.ppID and ColorizedProfessionName(itemInfo.ppID) or "Unknown",
+                profession = itemInfo.ppID and CraftScan.Utils.ColorizedProfessionNameByID(itemInfo.ppID) or "Unknown",
                 totalSeen = #itemInfo.times,
+                totalSeenFiltered = CountDuplicates(itemInfo.times),
                 averagePerDay = CalculateAveragePerDay(itemInfo.times),
                 peakPerHour = peakPerHour,
                 peakHour = peakHour,
-                medianRepeats = medianRepeats,
-                medianRepeatsFiltered = medianRepeatsFiltered,
+                medianPerCustomer = medianPerCustomer,
+                medianPerCustomerFiltered = medianPerCustomerFiltered,
             })
         end)
     end
 
-    SortItemsByComparator(items, self, ApplyAnalyticsSortOrder);
+    local function OnAllItemsLoaded()
+        if #items ~= TableSize(seenItems) then
+            -- Wait for all item links to be asynchronously loaded.
+            C_Timer.After(0, OnAllItemsLoaded)
+        end
 
-    for _, item in ipairs(items) do
-        dataProvider:Insert({
-            item = item,
-            pageFrame = self,
-            contextMenu = self.ContextMenu
-        });
+        SortItemsByComparator(items, self, ApplyAnalyticsSortOrder);
+
+        for _, item in ipairs(items) do
+            dataProvider:Insert({
+                item = item,
+                pageFrame = self,
+            });
+        end
+        self.ScrollBox:SetDataProvider(dataProvider);
     end
-    self.ScrollBox:SetDataProvider(dataProvider);
+
+    OnAllItemsLoaded();
+end
+
+function EscapeCSV(str)
+    if str:find('[,"]') then
+        -- Double up any existing quotes
+        str = str:gsub('"', '""')
+        -- Enclose the entire string in double quotes
+        str = '"' .. str .. '"'
+    end
+    return str
+end
+
+CraftScan_ResetAnalyticsButtonMixin = {}
+
+function CraftScan_ResetAnalyticsButtonMixin:OnLoad()
+    self:SetText(L("Analytics Options"))
+    self:FitToText();
+    self:SetupMenu(function(owner, rootDescription)
+        rootDescription:CreateTitle(L("Reset Data"));
+        AddClearAnalytics(rootDescription);
+        rootDescription:QueueDivider();
+        rootDescription:QueueTitle(L("Export"));
+        rootDescription:CreateButton(L("Export CSV"), function()
+            local seenItems = CraftScan.DB.analytics.seen_items;
+            if not seenItems or not next(seenItems) then return; end
+
+            local csv = "itemID,name,time,count,wowhead" .. "\n";
+            for itemID, entry in pairs(seenItems) do
+                local item = Item:CreateFromItemID(itemID);
+                local name = EscapeCSV(item:GetItemName());
+                for _, time in ipairs(entry.times) do
+                    local t = type(time) == "table" and time.t or time;
+                    local c = type(time) == "table" and time.c or 1;
+                    csv = csv ..
+                        string.format("%d,%s,%d,%d,https://www.wowhead.com/item=%d/", itemID, name, t, c, itemID) .. "\n";
+                end
+            end
+            CraftScan.Utils.DumpCopyableText(csv);
+        end)
+    end);
+end
+
+CraftScan_ResizeOrderListButtonMixin = {}
+
+function CraftScan_ResizeOrderListButtonMixin:OnLoad()
+    self:EnableMouse(true)
+    self:RegisterForDrag("LeftButton")
+end
+
+function CraftScan_ResizeOrderListButtonMixin:OnMouseDown()
+    self.isDragging = true
+
+    self.startY = select(2, GetCursorPosition())
+    self.startHeight = self:GetParent().OrderList:GetHeight()
+    self:GetParent().OrderList:SetScript("OnUpdate", function()
+        if self.isDragging then
+            local currentY = select(2, GetCursorPosition())
+            local offsetY = self.startY - currentY;
+            local newHeight = math.min(450, math.max(self.startHeight + offsetY, 100))
+            self:GetParent().OrderList:SetHeight(newHeight)
+            CraftScan.DB.settings.order_list_height = newHeight;
+        end
+    end)
+end
+
+function CraftScan_ResizeOrderListButtonMixin:OnMouseUp()
+    self.isDragging = false
+    self:GetParent().OrderList:SetScript("OnUpdate", nil);
+    ResetCursor()
 end
 
 CraftScan_CrafterListMixin = {}
@@ -1207,7 +1344,7 @@ end
 
 CraftScan_ProxyEnabledMixin = {}
 
-function CraftScan_ProxyEnabledMixin:OnLoad()
+function CraftScan_ProxyEnabledMixin:OnShow()
     local value = CraftScan.DB.settings[self.key] or false;
     self:SetChecked(value);
     self.Text:SetText(L(self.key));
@@ -1229,16 +1366,7 @@ end
 CraftScan_LinkAccountButtonMixin = {}
 
 function CraftScan_LinkAccountButtonMixin:Reset()
-    if CraftScanComm:HavePendingPeerRequest() then
-        self.PendingAlert:SetText(string.format(L(LID.ACCOUNT_LINK_ACCEPT_DST_LABEL),
-            CraftScanComm:GetPendingPeerRequestCharacter()));
-        self:SetText(L("Accept Linked Account"));
-        self.PendingAlert:Show();
-    else
-        self:SetText(L("Link Account"));
-        self.PendingAlert:Hide();
-    end
-
+    self:SetText(L("Link Account"));
     self:FitToText();
 end
 
@@ -1251,95 +1379,81 @@ function CraftScan_LinkAccountButtonMixin:OnLoad()
 end
 
 function CraftScan_LinkAccountButtonMixin:OnClick()
-    if CraftScanComm:HavePendingPeerRequest() then
-        local OnAccept = function(nickname)
-            CraftScanComm:AcceptPeerRequest(nickname);
-        end
-
-        CraftScan.Dialog.Show({
-
-            title = L("Accept Linked Account"),
-            submit = L("Accept Linked Account"),
-            OnAccept = OnAccept,
-            elements = {
-                {
-                    type = CraftScan.Dialog.Element.Text,
-                    text = string.format(L(LID.ACCOUNT_LINK_ACCEPT_DST_INFO),
-                        CraftScanComm:GetPendingPeerRequestCharacter()),
-                },
-                {
-                    type = CraftScan.Dialog.Element.EditBox,
-                },
-            },
-        })
-    else
-        local OnAccept = function(character, nickname)
-            if not CraftScan.State.realmID and string.find(character, "-") == nil then
-                -- On non-connected realms, hardcode the realm to our own to
-                -- avoid auto-complete on whisper sending to our own characters
-                -- on other realms.
-                character = CraftScan.GetUnitName(character, true, true);
-            end
-            self.PendingAlert:SetText(string.format(L(LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL), character));
-            self.PendingAlert:Show();
-
-            CraftScan.Dialog.Show({
-                title = L("Accept Linked Account"),
-                submit = L("OK"),
-                elements = {
-                    {
-                        type = CraftScan.Dialog.Element.Text,
-                        text = L(LID.ACCOUNT_LINK_ACCEPT_SRC_INFO),
-                    },
-                },
-            })
-
-            CraftScanComm:SendHandshake(character, nickname);
-        end
-        local elements = {
-            {
-                type = CraftScan.Dialog.Element.Text,
-                text = L(LID.ACCOUNT_LINK_DESC),
-            },
-            {
-                type = CraftScan.Dialog.Element.Text,
-                text = L(LID.ACCOUNT_LINK_PROMPT_CHARACTER),
-                padding = 10,
-            },
-            {
-                type = CraftScan.Dialog.Element.EditBox,
-            },
-            {
-                type = CraftScan.Dialog.Element.Text,
-                text = L(LID.ACCOUNT_LINK_PROMPT_NICKNAME),
-                padding = 10,
-            },
-            {
-                type = CraftScan.Dialog.Element.EditBox,
-            },
-        }
-        CraftScan.Dialog.Show({
-            title = L("Link Account"),
-            submit = L("Link Account"),
-            OnAccept = OnAccept,
-            elements = elements,
-        })
+    local Validator = function(fullcontrol, analytics, character, nickname)
+        return fullcontrol == true or analytics == true;
     end
+
+    local OnAccept = function(fullcontrol, analytics, character, nickname)
+        if not CraftScan.State.realmID and string.find(character, "-") == nil then
+            -- On non-connected realms, hardcode the realm to our own to
+            -- avoid auto-complete on whisper sending to our own characters
+            -- on other realms.
+            character = CraftScan.GetUnitName(character, true, true);
+        end
+        local permissions = {};
+        if fullcontrol then
+            table.insert(permissions, CraftScanComm.Permissions.Full);
+        elseif analytics then
+            table.insert(permissions, CraftScanComm.Permissions.Analytics);
+        end
+        CraftScanComm:SendHandshake(character, nickname, permissions);
+    end
+    local elements = {
+        {
+            type = CraftScan.Dialog.Element.Text,
+            text = L(LID.ACCOUNT_LINK_DESC),
+        },
+        {
+            type = CraftScan.Dialog.Element.Text,
+            text = L(LID.ACCOUNT_LINK_PERMISSIONS_DESC),
+        },
+        {
+            type = CraftScan.Dialog.Element.CheckButton,
+            default = true,
+            text = L(CraftScanComm.PermissionStrings[CraftScanComm.Permissions.Full].name),
+            description = L(CraftScanComm.PermissionStrings[CraftScanComm.Permissions.Full].desc),
+        },
+        {
+            type = CraftScan.Dialog.Element.CheckButton,
+            text = L(CraftScanComm.PermissionStrings[CraftScanComm.Permissions.Analytics].name),
+            description = L(CraftScanComm.PermissionStrings[CraftScanComm.Permissions.Analytics].desc),
+        },
+        {
+            type = CraftScan.Dialog.Element.Text,
+            text = L(LID.ACCOUNT_LINK_PROMPT_CHARACTER),
+            padding = 10,
+        },
+        {
+            type = CraftScan.Dialog.Element.EditBox,
+        },
+        {
+            type = CraftScan.Dialog.Element.Text,
+            text = L(LID.ACCOUNT_LINK_PROMPT_NICKNAME),
+            padding = 10,
+        },
+        {
+            type = CraftScan.Dialog.Element.EditBox,
+        },
+    }
+    CraftScan.Dialog.Show({
+        key = "link_account",
+        title = L("Link Account"),
+        submit = L("Link Account"),
+        Validator = Validator,
+        OnAccept = OnAccept,
+        elements = elements,
+    })
 end
 
 function CraftScan.OnPendingPeerAdded()
     CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkAccountControls.LinkAccountButton:Reset();
-end
 
-function CraftScan.OnPendingPeerRejected(reason)
-    CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkAccountControls.LinkAccountButton:Reset();
-
-    self.PendingAlert:SetText(reason);
-    self.PendingAlert:Show();
+    if CraftScanCraftingOrderPage:IsShown() then
+        CreateAcceptLinkedAccountDialog();
+    end
 end
 
 function CraftScan.OnPendingPeerAccepted()
-    CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkAccountControls.LinkAccountButton:Reset();
     CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
 
     CraftScan.Utils.printTable("my_uuid", CraftScan.DB.settings.my_uuid)
@@ -1467,33 +1581,46 @@ end
 CraftScan_LinkedAccountListElementMixin = {}
 
 function CraftScan_LinkedAccountListElementMixin:OnClick()
-    local linkedAccount = self.linkedAccount;
-    CraftScan.Utils.printTable("linkedAccount", linkedAccount)
+    local linkedAccountID = self.linkedAccount.sourceID;
+    local linkedAccount = self.linkedAccount.info;
     MenuUtil.CreateContextMenu(owner, function(owner, rootDescription)
+        local hasFull = CraftScan.Utils.Contains(linkedAccount.permissions, CraftScanComm.Permissions.Full);
+        local hasAnalytics = CraftScan.Utils.Contains(linkedAccount.permissions, CraftScanComm.Permissions.Analytics);
+
         local crafterList = {}
         for char, charConfig in pairs(CraftScan.DB.characters) do
-            if charConfig.sourceID == linkedAccount.sourceID then
+            if charConfig.sourceID == linkedAccountID then
                 table.insert(crafterList, CraftScan.NameAndRealmToName(char));
             end
         end
 
 
         do
-            rootDescription:CreateTitle(linkedAccount.info.nickname);
+            rootDescription:CreateTitle(linkedAccount.nickname);
+            rootDescription:QueueDivider();
+
+            if hasFull then
+                rootDescription:QueueTitle(
+                    L(CraftScanComm.PermissionStrings[CraftScanComm.Permissions.Full].name));
+            else
+                for _, perm in ipairs(linkedAccount.permissions) do
+                    rootDescription:QueueTitle(L(CraftScanComm.PermissionStrings[perm].name));
+                end
+            end
         end
         do
             rootDescription:QueueDivider();
             rootDescription:QueueTitle(L("Backup characters"));
             local OnClick = function(char)
-                for i, backup_char in ipairs(linkedAccount.info.backup_chars) do
+                for i, backup_char in ipairs(linkedAccount.backup_chars) do
                     if char == backup_char then
-                        table.remove(linkedAccount.info.backup_chars, i)
+                        table.remove(linkedAccount.backup_chars, i)
                         break;
                     end
                 end
             end
 
-            for _, char in ipairs(linkedAccount.info.backup_chars) do
+            for _, char in ipairs(linkedAccount.backup_chars) do
                 local popoutButton = rootDescription:CreateButton(char);
                 popoutButton:CreateButton(L("Remove"), OnClick, char);
             end
@@ -1507,9 +1634,10 @@ function CraftScan_LinkedAccountListElementMixin:OnClick()
                             char = CraftScan.GetUnitName(char, true);
                         end
 
-                        table.insert(CraftScan.DB.realm.linked_accounts[linkedAccount.sourceID].backup_chars, char);
+                        table.insert(CraftScan.DB.realm.linked_accounts[linkedAccountID].backup_chars, char);
                     end
                     CraftScan.Dialog.Show({
+                        key = "add_backup_char",
                         title = L("Add character"),
                         submit = L("Add character"),
                         OnAccept = AddChar,
@@ -1528,15 +1656,33 @@ function CraftScan_LinkedAccountListElementMixin:OnClick()
                 local button = rootDescription:CreateButton(L("Add"), OnClick, nil)
             end
         end
+        if hasFull or hasAnalytics then
+            rootDescription:QueueDivider();
+            do
+                local function OnClick()
+                    CraftScanComm:ShareAnalytics(linkedAccountID);
+                end
+
+                rootDescription:CreateButton(L("Sync Analytics"), OnClick, nil)
+            end
+            do
+                local function OnClick()
+                    CraftScanComm:ShareAnalytics(linkedAccountID, true);
+                end
+
+                rootDescription:CreateButton(L("Sync Recent Analytics"), OnClick, nil)
+            end
+        end
         rootDescription:QueueDivider();
         do
             local function DoRename(nickname)
-                CraftScan.DB.realm.linked_accounts[linkedAccount.sourceID].nickname = nickname;
+                linkedAccount.nickname = nickname;
                 CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
             end
 
             local OnClick = function()
                 CraftScan.Dialog.Show({
+                    key = "rename_linked_account",
                     title = L("Rename account"),
                     submit = L("Rename account"),
                     OnAccept = DoRename,
@@ -1552,18 +1698,17 @@ function CraftScan_LinkedAccountListElementMixin:OnClick()
                 });
             end
 
-            local button = rootDescription:CreateButton(L("Rename account"), OnClick, nil)
-            --button:SetTooltip(SetTooltipWithTitle);
+            rootDescription:CreateButton(L("Rename account"), OnClick, nil)
         end
 
         do
             local function DoDelete()
                 for char, charConfig in pairs(CraftScan.DB.characters) do
-                    if charConfig.sourceID == linkedAccount.sourceID then
+                    if charConfig.sourceID == linkedAccountID then
                         CraftScan.DB.characters[char] = nil;
                     end
                 end
-                CraftScan.DB.realm.linked_accounts[linkedAccount.sourceID] = nil;
+                CraftScan.DB.realm.linked_accounts[linkedAccountID] = nil;
 
                 CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
                 CraftScan.OnCrafterListModified();
@@ -1571,21 +1716,21 @@ function CraftScan_LinkedAccountListElementMixin:OnClick()
 
             local OnClick = function()
                 CraftScan.Dialog.Show({
+                    key = "delete_linked_account",
                     title = L("Delete Linked Account"),
                     submit = L("Delete Linked Account"),
                     OnAccept = DoDelete,
                     elements = {
                         {
                             type = CraftScan.Dialog.Element.Text,
-                            text = string.format(L(LID.ACCOUNT_LINK_DELETE_INFO), linkedAccount.info.nickname,
+                            text = string.format(L(LID.ACCOUNT_LINK_DELETE_INFO), linkedAccount.nickname,
                                 table.concat(crafterList, "\n")),
                         },
                     },
                 });
             end
 
-            local button = rootDescription:CreateButton(L("Unlink account"), OnClick, nil)
-            --button:SetTooltip(SetTooltipWithTitle);
+            rootDescription:CreateButton(L("Unlink account"), OnClick, nil)
         end
     end);
 end
@@ -2107,6 +2252,7 @@ function CraftScan_CustomGreetingButtonMixin:OnClick()
         })
     end
     CraftScan.Dialog.Show({
+        key = "customize_greeting",
         width = 450,
         title = L("Customize Greeting"),
         submit = L("Customize Greeting"),

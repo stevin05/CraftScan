@@ -285,8 +285,8 @@ local function GetItemIDsFromQualityLinks(inputString)
     local itemIDs = nil;
 
     local pattern = "item:(%d+)"
-    local qualityPattern = "professions%-chaticon%-quality%-tier"
-    for itemLink in string.gmatch(inputString, "item:%d+%:%S+") do
+    local qualityPattern = "professions%-chaticon%-quality%-tier";
+    for itemLink in string.gmatch(inputString, "(item:[%d:]+%|h%b[])") do
         if string.find(itemLink, qualityPattern) then
             local itemID = itemLink:match(pattern)
             if itemID then
@@ -303,7 +303,6 @@ end
 local function RemoveFront(array, n)
     local result = {};
     for i = n + 1, #array, 1 do
-        print("Copying element", n, #array, i)
         table.insert(result, array[i]);
     end
     return result;
@@ -317,57 +316,86 @@ end
 
 CraftScan.Analytics = {};
 
-function CraftScan.Analytics:GetTimeStamp(timeEntry)
+function CraftScan.Analytics.GetTimeStamp(timeEntry)
     if type(timeEntry) == "table" then return timeEntry.t end
     return timeEntry;
 end
 
--- Remove entries older than timeout for the given itemID.
+local function ClearAnalyticsForItem_(itemID, range)
+    local timeout = range.seconds;
+    local recent = range.recent;
+    local items = CraftScan.DB.analytics.seen_items;
+    local itemInfo = items[itemID];
+    local now = time();
+    for i, timeInfo in ipairs(itemInfo.times) do
+        if CraftScan.Analytics.GetTimeStamp(timeInfo) + timeout > now then
+            if recent then
+                local count = #itemInfo.times - i + 1;
+                if count == 0 then
+                    -- Don't need to refresh the display
+                    return false;
+                end
+
+                RemoveBack(itemInfo.times, count);
+            else
+                local count = i - 1;
+                if count == 0 then
+                    -- Don't need to refresh the display
+                    return false;
+                end
+
+                itemInfo.times = RemoveFront(itemInfo.times, i - 1);
+            end
+            if #itemInfo.times == 0 then items[itemID] = nil; end;
+            return true;
+        end
+    end
+    if not recent then
+        items[itemID] = nil;
+        return true;
+    end
+end
+
+-- Remove entries older than timeout for the given itemID. If itemID is nil,
+-- apply to all itemIDs.
 function CraftScan.Analytics:ClearAnalyticsForItem(itemID, range)
     local timeout = range.seconds;
 
     local items = CraftScan.DB.analytics.seen_items;
     if timeout == nil then
-        items[itemID] = nil;
-    else
-        local recent = range.recent;
-        local itemInfo = items[itemID];
-        local now = time();
-        for i, timeInfo in ipairs(itemInfo.times) do
-            if CraftScan.Analytics:GetTimeStamp(timeInfo) + timeout > now then
-                if recent then
-                    local count = #itemInfo.times - i + 1;
-                    if count == 0 then
-                        -- Don't need to refresh the display
-                        return false;
-                    end
-
-                    RemoveBack(itemInfo.times, count);
-                else
-                    local count = i - 1;
-                    if count == 0 then
-                        -- Don't need to refresh the display
-                        return false;
-                    end
-
-                    itemInfo.times = RemoveFront(itemInfo.times, i - 1);
-                end
-                if #itemInfo.times == 0 then items[itemID] = nil; end;
-                return true;
-            end
-        end
-        if not recent then
+        if itemID == nil then
+            items = {};
+        else
             items[itemID] = nil;
-            return true;
+        end
+        return true;
+    end
+
+    if itemID then
+        return ClearAnalyticsForItem_(itemID, range);
+    end
+
+    local result = false;
+    for itemID, itemInfo in pairs(items) do
+        if ClearAnalyticsForItem_(itemID, range) then
+            result = true;
         end
     end
-    return false;
+    return result;
 end
+
+-- If the same customer requests the same item repeatedly, that indicates a
+-- supply gap in the market, so we try to track and highlight it. Duplicate
+-- requests within 15 seconds are ignored completely - they're just impatient.
+-- For an hour after their first request, if they keep requesting the same
+-- thing, we count them.
+local ANALYTICS_IGNORE_DUPLICATE_INTERVAL = 15;
+local ANALYTICS_RESET_DUPLICATE_INTERVAL = 3600;
 
 local function CleanRecentAnalytics()
     if not CraftScan.DB.analytics.seen_items then return end
 
-    local timeout = 10; -- TODO 3600
+    local timeout = ANALYTICS_RESET_DUPLICATE_INTERVAL;
     local now = time();
     for _, itemInfo in pairs(CraftScan.DB.analytics.seen_items) do
         for i, timeInfo in ipairs(itemInfo.times) do
@@ -396,17 +424,26 @@ local function AddTimeToAnalytics(customer, item)
 
     --  Track repeat requests for up to an hour. This aligns with our 'peak per
     --  hour', so duplicate requests don't artificially inflate the peak requests.
-    local timeout = 10; -- TODO 3600
+    local timeout = ANALYTICS_RESET_DUPLICATE_INTERVAL;
     local now = time();
     for i = #times, 1, -1 do
         local entry = times[i]
         if type(entry) == "table" then
+            if entry.t + ANALYTICS_IGNORE_DUPLICATE_INTERVAL > now then
+                -- Ignore it. Same customer spamming a request before they had a chance to get any replies.
+                CraftScan.Utils.printTable("Ignoring very recent request", true);
+                return;
+            end
+
             if entry.t + timeout < now then
+                CraftScan.Utils.printTable("Starting a new bucket", true);
                 break;
             end
 
             if entry.customer == customer then
                 entry.c = (entry.c or 1) + 1;
+                CraftScan.Utils.printTable("Incrementing bucket", entry);
+                CraftScanCraftingOrderPage:UpdateAnalytics()
                 return;
             end
         else
@@ -490,14 +527,24 @@ local function getCrafterForMessage(customer, message)
         local crafterInfo = config.items[itemID];
         if crafterInfo then
             local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[crafterInfo.profID];
-            AddItemToAnalytics(customer, itemID, profConfig.parentProfID);
+            if not CraftScanComm.applying_remote_state then
+                AddItemToAnalytics(customer, itemID, profConfig.parentProfID);
+            end
             if IsScanningEnabled(crafterInfo) then
                 local recipeInfo, categoryID = getRequestIDs(message, crafterInfo, profConfig);
                 return crafterInfo, itemID, recipeInfo, categoryID;
             end
         else
-            -- We can't craft this item, but save that some one requested it for future analysis
-            AddMessageToAnalytics(customer, message);
+            -- Don't add to analytics based on proxied orders. The 'now' might
+            -- be slightly off because of the messaging. We don't want that to
+            -- create duplicates if both characters see the same message at the
+            -- same time. Instead, analytics can be separately sync'ed between
+            -- accounts, with a merge of timestamps to avoid creating
+            -- duplicates.
+            if not CraftScanComm.applying_remote_state then
+                -- We can't craft this item, but save that some one requested it for future analysis
+                AddMessageToAnalytics(message);
+            end
         end
 
         return nil

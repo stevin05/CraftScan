@@ -184,15 +184,7 @@ function CraftScan.LOCAL_IT:GetData()
         ["Linked Accounts"]                           = "Account Collegati",
         ["Accept Linked Account"]                     = "Accetta Account Collegato",
         ["Delete Linked Account"]                     = "Elimina Account Collegato",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
-        "'%s' ha inviato una richiesta per collegare gli account.\n\nNON ACCETTARE SE NON HAI INVIATO QUESTA RICHIESTA.\n\nInserisci un soprannome per l'altro account:",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]           =
-        "|cFF00FF00Hai una richiesta in sospeso per collegare l'account con %s. Clicca qui per accettarla.|r",
         ["OK"]                                        = "OK",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]            =
-        "Per completare il collegamento dell'account, devi accettare la richiesta sull'altro account. Il pulsante 'Collega Account' sarà sostituito da un pulsante 'Accetta Account Collegato' per completare l'operazione. Se c'è un errore, sarà visualizzato accanto al pulsante 'Collega Account'.",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]           =
-        "|cFFFFA500In attesa che %s accetti la richiesta di collegamento dell'account.|r",
         [LID.VERSION_MISMATCH]                        =
         "|cFFFF0000Errore: versione di CraftScan non compatibile. Versione dell'altro account: %s. La tua versione: %s.|r",
 
@@ -205,7 +197,6 @@ function CraftScan.LOCAL_IT:GetData()
         ["proxy_receive_enabled_tooltip"]             =
         "Quando un altro account rileva e invia un ordine cliente, questo account lo riceverà. Il pulsante CraftScan sarà visualizzato per mostrare l'avviso se necessario.",
         [LID.LINK_ACTIVE]                             = "|cFF00FF00%s (visto l'ultima volta %s)|r", -- Crafter, Time
-        [LID.LINK_DEAD]                               = "|cFFFF0000Offline|r",
         [LID.ACCOUNT_LINK_DELETE_INFO]                =
         "Elimina il collegamento con '%s' e tutti i personaggi importati. Questo account cesserà ogni comunicazione con l'altro lato. L'altro lato continuerà a tentare di stabilire connessioni fino a quando il collegamento non sarà eliminato manualmente anche lì.\n\nArtigiani importati che saranno eliminati:\n%s",
         [LID.ACCOUNT_LINK_ADD_CHAR]                   =

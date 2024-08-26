@@ -177,12 +177,7 @@ function CraftScan.LOCAL_KO:GetData()
         ["Linked Accounts"]                           = "연결된 계정",
         ["Accept Linked Account"]                     = "연결된 계정 수락",
         ["Delete Linked Account"]                     = "연결된 계정 삭제",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            = "'%s'님이 계정 연결 요청을 보냈습니다.\n\n이 요청을 보내지 않았다면 수락하지 마세요.\n\n다른 계정의 별명을 입력하세요:",
-        [LID.ACCOUNT_LINK_ACCEPT_DST_LABEL]           = "|cFF00FF00%s와(과) 계정 연결 요청이 있습니다. 여기 클릭하여 수락하세요.|r",
         ["OK"]                                        = "확인",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_INFO]            =
-        "계정 연결을 완료하려면 다른 계정에서 요청을 수락해야 합니다. '계정 연결' 버튼이 '연결된 계정 수락' 버튼으로 바뀌어 작업을 완료합니다. 오류가 발생하면 '계정 연결' 버튼 옆에 표시됩니다.",
-        [LID.ACCOUNT_LINK_ACCEPT_SRC_LABEL]           = "|cFFFFA500%s님이 계정 연결 요청을 수락할 때까지 기다리는 중입니다.|r",
         [LID.VERSION_MISMATCH]                        = "|cFFFF0000오류: CraftScan 버전 불일치. 다른 계정의 버전: %s. 현재 버전: %s.|r",
 
         [LID.REMOTE_CRAFTER_TOOLTIP]                  =
@@ -193,7 +188,6 @@ function CraftScan.LOCAL_KO:GetData()
         ["proxy_receive_enabled"]                     = "프록시 주문 받기",
         ["proxy_receive_enabled_tooltip"]             = "다른 계정이 고객 주문을 감지하고 전송하면 이 계정이 받습니다. 필요한 경우 CraftScan 버튼이 경고 배너를 표시합니다.",
         [LID.LINK_ACTIVE]                             = "|cFF00FF00%s (마지막 접속: %s)|r", -- Crafter, Time
-        [LID.LINK_DEAD]                               = "|cFFFF0000오프라인|r",
         [LID.ACCOUNT_LINK_DELETE_INFO]                =
         "'%s'와(과)의 연결을 삭제하고 모든 가져온 캐릭터를 삭제합니다. 이 계정은 다른 계정과의 모든 통신을 중단합니다. 다른 계정은 수동으로 연결을 제거할 때까지 계속 연결을 시도할 것입니다.\n\n삭제될 가져온 제작자:\n%s",
         [LID.ACCOUNT_LINK_ADD_CHAR]                   =

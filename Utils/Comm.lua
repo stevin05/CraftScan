@@ -43,8 +43,26 @@ CraftScanComm.Operations = {
     ShareCharacterData  = 'share_char_data',
     Handshake           = 'handshake',
     ShareCustomerOrder  = 'share_customer_order',
-    ShareCustomGreeting = 'share_custom_greeting'
+    ShareCustomGreeting = 'share_custom_greeting',
+    ShareAnalytics      = 'share_analytics',
+    Ping                = 'ping',
 }
+
+CraftScanComm.Permissions = {
+    Full = 1,
+    Analytics = 2,
+};
+
+CraftScanComm.PermissionStrings = {
+    [CraftScanComm.Permissions.Full] = {
+        name = LID.LINKED_ACCOUNT_PERMISSION_FULL,
+        desc = LID.ACCOUNT_LINK_FULL_CONTROL_DESC,
+    },
+    [CraftScanComm.Permissions.Analytics] = {
+        name = LID.LINKED_ACCOUNT_PERMISSION_ANALYTICS,
+        desc = LID.ACCOUNT_LINK_ANALYTICS_DESC,
+    }
+};
 
 -- A flag to send the request to all known linked accounts
 local TARGET_ALL = nil;
@@ -89,9 +107,11 @@ local function CreateInitialTargets()
     end
 
     for sourceID, info in pairs(CraftScan.DB.realm.linked_accounts) do
-        targets[sourceID] = targets[sourceID] or {}
-        for _, char in ipairs(info.backup_chars) do
-            targets[sourceID][char] = true;
+        if CraftScan.Utils.Contains(info.permissions, CraftScanComm.Permissions.Full) then
+            targets[sourceID] = targets[sourceID] or {}
+            for _, char in ipairs(info.backup_chars) do
+                targets[sourceID][char] = true;
+            end
         end
     end
 
@@ -407,16 +427,294 @@ local function ReceiveShareCustomGreeting(sender, data, senderID)
     ReceiveShareCustomGreeting_(data);
 end
 
+local todosByAccount = {};
+local function SendPing(targetAccountID, todo)
+    -- This is a lightweight check to see who on the other account is online
+    -- before we do a more heavy weight send. We don't want to try to send a
+    -- huge payload to a bunch of characters to find out none of them are
+    -- online.
+    local account = CraftScan.DB.realm.linked_accounts[targetAccountID];
+    if not account then return; end
+
+    local targets = { [targetAccountID] = {} };
+    for _, char in ipairs(account.backup_chars) do
+        targets[targetAccountID][char] = true;
+    end
+
+    local todos = saved(todosByAccount, targetAccountID, {});
+    table.insert(todos, todo);
+
+    CraftScanComm:Transmit({ state = SharingState.InitialInquiry, },
+        CraftScanComm.Operations.Ping, targets);
+end
+
+local function ReceivePing(sender, data, senderID)
+    if data.state == SharingState.InitialInquiry then
+        CraftScanComm:Transmit({ state = SharingState.ResponseInquiry, },
+            CraftScanComm.Operations.Ping, sender);
+    else
+        local todos = todosByAccount[senderID];
+        for _, todo in ipairs(todos) do
+            todo(senderID, sender);
+        end
+        todosByAccount[senderID] = nil;
+    end
+end
+
+local function ShareAnalytics_(senderID, sender, state, sinceLastUpdate)
+    local analytics = CraftScan.DB.analytics;
+    local lastShare = CraftScan.DB.realm.linked_accounts[senderID].last_analytics_share;
+
+    CraftScan.Utils.printTable("ShareAnalytics_ Account", CraftScan.DB.realm.linked_accounts[senderID])
+
+    if sinceLastUpdate and lastShare then
+        -- Copy the analytics table, then filter the 'times' lists to be more
+        -- recent than the last sharing time.
+        local allAnalytics = analytics;
+        analytics = { seen_items = {} };
+        local dst = analytics.seen_items;
+        local src = allAnalytics.seen_items;
+        if src then
+            for itemID, srcEntry in pairs(src) do
+                local times = {};
+                for _, t in ipairs(srcEntry.times) do
+                    if CraftScan.Analytics.GetTimeStamp(t) > lastShare then
+                        table.insert(times, t);
+                    end
+                end
+                if #times ~= 0 then
+                    dst[itemID] = {}
+                    dstEntry = dst[itemID];
+                    for key, value in pairs(srcEntry) do
+                        if key ~= 'times' then
+                            dstEntry[key] = value;
+                        end
+                    end
+                    dst[itemID].times = times;
+                end
+            end
+        end
+    end
+
+    CraftScanComm:Transmit({ analytics = analytics, state = state, recent = sinceLastUpdate },
+        CraftScanComm.Operations.ShareAnalytics, sender);
+end
+
+local function MergeTimes(myTimes, otherTimes)
+    local GetTime = CraftScan.Analytics.GetTimeStamp;
+    local i, j = 1, 1
+    local merged = {}
+    local merging = false;
+    while i <= #myTimes and j <= #otherTimes do
+        local myTime = GetTime(myTimes[i]);
+        local otherTime = GetTime(otherTimes[j]);
+        if myTime == otherTime then
+            local myTable = type(myTimes[i]) == "table";
+            local otherTable = type(otherTimes[j]) == "table";
+            if myTable and otherTable then
+                -- If both sides saw repeats, take the max. We
+                -- assume they were both watching, but one of them
+                -- stayed online longer and saw more repeats.
+                myTimes[i].c = math.max(myTimes[i].c or 1, otherTimes[j].c or 1)
+            elseif otherTable then
+                myTimes[i] = otherTimes[j];
+            end
+
+            if merging then
+                table.insert(merged, myTimes[i]);
+            end
+            i = i + 1;
+            j = j + 1;
+        elseif myTime < otherTime then
+            if merging then
+                table.insert(merged, myTimes[i]);
+            end
+            i = i + 1;
+        else
+            assert(myTime > otherTime);
+
+            -- The other side has an entry that needs to go before our next
+            -- entry, so time to copy and start merge inserting.
+            if not merging then
+                merging = true;
+                for copyI = 1, i - 1, 1 do
+                    table.insert(merged, myTimes[copyI]);
+                end
+            end
+
+            table.insert(merged, otherTimes[j]);
+            j = j + 1;
+        end
+    end
+
+    if merging then
+        while i <= #myTimes do
+            table.insert(merged, myTimes[i]);
+            i = i + 1;
+        end
+    end
+    while j <= #otherTimes do
+        if merging then
+            table.insert(merged, otherTimes[j]);
+        else
+            table.insert(myTimes, otherTimes[j]);
+        end
+        j = j + 1;
+    end
+
+    assert(merging or #merged == 0);
+    return merging, merging and merged or myTimes;
+end
+
+CraftScan.Utils.onLoad(function()
+    if CraftScan.Utils.DIAG_PRINT_ENABLED == false then
+        return;
+    end
+
+
+    function TestCase(index, myTimes, otherTimes, expectedMerged, expected)
+        local merged, times = MergeTimes(myTimes, otherTimes);
+        local failed = false;
+        if merged ~= expectedMerged then
+            failed = true;
+        end
+        if not merged and times ~= myTimes then
+            failed = true;
+        end
+        if #times ~= #expected then
+            failed = true;
+        end
+        for i, e in ipairs(expected) do
+            if type(times[i]) == "table" then
+                if type(e) ~= "table" then
+                    failed = true;
+                end
+                if times[i].t ~= e.t then
+                    failed = true;
+                end
+                if times[i].c ~= e.c then
+                    failed = true;
+                end
+            elseif times[i] ~= e then
+                failed = true;
+            end
+        end
+        if failed then
+            CraftScan.Utils.printTable("Failed Testcase Output", {
+                index = index,
+                merged = merged,
+                expectedMerged = expectedMerged,
+                times = times,
+                expected = expected,
+            });
+            assert(not failed);
+        end
+    end
+
+    -- Basic equal
+    TestCase(1, { 1, 2, 3, }, { 1, 2, 3, }, false, { 1, 2, 3, })
+    -- mine longer
+    TestCase(2, { 1, 2, 3, 4, }, { 1, 2, 3, }, false, { 1, 2, 3, 4, })
+    -- other longer
+    TestCase(3, { 1, 2, 3, }, { 1, 2, 3, 4, }, false, { 1, 2, 3, 4, })
+    -- other has a hole
+    TestCase(4, { 1, 2, 3, }, { 1, 3, 4, }, false, { 1, 2, 3, 4, })
+    -- Merges needed, other longer
+    TestCase(5, { 1, 4, }, { 1, 2, 3, }, true, { 1, 2, 3, 4, })
+    -- Merges needed, mine longer
+    TestCase(6, { 11, 14, 15 }, { 11, 12, 13, }, true, { 11, 12, 13, 14, 15 })
+
+    -- Mixed formats
+    TestCase(7, { { t = 1 }, 9, 12 }, { 1, 2, { t = 5 }, }, true, { { t = 1 }, 2, { t = 5 }, 9, 12 })
+    TestCase(8, { { t = 1, c = 2 }, }, { 1, 2, }, false, { { t = 1, c = 2 }, 2, })
+    TestCase(8, { { t = 1, c = 2 }, }, { { t = 1, c = 5 }, 2, }, false, { { t = 1, c = 5 }, 2, })
+    TestCase(9, { 1, }, { { t = 1, c = 5 }, 2, }, false, { { t = 1, c = 5 }, 2, })
+    TestCase(10, { 1, 3, 5 }, { 2, { t = 5, c = 5 }, }, true, { 1, 2, 3, { t = 5, c = 5 }, })
+    TestCase(11, { 1, 3, { t = 5, c = 5 } }, { 2, 5, }, true, { 1, 2, 3, { t = 5, c = 5 }, })
+    TestCase(12, { 1, 3, { t = 5, c = 5 } }, { 2, }, true, { 1, 2, 3, { t = 5, c = 5 }, })
+    TestCase(12, { 1, 3, }, { 2, { t = 5, c = 5 } }, true, { 1, 2, 3, { t = 5, c = 5 }, })
+end)
+
+local function ReceiveShareAnalytics(sender, data, senderID)
+    if data.state == SharingState.InitialInquiry then
+        ShareAnalytics_(senderID, sender, SharingState.ResponseInquiry, data.recent);
+    end
+
+    local function OnExitUpdate()
+        CraftScan.DB.realm.linked_accounts[senderID].last_analytics_share = time();
+        CraftScanCraftingOrderPage:UpdateAnalytics()
+    end
+
+    -- Our share analytics implementation is a merge. Any time stamps present on
+    -- both sides are left in place and treated as being the same entry. If one
+    -- side has an entry the other doesn't, it is merged into the collection at
+    -- the right spot. To avoid terrible performance, once we need to start
+    -- merging, we copy over all recent data and start appending to a new list
+    -- to replace the list rather than inserting in the middle of the list.
+    local other = data.analytics.seen_items;
+    local mine = CraftScan.DB.analytics.seen_items;
+    if not mine then
+        CraftScan.DB.analytics.seen_items = other;
+        OnExitUpdate();
+        return;
+    end
+    if not other then
+        return;
+    end
+
+    for itemID, otherItem in pairs(other) do
+        local myItem = mine[itemID];
+        if not myItem then
+            mine[itemID] = otherItem;
+        else
+            -- If one side has identified the profession, accept it if we have
+            -- not yet. If there's a difference, we leave our value in place and
+            -- spit out a message about it.
+            if otherItem.ppID then
+                if not myItem.ppID then
+                    myItem.ppID = otherItem.ppID;
+                elseif otherItem.ppID ~= myItem.ppID then
+                    item = Item:CreateFromItemID(itemID);
+                    item:ContinueOnItemLoad(function()
+                        local myProf = CraftScan.Utils.ColorizedProfessionNameByID(myItem.ppID);
+                        local otherProf = CraftScan.Utils.ColorizedProfessionNameByID(otherItem.ppID);
+                        print(string.format(L(LID.ANALYTICS_PROF_MISMATCH), item:GetItemLink(), myProf, otherProf));
+                    end);
+                end
+            end
+
+            local myTimes = myItem.times;
+            local otherTimes = otherItem.times;
+            local merged, times = MergeTimes(myTimes, otherTimes);
+            if merged then
+                myItem.times = times;
+            else
+                assert(myTimes == times);
+            end
+        end
+    end
+
+    OnExitUpdate();
+end
+
+function CraftScanComm:ShareAnalytics(targetAccountID, sinceLastUpdate)
+    SendPing(targetAccountID, function(senderID, sender)
+        ShareAnalytics_(targetAccountID, sender, SharingState.InitialInquiry, sinceLastUpdate);
+    end)
+end
+
+local function MakeUUID()
+    local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    return string.gsub(template, '[xy]', function(c)
+        local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
+        return string.format('%x', v)
+    end)
+end
+
+
 local function InitMyUUID()
     if not CraftScan.DB.settings.my_uuid then
         local random = math.random
-        local function MakeUUID()
-            local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-            return string.gsub(template, '[xy]', function(c)
-                local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
-                return string.format('%x', v)
-            end)
-        end
         local myUuid = MakeUUID();
         CraftScan.DB.settings.my_uuid = myUuid;
         for char, charConfig in pairs(CraftScan.DB.characters) do
@@ -425,25 +723,31 @@ local function InitMyUUID()
     end
 end
 
-function CraftScanComm:SendHandshake(target, nickname)
+function CraftScanComm:SendHandshake(target, nickname, permissions)
     CraftScan.pending_peer_accept = {
         character = target,
         nickname = nickname,
+        permissions = permissions,
     };
 
     InitMyUUID();
-    CraftScanComm:Transmit({ remoteID = CraftScan.DB.settings.my_uuid, version = CraftScan.CONST.CURRENT_VERSION },
+    CraftScanComm:Transmit(
+        { remoteID = CraftScan.DB.settings.my_uuid, version = CraftScan.CONST.CURRENT_VERSION, permissions = permissions, },
         CraftScanComm.Operations.Handshake, target);
 end
 
 CraftScanComm.Result = {
     OK = 1,
     VersionMismatch = 1,
+    UserDenied = 2,
 };
 
 local function GetRejectionMessage(result, data)
     if result == CraftScanComm.Result.VersionMismatch then
         return string.format(L(LID.VERSION_MISMATCH), data, CraftScan.CONST.CURRENT_VERSION);
+    end
+    if result == CraftScanComm.Result.UserDenied then
+        return L(LID.LINKED_ACCOUNT_USER_REJECTED);
     end
 
     return "Received unknown error code: " .. result .. ". Argument: " .. (data or "none");
@@ -454,7 +758,8 @@ local function AcceptPeerRequest_(pending)
     linkedAccounts[pending.remoteID] = {
         nickname = pending.nickname,
         backup_chars = { pending.character },
-    }
+        permissions = pending.permissions,
+    };
 
     if not remoteTargets then
         -- If this is the first time we're linking to anyone, we didn't
@@ -465,10 +770,21 @@ local function AcceptPeerRequest_(pending)
         };
     end
 
+    if not CraftScan.Utils.Contains(pending.permissions, CraftScanComm.Permissions.Full) then
+        -- In case we're changing permissions to not include full, wipe out any
+        -- remote characters.
+        for char, charConfig in pairs(CraftScan.DB.characters) do
+            if charConfig.sourceID == pending.remoteID then
+                CraftScan.DB.characters[char] = nil;
+            end
+        end
+        CraftScan.OnCrafterListModified();
+    end
+
     CraftScan.Utils.printTable("linkedAccounts:", linkedAccounts)
 end
 
-function ReceiveHandshake(sender, data)
+local function ReceiveHandshake(sender, data)
     if data.result then
         if data.result == CraftScanComm.Result.OK then
             CraftScan.pending_peer_accept.remoteID = data.result_data.remoteID;
@@ -481,7 +797,7 @@ function ReceiveHandshake(sender, data)
             -- them to stay in sync.
             ShareCharacterData_(SharingState.InitialInquiry, sender);
         else
-            CraftScan.OnPendingPeerRejected(GetRejectionMessage(data.result, data.result_data));
+            print(string.format(L(LID.LINKED_ACCOUNT_REJECTED), GetRejectionMessage(data.result, data.result_data)));
         end
         return;
     end
@@ -499,6 +815,7 @@ function ReceiveHandshake(sender, data)
     CraftScan.pending_peer_request = {
         remoteID = data.remoteID,
         character = sender,
+        permissions = data.permissions,
     }
     CraftScan.OnPendingPeerAdded();
 end
@@ -509,6 +826,18 @@ end
 
 function CraftScanComm:GetPendingPeerRequestCharacter()
     return CraftScan.pending_peer_request.character;
+end
+
+function CraftScanComm:GetPendingPeerRequestPermissions()
+    local perms = CraftScan.pending_peer_request.permissions;
+
+    -- Very inefficient, but rarely used.
+    local result = {};
+    for _, perm in ipairs(perms) do
+        local strings = CraftScanComm.PermissionStrings[perm];
+        table.insert(result, L(strings.name) .. " (" .. L(strings.desc) .. ")");
+    end
+    return table.concat(result, "\n");
 end
 
 function CraftScanComm:AcceptPeerRequest(nickname)
@@ -528,6 +857,15 @@ function CraftScanComm:AcceptPeerRequest(nickname)
 
     CraftScan.pending_peer_request = nil;
     CraftScan.OnPendingPeerAccepted();
+end
+
+function CraftScanComm:RejectPeerRequest()
+    CraftScanComm:Transmit(
+        { result = CraftScanComm.Result.UserDenied, },
+        CraftScanComm.Operations.Handshake,
+        CraftScan.pending_peer_request.character);
+
+    CraftScan.pending_peer_request = nil;
 end
 
 local function SendMessage(encoded, target)
@@ -558,26 +896,28 @@ function IgnoreOfflineMessages:new(targets, encoded)
             -- target first and test for success before sending to others.
             self.filtered = self.filtered or {};
 
-            local filter = 
+            local filter =
                 ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", target);
             self.filtered[target] = { filter };
 
-                -- On non-connected realms, something below us auto-removes the
-                -- realm name from the target. It even happens on connected
-                -- realms if the the characters are on the same realm, so we do
-                -- this unconditionally.
-                filter = ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", CraftScan.NameAndRealmToName(target));
-                table.insert(self.filtered[target], filter);
+            -- On non-connected realms, something below us auto-removes the
+            -- realm name from the target. It even happens on connected
+            -- realms if the the characters are on the same realm, so we do
+            -- this unconditionally.
+            filter = ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("%%s", CraftScan.NameAndRealmToName(target));
+            table.insert(self.filtered[target], filter);
         end
     end
 
     local function CreateOfflineChatFilter(filtered)
         CraftScan.Utils.printTable("Created chat filter. Ignoring", filtered)
         return function(self, event, msg)
-            for char, filter in pairs(filtered) do
-                for _, f in ipairs(filter) do
-                    if msg == f then
-                        return true;
+            if filtered then
+                for char, filter in pairs(filtered) do
+                    for _, f in ipairs(filter) do
+                        if msg == f then
+                            return true;
+                        end
                     end
                 end
             end
@@ -608,7 +948,11 @@ local function TransmitSerialized(serialized, target)
     -- every character every time.
     local targets = {};
     if target then
-        table.insert(targets, { [target] = true });
+        if type(target) ~= "table" then
+            table.insert(targets, { [target] = true });
+        else
+            targets = target;
+        end
     else
         if not remoteTargets then
             targets = CreateInitialTargets();
@@ -665,7 +1009,7 @@ local function ReceiveRemoteTarget(senderID, sender)
     CraftScan.OnLinkedAccountStateChange()
 
     -- TODO: Connected realms - does sender come with the realm name?
-    local nameAndRealm = sender .. "-" .. GetRealmName();
+    --local nameAndRealm = sender .. "-" .. GetRealmName();
 
     -- If we are receiving from a character that is not a crafter, save the name
     -- as a backup so we can find it again during future discovery phases.
@@ -690,23 +1034,33 @@ local function ReceiveDeserialized(msg, sender)
         end
 
         local linkedAccounts = CraftScan.DB.realm.linked_accounts;
-        if not linkedAccounts or not linkedAccounts[msg.senderID] then
-            CraftScan.Utils.printTable("Ignoring message from unlinked account.", nil)
+        if (not linkedAccounts or not linkedAccounts[msg.senderID]) then
+            CraftScan.Utils.printTable("Ignoring message from unknown account.", nil)
             return;
         end
+
+        local linkedAccount = linkedAccounts[msg.senderID];
+        local hasFull = CraftScan.Utils.Contains(linkedAccount.permissions, CraftScanComm.Permissions.Full);
+        local hasAnalytics = CraftScan.Utils.Contains(linkedAccount.permissions, CraftScanComm.Permissions.Analytics);
 
         if remoteTargets then
             ReceiveRemoteTarget(msg.senderID, sender)
         end
 
-        if msg.operation == CraftScanComm.Operations.ShareCharacterData then
+        if msg.operation == CraftScanComm.Operations.Ping then
+            ReceivePing(sender, msg.data, msg.senderID);
+        end
+        if hasFull and msg.operation == CraftScanComm.Operations.ShareCharacterData then
             ReceiveShareCharacterData(sender, msg.data, msg.senderID);
         end
-        if msg.operation == CraftScanComm.Operations.ShareCustomerOrder then
+        if hasFull and msg.operation == CraftScanComm.Operations.ShareCustomerOrder then
             ReceiveShareCustomerOrder(sender, msg.data, msg.senderID);
         end
-        if msg.operation == CraftScanComm.Operations.ShareCustomGreeting then
+        if hasFull and msg.operation == CraftScanComm.Operations.ShareCustomGreeting then
             ReceiveShareCustomGreeting(sender, msg.data, msg.senderID);
+        end
+        if (hasFull or hasAnalytics) and msg.operation == CraftScanComm.Operations.ShareAnalytics then
+            ReceiveShareAnalytics(sender, msg.data, msg.senderID);
         end
     end
 end
