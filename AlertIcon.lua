@@ -179,7 +179,8 @@ local bannerTooltip = CraftScan.Utils.ChatHistoryTooltip:new();
 function CraftScanBannerMixin:OnEnter()
     if CraftScan.State.activeOrder then
         bannerTooltip:Show("CraftScanChatHistoryBannerTooltip", self, CraftScan.State.activeOrder,
-            string.format(L("Customer Request"), CraftScan.NameAndRealmToName(CraftScan.State.activeOrder.customerName)), true);
+            string.format(L("Customer Request"), CraftScan.NameAndRealmToName(CraftScan.State.activeOrder.customerName)),
+            true);
         self.HighlightTexture:Show()
     end
 end
@@ -190,12 +191,14 @@ function CraftScanBannerMixin:OnLeave()
 end
 
 function CraftScan.UpdateAlertIconScale()
-    local scale = CraftScan.DB.settings.alert_icon_scale or 100;
+    local scale = CraftScan.DB.settings.alert_icon_scale or
+        CraftScan.CONST.DEFAULT_SETTINGS.alert_icon_scale;
     CraftScanScannerMenu:SetScale(scale / 100);
 end
 
 CraftScan.Utils.onLoad(function()
     local frame = CraftScanScannerMenu
+    frame:SetParent(UIParent);
     CraftScan.Frames.MainButton = frame.PageButton;
     CraftScan.Frames.makeMovable(frame.PageButton)
 

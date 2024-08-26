@@ -2147,8 +2147,23 @@ function CraftScan_OpenSettingsButtonMixin:OnLoad()
     self:FitToText();
 end
 
-function CraftScan_OpenSettingsButtonMixin:OnClick()
-    CraftScan.Settings:Open();
+function CraftScan_OpenSettingsButtonMixin:OnClick(button)
+    if button == "LeftButton" then
+        CraftScan.Settings:Open();
+    else
+        MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
+            rootDescription:CreateButton(L("Reset Alert Icon"), function()
+                CraftScanScannerMenu.PageButton:ClearAllPoints();
+                CraftScanScannerMenu.PageButton:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+
+                CraftScanScannerMenu:ClearAllPoints();
+                CraftScanScannerMenu:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+
+                CraftScan.DB.settings.alert_icon_scale = CraftScan.CONST.DEFAULT_SETTINGS.alert_icon_scale;
+                CraftScan.UpdateAlertIconScale();
+            end)
+        end);
+    end
 end
 
 CraftScan_CustomGreetingButtonMixin = {}

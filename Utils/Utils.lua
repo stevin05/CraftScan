@@ -671,7 +671,7 @@ local function CompareVersions(version1, version2)
     return 0
 end
 
-CraftScan.CONST.CURRENT_VERSION = 'v1.2.5';
+CraftScan.CONST.CURRENT_VERSION = 'v1.2.6';
 
 function CraftScan_RecentUpdatesMixin:OnHide()
     CraftScan.DB.settings.last_loaded_version = CraftScan.CONST.CURRENT_VERSION;
@@ -724,6 +724,10 @@ local function NotifyRecentChanges()
         {
             version = 'v1.2.5',
             id = LID.RN_ANALYTICS,
+        },
+        {
+            version = 'v1.2.6',
+            id = LID.RN_ALERT_ICON_ANCHOR,
         },
     };
 

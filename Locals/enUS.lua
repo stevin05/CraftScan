@@ -309,6 +309,9 @@ function CraftScan.LOCAL_EN:GetData()
                 "With a character parked in trade chat long enough, this should build up a good view of what branches of the profession tree are worth investment.",
                 [LID.RN_ANALYTICS + 4]                        =
                 "Analytics can be synchronized across multiple accounts. You can park a trial account in trade all day to collect data, then sync it over to your main account. You can also now create an analytics-only account link with a friend, supporting a two way sync that merges your analytics together. Once the collection gets large, there is an option to only sync data since the last time the accounts were synced.",
+                [LID.RN_ALERT_ICON_ANCHOR]                    = "Alert Icon Anchoring Updates",
+                [LID.RN_ALERT_ICON_ANCHOR + 1]                =
+                "The alert icon's will now be hidden correctly when the UI is hidden. The change moved and scaled it on my screen slightly. If the button has moved off your screen because of this, there is a reset option if you right click the 'Open Settings' button at the top right of the chat orders page.",
 
 
 

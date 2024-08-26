@@ -244,7 +244,7 @@
 
 			<Button parentKey="CloseButton" inherits="UIPanelCloseButtonDefaultAnchors"/>
 
-			<Button parentKey="SettingsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_OpenSettingsButtonMixin" frameLevel="510">
+			<Button parentKey="SettingsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonUp,RightButtonUp" mixin="CraftScan_OpenSettingsButtonMixin" frameLevel="510">
 				<Size x="120" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="CraftScanCraftingOrderPage" relativePoint="TOPRIGHT" x="-32" y="0"/>
