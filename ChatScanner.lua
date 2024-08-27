@@ -287,11 +287,19 @@ local function GetItemIDsFromQualityLinks(inputString)
     local pattern = "item:(%d+)"
     local qualityPattern = "professions%-chaticon%-quality%-tier";
     for itemLink in string.gmatch(inputString, "(item:[%d:]+%|h%b[])") do
-        if string.find(itemLink, qualityPattern) then
-            local itemID = itemLink:match(pattern)
-            if itemID then
+        local itemIDStr = itemLink:match(pattern)
+        if itemIDStr then
+            local itemID = tonumber(itemIDStr);
+            local crafterInfo = config.items[itemID];
+            if crafterInfo or string.find(itemLink, qualityPattern) then
                 if not itemIDs then itemIDs = {}; end
-                table.insert(itemIDs, tonumber(itemID))
+
+                if crafterInfo then
+                    local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[crafterInfo.profID];
+                    table.insert(itemIDs, { itemID = itemID, ppID = profConfig.parentProfID });
+                else
+                    table.insert(itemIDs, itemID);
+                end
             end
         end
     end
@@ -459,22 +467,26 @@ local function AddTimeToAnalytics(customer, item)
     CraftScanCraftingOrderPage:UpdateAnalytics()
 end
 
-local function AddMessageToAnalytics(message)
-    local itemIDs = GetItemIDsFromQualityLinks(message);
-    if not itemIDs then return; end
-
-    local seen = saved(CraftScan.DB.analytics, "seen_items", {});
-    for _, itemID in ipairs(itemIDs) do
-        local item = saved(seen, itemID, { times = {} });
-        AddTimeToAnalytics(customer, item);
-    end
-end
-
 local function AddItemToAnalytics(customer, itemID, parentProfID)
     local seen = saved(CraftScan.DB.analytics, "seen_items", {});
     local item = saved(seen, itemID, { times = {}, ppID = parentProfID });
     AddTimeToAnalytics(customer, item);
     if not item.ppID then item.ppID = parentProfID end
+end
+
+local function AddMessageToAnalytics(customer, message)
+    local itemIDs = GetItemIDsFromQualityLinks(message);
+    if not itemIDs then return; end
+
+    local seen = saved(CraftScan.DB.analytics, "seen_items", {});
+    for _, itemID in ipairs(itemIDs) do
+        if type(itemID) == "table" then
+            AddItemToAnalytics(customer, itemID.itemID, itemID.ppID);
+        else
+            local item = saved(seen, itemID, { times = {} });
+            AddTimeToAnalytics(customer, item);
+        end
+    end
 end
 
 -- Because we can't reverse look up from item link to crafting profession, we do
@@ -519,6 +531,21 @@ local function getCrafterForMessage(customer, message)
         return nil
     end
 
+    if not CraftScanComm.applying_remote_state then
+        -- Don't add to analytics based on proxied orders. The 'now' might
+        -- be slightly off because of the messaging. We don't want that to
+        -- create duplicates if both characters see the same message at the
+        -- same time. Instead, analytics can be separately sync'ed between
+        -- accounts, with a merge of timestamps to avoid creating
+        -- duplicates.
+
+        -- We originally piggy backed on the matching below for analytics, but
+        -- analytics supports multiple items in a request while the matching
+        -- below does not.
+        AddMessageToAnalytics(customer, message);
+    end
+
+
     -- Determine the profession via the item link or keywords in the message
     local itemFound, _, itemID = string.find(message, "item:(%d+):")
 
@@ -527,23 +554,9 @@ local function getCrafterForMessage(customer, message)
         local crafterInfo = config.items[itemID];
         if crafterInfo then
             local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[crafterInfo.profID];
-            if not CraftScanComm.applying_remote_state then
-                AddItemToAnalytics(customer, itemID, profConfig.parentProfID);
-            end
             if IsScanningEnabled(crafterInfo) then
                 local recipeInfo, categoryID = getRequestIDs(message, crafterInfo, profConfig);
                 return crafterInfo, itemID, recipeInfo, categoryID;
-            end
-        else
-            -- Don't add to analytics based on proxied orders. The 'now' might
-            -- be slightly off because of the messaging. We don't want that to
-            -- create duplicates if both characters see the same message at the
-            -- same time. Instead, analytics can be separately sync'ed between
-            -- accounts, with a merge of timestamps to avoid creating
-            -- duplicates.
-            if not CraftScanComm.applying_remote_state then
-                -- We can't craft this item, but save that some one requested it for future analysis
-                AddMessageToAnalytics(message);
             end
         end
 
