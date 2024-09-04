@@ -492,7 +492,7 @@ end
 -- Because we can't reverse look up from item link to crafting profession, we do
 -- the translation when a profession is opened scan any saved items and see if
 -- they are related to this profession.
-function CraftScan.Scanner.UpdateAnalyticsProfIDs(customer, parentProfID)
+function CraftScan.Scanner.UpdateAnalyticsProfIDs(parentProfID)
     if not CraftScan.DB.analytics.seen_items then return end
 
     local itemIDs = nil;
@@ -503,11 +503,12 @@ function CraftScan.Scanner.UpdateAnalyticsProfIDs(customer, parentProfID)
                 -- On the first analytics item without profession info, grab the
                 -- full list, convert it to all itemIDs created by the
                 -- profession, then check if we have a match.
-                for _, id in pairs(C_TradeSkillUI.GetAllRecipeIDs()) do
+                local recipes = C_TradeSkillUI.GetAllRecipeIDs();
+                for _, id in pairs(recipes) do
                     local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
-                    local itemIDs = CraftScan.Utils.GetOutputItems(recipeInfo)
-                    if itemIDs then
-                        for _, itemID in ipairs(itemIDs) do
+                    local recipeItemIDs = CraftScan.Utils.GetOutputItems(recipeInfo)
+                    if recipeItemIDs then
+                        for _, itemID in ipairs(recipeItemIDs) do
                             itemIDs[itemID] = true;
                         end
                     end
