@@ -87,12 +87,12 @@ end
 
 -- The TSM axis label handling is very nice, so after my initial sloppy attempt,
 -- hoisting the key bits.
-function Scale(value, fromStart, fromEnd, toStart, toEnd)
+local function Scale(value, fromStart, fromEnd, toStart, toEnd)
     assert(value >= min(fromStart, fromEnd) and value <= max(fromStart, fromEnd))
     return toStart + ((value - fromStart) / (fromEnd - fromStart)) * (toEnd - toStart)
 end
 
-function GraphXStepFunc(prevValue, suggestedStep)
+local function GraphXStepFunc(prevValue, suggestedStep)
     local year, day, month, hour, min, sec = strsplit(",", date("%Y,%d,%m,%H,%M,%S", prevValue))
     local time_ = {};
     time_.year = tonumber(year)
@@ -127,7 +127,7 @@ function GraphXStepFunc(prevValue, suggestedStep)
     return newValue
 end
 
-function GraphFormatX(timestamp, suggestedStep)
+local function GraphFormatX(timestamp, suggestedStep)
     if suggestedStep > SECONDS_PER_DAY * 14 then
         return date("%b '%y", timestamp)
     elseif suggestedStep > SECONDS_PER_DAY * 2 then
