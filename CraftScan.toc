@@ -3,7 +3,8 @@
 ## Version: 1.0.4
 ## Notes: Scans chat for potential work orders
 ## Author: Stevin
-## X-Curse-Project-ID: 
+## X-Curse-Project-ID: 1028358
+## X-Wago-ID: rN4V3jKD
 ## SavedVariables: CraftScan_DB
 ## IconTexture: Interface\Icons\Trade_blacksmithing
 
