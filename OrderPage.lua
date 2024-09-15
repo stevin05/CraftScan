@@ -2157,6 +2157,27 @@ function CraftScan_OpenSettingsButtonMixin:OnClick(button)
     end
 end
 
+CraftScan_BusyCheckButtonMixin = {}
+
+function CraftScan_BusyCheckButtonMixin:OnLoad()
+    self.Text:SetText(L(LID.BUSY_RIGHT_NOW));
+end
+
+function CraftScan_BusyCheckButtonMixin:OnClick()
+    CraftScan.State.isBusy = self:GetChecked();
+end
+
+function CraftScan_BusyCheckButtonMixin:OnEnter()
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+    GameTooltip:AddLine(string.format(L(LID.BUSY_HELP), CraftScan.Utils.GetGreeting("GREETING_BUSY")), 1, 1, 1, true);
+    GameTooltip:SetMinimumWidth(350);
+    GameTooltip:Show();
+end
+
+function CraftScan_BusyCheckButtonMixin:OnLeave()
+    GameTooltip:Hide();
+end
+
 CraftScan_CustomGreetingButtonMixin = {}
 
 function CraftScan_CustomGreetingButtonMixin:OnLoad()
@@ -2171,6 +2192,7 @@ function CraftScan_CustomGreetingButtonMixin:OnClick()
         { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = 2, suggestion = L("alt name and then item link") },
         { key = 'GREETING_ALT_HAS_PROF',       placeholders = 2, suggestion = L("alt name and then profession name") },
         { key = 'GREETING_ALT_SUFFIX',         placeholders = 0, },
+        { key = 'GREETING_BUSY',               placeholders = 0, },
     };
 
     local function Validator(index, text)

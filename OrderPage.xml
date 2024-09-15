@@ -290,7 +290,6 @@
 										</Anchors>
 									</Frame>
 
-
 									<Button parentKey="LinkAccountButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_LinkAccountButtonMixin">
 										<Size x="140" y="22"/>
 										<Anchors>
@@ -531,6 +530,35 @@
 							<OnClick method="OnClick"/>
 						</Scripts>
 					</Button>
+
+					<CheckButton parentKey="BusyCheckButton" mixin="CraftScan_BusyCheckButtonMixin">
+						<Size x="18" y="18"/>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+							<OnClick method="OnClick"/>
+							<OnEnter method="OnEnter"/>
+							<OnLeave method="OnLeave"/>
+						</Scripts>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentText" inherits="GameFontNormal" parentKey="Text">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT" x="0" y="0"/>
+									</Anchors>
+									<Scripts>
+										<OnLoad function="UICheckButtonFontString_SetParentKeyAlias"/>
+									</Scripts>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+						<PushedTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+						<CheckedTexture atlas="checkmark-minimal" useAtlasSize="true"/>
+						<DisabledCheckedTexture atlas="checkmark-minimal-disabled" useAtlasSize="true"/>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativeKey="$parent.CustomGreetingButton" relativePoint="TOPLEFT" x="0" y="0"/>
+						</Anchors>
+					</CheckButton>
 
 					<DropdownButton parentKey="ResetAnalyticsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_ResetAnalyticsButtonMixin">
 						<Size x="120" y="22"/>

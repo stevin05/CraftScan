@@ -109,6 +109,9 @@ CraftScan.CONST.TEXT = {
     ACCOUNT_LINK_FULL_CONTROL_DESC          = 105,
     ACCOUNT_LINK_ANALYTICS_DESC             = 106,
     ANALYTICS_PROF_MISMATCH                 = 107,
+    BUSY_RIGHT_NOW                          = 108,
+    GREETING_BUSY                           = 110,
+    BUSY_HELP                               = 109,
 
 
 

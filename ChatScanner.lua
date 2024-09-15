@@ -785,6 +785,16 @@ local function MakeChatHistoryEntryDefault(customer, message)
     }
 end
 
+local function GetGreeting(tag)
+    -- We support configured or internationalized greetings. They use the
+    -- same naming pattern, so we can look them up by tag.
+    local greeting = CraftScan.DB.settings.greeting;
+    if not greeting then return L(LID[tag]); end
+    return greeting[tag] or L(LID[tag]);
+end
+
+CraftScan.Utils.GetGreeting = GetGreeting;
+
 local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, item)
     -- At this point, we have everything we need to generate a response to the message.
     local itemLink = item and item:GetItemLink() or nil
@@ -810,14 +820,6 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter);
     local alt_craft = crafter ~= CraftScan.GetPlayerName();
 
-    local function GetGreeting(tag)
-        -- We support configured or internationalized greetings. They use the
-        -- same naming pattern, so we can look them up by tag.
-        local greeting = CraftScan.DB.settings.greeting;
-        if not greeting then return L(LID[tag]); end
-        return greeting[tag] or L(LID[tag]);
-    end
-
     local greeting = '';
     if alt_craft then
         if itemID then
@@ -826,12 +828,20 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         else
             greeting = string.format(GetGreeting('GREETING_ALT_HAS_PROF'), crafter, profInfo.parentProfessionName);
         end
-        greeting = greeting .. ' ' .. GetGreeting('GREETING_ALT_SUFFIX');
+        if CraftScan.State.isBusy then
+            greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
+        else
+            -- They know we are busy and can't do it now, so don't bother saying we need to log over.
+            greeting = greeting .. ' ' .. GetGreeting('GREETING_ALT_SUFFIX');
+        end
     else
         if itemID then
             greeting = string.format(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'), itemLink or L(LID.GREETING_LINK_BACKUP));
         else
             greeting = string.format(GetGreeting('GREETING_I_HAVE_PROF'), profInfo.parentProfessionName);
+        end
+        if CraftScan.State.isBusy then
+            greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
         end
     end
 

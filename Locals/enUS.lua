@@ -312,6 +312,10 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.RN_ALERT_ICON_ANCHOR]                    = "Alert Icon Anchoring Updates",
                 [LID.RN_ALERT_ICON_ANCHOR + 1]                =
                 "The alert icon's will now be hidden correctly when the UI is hidden. The change moved and scaled it on my screen slightly. If the button has moved off your screen because of this, there is a reset option if you right click the 'Open Settings' button at the top right of the chat orders page.",
+                [LID.BUSY_RIGHT_NOW]                          = "Busy Mode",
+                [LID.GREETING_BUSY]                           = "I am busy now, but can craft that later if you send it.",
+                [LID.BUSY_HELP]                               =
+                "|cFFFFFFFFWhen checked, append the busy greeting in your response. Edit your busy greeting with the button below.\n\nThis is intended for use with a second account proxying orders so you can catch orders while out and about on your main.\n\nCurrent busy greeting: |cFF00FF00%s|r|r",
 
 
 
