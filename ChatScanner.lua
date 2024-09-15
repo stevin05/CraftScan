@@ -45,14 +45,17 @@ end
 -- contains one of the tokens, delimited by spaces, start/end, or
 -- the [] of an item link.]
 local function HasMatch(message, tokens)
+    local len = nil;
     for _, token in pairs(tokens) do
         local b, e = string.find(message, token)
         if b and e and (b == 1 or message:sub(b - 1, b - 1) == ' ' or (b > 2 and message:sub(b - 2, b - 1) == '|r')) and
             (e == #message or message:sub(e + 1, e + 1) == ' ' or message:sub(e + 1, e + 1) == '|') then
-            return true
+            if not len or len < #token then
+                len = #token;
+            end
         end
     end
-    return false
+    return len;
 end
 
 local function TableConcat(t1, t2)
@@ -250,14 +253,20 @@ local function idForKeywords(message, profConfig, section)
         return nil
     end
 
+    local len = nil;
+    local result = nil;
     for id, config in pairs(sectionConfig) do
         if (profConfig.all_enabled or section ~= 'recipes' or config.enabled) and config.keywords then
-            if HasMatch(message, ParseStringList(config.keywords)) then
-                return id
+            local matchLen = HasMatch(message, ParseStringList(config.keywords));
+            if matchLen then
+                if not len or len < matchLen then
+                    len = matchLen
+                    result = id;
+                end
             end
         end
     end
-    return nil
+    return result;
 end
 
 local function getRequestIDs(message, crafterInfo, profConfig)

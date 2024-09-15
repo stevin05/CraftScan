@@ -340,20 +340,11 @@ function CraftScanCraftingOrderPageMixin:ShowGeneric()
     for i, order in ipairs(orders) do
         dataProvider:Insert({
             order = order,
-            -- browseType = OrderBrowseType.Flat,
             pageFrame = self,
             contextMenu = self.BrowseFrame.OrderList.ContextMenu
         });
     end
     self.BrowseFrame.OrderList.ScrollBox:SetDataProvider(dataProvider);
-    -- else
-    -- dataProvider = self.BrowseFrame.OrderList.ScrollBox:GetDataProvider();
-    -- for idx = offset + 1, #orders do
-    -- local order = orders[idx];
-    -- dataProvider:Insert({option = order, browseType = browseType, pageFrame = self, contextMenu = self.BrowseFrame.OrderList.ContextMenu});
-    -- end
-    -- end
-    -- self.numOrders = #orders;
 
     C_Timer.After(5, UpdateCells)
 end

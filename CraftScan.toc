@@ -5,6 +5,7 @@
 ## Author: Stevin
 ## X-Curse-Project-ID: 1028358
 ## X-Wago-ID: rN4V3jKD
+## X-WoWI-ID: 26847
 ## SavedVariables: CraftScan_DB
 ## IconTexture: Interface\Icons\Trade_blacksmithing
 
