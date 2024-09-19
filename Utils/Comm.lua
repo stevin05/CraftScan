@@ -40,12 +40,13 @@ function CraftScanComm:OnEnable()
 end
 
 CraftScanComm.Operations = {
-    ShareCharacterData  = 'share_char_data',
-    Handshake           = 'handshake',
-    ShareCustomerOrder  = 'share_customer_order',
-    ShareCustomGreeting = 'share_custom_greeting',
-    ShareAnalytics      = 'share_analytics',
-    Ping                = 'ping',
+    ShareCharacterData      = 'share_char_data',
+    Handshake               = 'handshake',
+    ShareCustomerOrder      = 'share_customer_order',
+    ShareCustomGreeting     = 'share_custom_greeting',
+    ShareCustomExplanations = 'share_custom_explanations',
+    ShareAnalytics          = 'share_analytics',
+    Ping                    = 'ping',
 }
 
 CraftScanComm.Permissions = {
@@ -180,12 +181,18 @@ local function GreetingRevision()
     return greeting and greeting.rev or 0;
 end
 
+local function ExplanationsRevision()
+    local explanations = CraftScan.DB.settings.explanations;
+    return explanations and explanations.rev or 0;
+end
+
 local function SendShareCharacterData(target, data)
     CraftScanComm:Transmit(data, CraftScanComm.Operations.ShareCharacterData, target);
 end
 
-local function SendResponseCharacterData(target, characters, greeting)
-    SendShareCharacterData(target, { characters = characters, greeting = greeting, state = SharingState.ResponseData });
+local function SendResponseCharacterData(target, characters, greeting, explanations)
+    SendShareCharacterData(target,
+        { characters = characters, greeting = greeting, explanations = explanations, state = SharingState.ResponseData });
 end
 
 local function ShareCharacterData_(state, target)
@@ -193,13 +200,20 @@ local function ShareCharacterData_(state, target)
 
     local revisions = CreateRevisions();
     local peers = MyPeers();
-    local data = { revisions = revisions, peers = peers, greeting_revision = GreetingRevision(), state = state };
+    local data = { revisions = revisions, peers = peers, greeting_revision = GreetingRevision(), explanations_revision =
+    ExplanationsRevision(), state = state };
     SendShareCharacterData(target, data);
 end
 
 local function ReceiveShareCustomGreeting_(greeting)
-    if not CraftScan.DB.settings.greeting or CraftScan.DB.settings.greeting.rev < greeting.rev then
+    if not CraftScan.DB.settings.greeting or ((CraftScan.DB.settings.greeting.rev or 0) < greeting.rev) then
         CraftScan.DB.settings.greeting = greeting;
+    end
+end
+
+local function ReceiveShareCustomExplanations_(explanations)
+    if not CraftScan.DB.settings.explanations or ((CraftScan.DB.settings.explanations.rev or 0) < explanations.rev) then
+        CraftScan.DB.settings.explanations = explanations;
     end
 end
 
@@ -254,6 +268,10 @@ local function ReceiveShareCharacterData(sender, data, senderID)
         ReceiveShareCustomGreeting_(data.greeting);
     end
 
+    if data.explanations then
+        ReceiveShareCustomExplanations_(data.explanations);
+    end
+
     if data.state ~= SharingState.ResponseData then
         -- We were given revisions. Respond with any character data that is
         -- either newer than or not included in the revisions, filtered by what
@@ -281,6 +299,10 @@ local function ReceiveShareCharacterData(sender, data, senderID)
                             -- Only the character owning account has access to
                             -- modify professions, so we don't need to worry
                             -- about sending them.
+                            --
+                            -- Note that this can lead to errors if the user
+                            -- manually does CLEANUP on the owning account but
+                            -- not on the other account.
                             if not characterOwnedByPeer then
                                 for id, config in pairs(localCharConfig.professions) do
                                     if config.parentProfID == ppID then
@@ -301,9 +323,16 @@ local function ReceiveShareCharacterData(sender, data, senderID)
             greetingResponse = CraftScan.DB.settings.greeting;
         end
 
-        if next(responseCharacters) or greetingResponse then
-            SendResponseCharacterData(sender, responseCharacters, greetingResponse);
+        local explanationsResponse = nil;
+        local explanationsRevision = ExplanationsRevision();
+        if data.explanations_revision and data.explanations_revision < explanationsRevision then
+            explanationsResponse = CraftScan.DB.settings.explanations;
         end
+
+        if next(responseCharacters) or greetingResponse or explanationsResponse then
+            SendResponseCharacterData(sender, responseCharacters, greetingResponse, explanationsResponse);
+        end
+
     end
 end
 
@@ -425,6 +454,21 @@ end
 
 local function ReceiveShareCustomGreeting(sender, data, senderID)
     ReceiveShareCustomGreeting_(data);
+end
+
+function CraftScanComm:ShareCustomExplanations(explanations)
+    if not LinkedAccountsConfigured() then return; end
+
+    explanations.rev = (explanations.rev or 0) + 1;
+
+    if not HaveTarget() then return; end
+    if CraftScanComm.applying_remote_state then return; end -- Block infinite recursion
+
+    CraftScanComm:Transmit(explanations, CraftScanComm.Operations.ShareCustomExplanations, TARGET_ALL);
+end
+
+local function ReceiveShareCustomExplanations(sender, data, senderID)
+    ReceiveShareCustomExplanations_(data);
 end
 
 local todosByAccount = {};
@@ -1058,6 +1102,9 @@ local function ReceiveDeserialized(msg, sender)
         end
         if hasFull and msg.operation == CraftScanComm.Operations.ShareCustomGreeting then
             ReceiveShareCustomGreeting(sender, msg.data, msg.senderID);
+        end
+        if hasFull and msg.operation == CraftScanComm.Operations.ShareCustomExplanations then
+            ReceiveShareCustomExplanations(sender, msg.data, msg.senderID);
         end
         if (hasFull or hasAnalytics) and msg.operation == CraftScanComm.Operations.ShareAnalytics then
             ReceiveShareAnalytics(sender, msg.data, msg.senderID);

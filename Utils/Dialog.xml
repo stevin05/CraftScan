@@ -29,33 +29,52 @@
         </Frames>
     </Frame>
 
+    <Texture name="CraftScan_InvalidInputTemplate" mixin="CraftScan_DialogTextInputAlertIconMixin" atlas="common-icon-redx" hidden="true" virtual="true">
+        <Size x="16" y="16"/>
+        <Anchors>
+            <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-2"/>
+        </Anchors>
+        <Scripts>
+            <OnEnter method="OnEnter" />
+            <OnLeave method="OnLeave" />
+        </Scripts>
+    </Texture>
+
+    <ScrollFrame name="CraftScanDialogMultiLineTextInputTemplate" mixin="CraftScanDialogMultiLineTextInputMixin" inherits="InputScrollFrameTemplate" frameStrata="DIALOG" virtual="true">
+        <Size x="200" y="120" />
+        <KeyValues>
+            <KeyValue key="maxLetters" value="0" type="number"/>
+            <KeyValue key="hideCharCount" value="true" type="boolean"/>
+            <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+            <KeyValue key="scrollBarHideTrackIfThumbExceedsTrack" value="true" type="boolean"/>
+            <KeyValue key="scrollBarX" value="-10" type="number"/>
+            <KeyValue key="scrollBarTopY" value="2" type="number"/>
+            <KeyValue key="scrollBarBottomY" value="-2" type="number"/>
+        </KeyValues>
+        <Scripts>
+            <OnLoad method="OnLoad" />
+        </Scripts>
+        <Layers>
+            <Layer level="DIALOG" textureSubLevel="1">
+                <Texture parentKey="InvalidInput" inherits="CraftScan_InvalidInputTemplate" />
+            </Layer>
+        </Layers>
+    </ScrollFrame>
+
     <EditBox name="CraftScanDialogTextInputTemplate" mixin="CraftScanDialogTextInputMixin" inherits="InputBoxTemplate" frameStrata="DIALOG" virtual="true">
         <Size x="200" y="22" />
         <Scripts>
             <OnLoad method="OnLoad" />
-            <OnEscapePressed method="OnEscapePressed" />
-            <OnTabPressed method="OnTabPressed" />
-            <!-- <OnTextChanged method="OnTextChanged" /> -->
-            <OnEnterPressed method="OnEnterPressed" />
-            <OnEditFocusLost method="OnEditFocusLost" />
         </Scripts>
 
         <Layers>
             <Layer level="DIALOG" textureSubLevel="1">
-                <Texture parentKey="InvalidInput" mixin="CraftScan_DialogTextInputAlertIconMixin" atlas="common-icon-redx" hidden="true">
-                    <Size x="16" y="16"/>
-                    <Anchors>
-                        <Anchor point="RIGHT" relativePoint="RIGHT" x="-2"/>
-                    </Anchors>
-                    <Scripts>
-                        <OnEnter method="OnEnter" />
-                        <OnLeave method="OnLeave" />
-                    </Scripts>
-                </Texture>
+                <Texture parentKey="InvalidInput" inherits="CraftScan_InvalidInputTemplate" />
             </Layer>
         </Layers>
-
     </EditBox>
+
+
 
     <Frame name="CraftScanDialogTextTemplate" frameStrata="DIALOG" virtual="true">
         <Size x="260" />

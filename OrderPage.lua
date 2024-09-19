@@ -1070,6 +1070,51 @@ function CraftScan_ResizeOrderListButtonMixin:OnMouseUp()
     ResetCursor()
 end
 
+function CraftScan:GetSortedCrafters()
+    local crafterRows = {}
+    for name, info in pairs(CraftScan.DB.characters) do
+        for parentProfessionID, ppInfo in pairs(info.parent_professions) do
+            if not ppInfo.character_disabled then
+                table.insert(crafterRows, {
+                    name = name,
+                    parentProfessionID = parentProfessionID,
+                })
+            end
+        end
+    end
+
+    -- Sort characters so all primary crafters appear first, then alphabetically within the two groups.
+    table.sort(crafterRows, function(lhs, rhs)
+        local lhsPpConfig = CraftScan.DB.characters[lhs.name].parent_professions[lhs.parentProfessionID];
+        local rhsPpConfig = CraftScan.DB.characters[rhs.name].parent_professions[rhs.parentProfessionID];
+
+        local secondarySort = function()
+            if lhs.name ~= rhs.name then
+                return lhs.name < rhs.name
+            end
+
+            local lhsProfInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(lhs.parentProfessionID);
+            local rhsProfInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(rhs.parentProfessionID);
+
+            return lhsProfInfo.professionName < rhsProfInfo.professionName
+        end
+
+        if lhsPpConfig.primary_crafter then
+            if rhsPpConfig.primary_crafter then
+                return secondarySort()
+            end
+            return true;
+        end
+
+        if rhsPpConfig.primary_crafter then
+            return false;
+        end
+
+        return secondarySort()
+    end)
+    return crafterRows;
+end
+
 CraftScan_CrafterListMixin = {}
 
 function CraftScan_CrafterListMixin:SetupCrafterList()
@@ -1123,48 +1168,8 @@ function CraftScan_CrafterListMixin:SetupCrafterList()
     ScrollUtil.AddManagedScrollBarVisibilityBehavior(self.ScrollBox, self.ScrollBar, nil,
         nil);
 
-    local crafterRows = {}
-    for name, info in pairs(CraftScan.DB.characters) do
-        for parentProfessionID, ppInfo in pairs(info.parent_professions) do
-            if not ppInfo.character_disabled then
-                table.insert(crafterRows, {
-                    name = name,
-                    parentProfessionID = parentProfessionID,
-                })
-            end
-        end
-    end
 
-    -- Sort characters so all primary crafters appear first, then alphabetically within the two groups.
-    table.sort(crafterRows, function(lhs, rhs)
-        local lhsPpConfig = CraftScan.DB.characters[lhs.name].parent_professions[lhs.parentProfessionID];
-        local rhsPpConfig = CraftScan.DB.characters[rhs.name].parent_professions[rhs.parentProfessionID];
-
-        local secondarySort = function()
-            if lhs.name ~= rhs.name then
-                return lhs.name < rhs.name
-            end
-
-            local lhsProfInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(lhs.parentProfessionID);
-            local rhsProfInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(rhs.parentProfessionID);
-
-            return lhsProfInfo.professionName < rhsProfInfo.professionName
-        end
-
-        if lhsPpConfig.primary_crafter then
-            if rhsPpConfig.primary_crafter then
-                return secondarySort()
-            end
-            return true;
-        end
-
-        if rhsPpConfig.primary_crafter then
-            return false;
-        end
-
-        return secondarySort()
-    end)
-
+    local crafterRows = CraftScan.GetSortedCrafters();
     local dataProvider = CreateDataProvider(crafterRows)
     self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition);
 end
@@ -2297,6 +2302,7 @@ CraftScan.Utils.onLoad(function()
 
     frame.BrowseFrame.AddonToggleButton:SetButtonText();
     frame.BrowseFrame.AutoReplyButton:SetButtonText();
+    frame.BrowseFrame.CustomExplanationsButton:Init();
 
     frame.BrowseFrame.LeftPanel.LinkedAccountList:Init();
 

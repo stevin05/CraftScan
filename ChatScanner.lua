@@ -40,6 +40,7 @@ local function SplitResponse(raw_response)
     end
     return result
 end
+CraftScan.Utils.SplitResponse = SplitResponse;
 
 -- Given a string and a list of string tokens, return if the string
 -- contains one of the tokens, delimited by spaces, start/end, or
@@ -531,30 +532,32 @@ function CraftScan.Scanner.UpdateAnalyticsProfIDs(parentProfID)
     end
 end
 
-local function getCrafterForMessage(customer, message)
+local function getCrafterForMessage(customer, message, forceCrafterInfo)
     message = string.lower(message)
-    if HasMatch(message, config.exclusions) then
-        return nil
+
+    if not forceCrafterInfo then
+        if HasMatch(message, config.exclusions) then
+            return nil
+        end
+
+        if not HasMatch(message, config.inclusions) then
+            return nil
+        end
+
+        if not CraftScanComm.applying_remote_state then
+            -- Don't add to analytics based on proxied orders. The 'now' might
+            -- be slightly off because of the messaging. We don't want that to
+            -- create duplicates if both characters see the same message at the
+            -- same time. Instead, analytics can be separately sync'ed between
+            -- accounts, with a merge of timestamps to avoid creating
+            -- duplicates.
+
+            -- We originally piggy backed on the matching below for analytics, but
+            -- analytics supports multiple items in a request while the matching
+            -- below does not.
+            AddMessageToAnalytics(customer, message);
+        end
     end
-
-    if not HasMatch(message, config.inclusions) then
-        return nil
-    end
-
-    if not CraftScanComm.applying_remote_state then
-        -- Don't add to analytics based on proxied orders. The 'now' might
-        -- be slightly off because of the messaging. We don't want that to
-        -- create duplicates if both characters see the same message at the
-        -- same time. Instead, analytics can be separately sync'ed between
-        -- accounts, with a merge of timestamps to avoid creating
-        -- duplicates.
-
-        -- We originally piggy backed on the matching below for analytics, but
-        -- analytics supports multiple items in a request while the matching
-        -- below does not.
-        AddMessageToAnalytics(customer, message);
-    end
-
 
     -- Determine the profession via the item link or keywords in the message
     local itemFound, _, itemID = string.find(message, "item:(%d+):")
@@ -570,45 +573,58 @@ local function getCrafterForMessage(customer, message)
             end
         end
 
-        return nil
+        if not forceCrafterInfo then
+            return nil;
+        end
     end
 
     local bestMatch = nil;
-    for _, crafterInfo in ipairs(config.prof_keywords) do
-        if HasMatch(message, crafterInfo.keywords) and not HasMatch(message, crafterInfo.exclusions) then
-            -- For profession keywords, we store the parent profession ID,
-            -- and need to determine which expansion's profession we should
-            -- report. We check the sub-configurations for a category or recipe
-            -- match, and if not found, return the largest profession ID, which
-            -- presumable refers to the latest expansion.
-            local crafterConfig = CraftScan.DB.characters[crafterInfo.crafter];
-            local ppConfig = crafterConfig.parent_professions[crafterInfo.parentProfID];
-            if ppConfig.scanning_enabled then
-                local maxProfID = 0;
-                for pID, pConfig in pairs(crafterConfig.professions) do
-                    if pConfig.parentProfID == crafterInfo.parentProfID then
-                        local recipeInfo, categoryID = getRequestIDs(message, crafterInfo, pConfig)
-                        if recipeInfo or categoryID then
-                            return { crafter = crafterInfo.crafter, profID = pID }, nil, recipeInfo,
-                                categoryID;
-                        end
 
-                        if pID > maxProfID then
-                            maxProfID = pID;
-                        end
+    local function FindBestCrafter(crafterInfo)
+        -- For profession keywords, we store the parent profession ID,
+        -- and need to determine which expansion's profession we should
+        -- report. We check the sub-configurations for a category or recipe
+        -- match, and if not found, return the largest profession ID, which
+        -- presumable refers to the latest expansion.
+        local crafterConfig = CraftScan.DB.characters[crafterInfo.crafter];
+        local ppConfig = crafterConfig.parent_professions[crafterInfo.parentProfID];
+        if ppConfig.scanning_enabled then
+            local maxProfID = 0;
+            for pID, pConfig in pairs(crafterConfig.professions) do
+                if pConfig.parentProfID == crafterInfo.parentProfID then
+                    local recipeInfo, categoryID = getRequestIDs(message, crafterInfo, pConfig)
+                    if recipeInfo or categoryID then
+                        return { crafter = crafterInfo.crafter, profID = pID }, nil, recipeInfo,
+                            categoryID;
+                    end
+
+                    if pID > maxProfID then
+                        maxProfID = pID;
                     end
                 end
-
-                local profID = maxProfID;
-                if ppConfig.primary_expansion then
-                    profID = ppConfig.primary_expansion;
-                end
-
-                if profID ~= nil and not bestMatch then
-                    bestMatch = { crafter = crafterInfo.crafter, profID = profID };
-                end -- Keep looking for other crafters with keywords that match something specific.
             end
+
+            local profID = maxProfID;
+            if ppConfig.primary_expansion then
+                profID = ppConfig.primary_expansion;
+            end
+
+            if profID ~= nil and not bestMatch then
+                bestMatch = { crafter = crafterInfo.crafter, profID = profID };
+            end -- Keep looking for other crafters with keywords that match something specific.
         end
+    end
+
+    for _, crafterInfo in ipairs(config.prof_keywords) do
+        if HasMatch(message, crafterInfo.keywords) and not HasMatch(message, crafterInfo.exclusions) then
+            local crafterInfo, itemID, recipeInfo, categoryID = FindBestCrafter(crafterInfo);
+            if crafterInfo then return crafterInfo, itemID, recipeInfo, categoryID; end
+        end
+    end
+
+    if not bestMatch and forceCrafterInfo then
+        local crafterInfo, itemID, recipeInfo, categoryID = FindBestCrafter(forceCrafterInfo);
+        if crafterInfo then return crafterInfo, itemID, recipeInfo, categoryID; end
     end
 
     return bestMatch;
@@ -803,6 +819,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     local customerInfo = CraftScan.DB.customers[customer]
 
     -- Be as specific as possible about what we're responding to.
+    CraftScan.Utils.printTable("crafterInfo", crafterInfo);
     local profID = crafterInfo.profID
     local recipeID = recipeInfo and recipeInfo.recipeID
     local responseID = recipeID or categoryID or profID
@@ -875,7 +892,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     local greeting_queued = not alt_craft and CraftScan.auto_replies_enabled;
     if greeting_queued then
         C_Timer.After(CraftScan.Utils.GetSetting('auto_reply_delay') / 1000, function()
-            CraftScan.Utils.SendResponses(response.message, customer, reason)
+            CraftScan.Utils.SendResponses(response.message, customer)
             response.greeting_sent = true
         end)
     end
@@ -930,7 +947,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     CraftScanComm:ShareCustomerOrder(message, customer, customerInfo.guid, chat_history[#chat_history]);
 end
 
-function CraftScan.OnMessage(event, message, customer, customerGuid)
+function CraftScan.OnMessage(event, message, customer, customerGuid, forceCrafterInfo)
     if not message or not customer then
         return false
     end
@@ -959,7 +976,7 @@ function CraftScan.OnMessage(event, message, customer, customerGuid)
         return false
     end
 
-    local crafterInfo, itemID, recipeInfo, categoryID = getCrafterForMessage(customer, message)
+    local crafterInfo, itemID, recipeInfo, categoryID = getCrafterForMessage(customer, message, forceCrafterInfo)
     if not crafterInfo then
         return false
     end

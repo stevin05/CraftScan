@@ -213,6 +213,126 @@ function CraftScan.LOCAL_CN:GetData()
         ["alt name and then profession name"]         = "替代名称和职业名称",
         [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
         "此文本必须包含 %d 个或更少的 %%s 占位符才能包含 %s。你已经包含了 %d 个。\n\nCraftScan 可以在更少的占位符下工作，但你可能希望为上下文包含它们。",
+        ["Pixels"]                                    = "像素",
+        ["Show button height"]                        = "显示按钮高度",
+        ["Alert icon scale"]                          = "警报图标缩放",
+        ["Total"]                                     = "总计",
+        ["Repeat"]                                    = "重复",
+        ["Avg Per Day"]                               = "日均",
+        ["Peak Per Hour"]                             = "峰值/小时",
+        ["Median Per Customer"]                       = "中位数/客户",
+        ["Median Per Customer Filtered"]              = "中位数/客户重复",
+        ["No analytics data"]                         = "没有分析数据",
+        ["Reset Analytics"]                           = "重置分析数据",
+        ["Analytics Options"]                         = "分析选项",
+
+        ["1 minute"]                                  = "1分钟",
+        ["15 minutes "]                               = "15分钟",
+        ["1 hour"]                                    = "1小时",
+        ["1 day"]                                     = "1天",
+        ["1 week "]                                   = "1周",
+        ["30 days"]                                   = "30天",
+        ["180 days"]                                  = "180天",
+        ["1 year"]                                    = "1年",
+        ["Clear recent data"]                         = "清除近期数据",
+        ["Newer than"]                                = "比...新",
+        ["Clear old data"]                            = "清除旧数据",
+        ["Older than"]                                = "比...旧",
+        ["1 Minute Bins"]                             = "1分钟时间段",
+        ["5 Minute Bins"]                             = "5分钟时间段",
+        ["10 Minute Bins"]                            = "10分钟时间段",
+        ["30 Minute Bins"]                            = "30分钟时间段",
+        ["1 Hour Bins"]                               = "1小时时间段",
+        ["6 Hour Bins"]                               = "6小时时间段",
+        ["12 Hour Bins"]                              = "12小时时间段",
+        ["24 Hour Bins"]                              = "24小时时间段",
+        ["1 Week Bins"]                               = "1周时间段",
+
+        [LID.ANALYTICS_ITEM_TOOLTIP]                  =
+        "物品通过确保消息匹配全球包含和排除关键词来匹配，然后查找物品链接中的品质图标。没有全球手工制作物品列表或方法来确定物品ID是否为手工制作，因此这是我们能做到的最好方式。",
+        [LID.ANALYTICS_PROFESSION_TOOLTIP]            =
+        "没有从物品到制作它的职业的反向查找。如果你的角色能制作该物品，职业会自动分配。当打开一个职业时，任何未知物品会被分配给该职业。你也可以手动分配职业。",
+        [LID.ANALYTICS_TOTAL_TOOLTIP]                 =
+        "该物品被请求的总次数。相同客户在同一小时内的重复请求不计入。",
+        [LID.ANALYTICS_REPEAT_TOOLTIP]                =
+        "相同客户在同一小时内多次请求该物品的总次数。\n\n如果该值接近总数，则该物品的供应可能不足。\n\n在首次请求后15秒内的重复请求会被忽略。",
+        [LID.ANALYTICS_AVERAGE_TOOLTIP]               = "该物品每天的平均请求数量。",
+        [LID.ANALYTICS_PEAK_TOOLTIP]                  = "该物品每小时的请求峰值数量。",
+        [LID.ANALYTICS_MEDIAN_TOOLTIP]                =
+        "同一客户在同一小时内请求同一物品的中位数次数。\n\n值为1表示至少一半的请求由某人满足，需求可能得到了满足。\n\n如果该值很高，可能是值得追求的好物品。",
+        [LID.ANALYTICS_MEDIAN_TOOLTIP_FILTERED]       =
+        "同一客户在同一小时内请求同一物品的中位数次数，仅限于请求多次的情况。\n\n如果该值不是1，但未过滤中位数为1，则表明有时需求没有得到满足。",
+        ["Request Count"]                             = "请求次数",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
+        "'%s'已发送请求以链接账户。\n\n请求的权限包括：\n\n%s\n\n除非你发送了请求，否则请勿接受完全权限。\n\n输入另一个账户的昵称：",
+        [LID.LINKED_ACCOUNT_REJECTED]                 = "CraftScan: 关联账户请求失败。原因：%s",
+        [LID.LINKED_ACCOUNT_USER_REJECTED]            = "目标账户拒绝了请求。",
+
+        [LID.LINKED_ACCOUNT_PERMISSION_FULL]          = "完全控制",
+        [LID.LINKED_ACCOUNT_PERMISSION_ANALYTICS]     = "分析同步",
+        [LID.ACCOUNT_LINK_PERMISSIONS_DESC]           = "请求与关联账户的以下权限。",
+        [LID.ACCOUNT_LINK_FULL_CONTROL_DESC]          =
+        "同步所有角色数据，并支持所有其他权限。",
+        [LID.ACCOUNT_LINK_ANALYTICS_DESC]             =
+        "仅通过账户菜单手动同步两个账户之间的分析数据。任一账户随时可以触发双向同步。绝不会自动完成。由于没有角色被导入，你将仅与此处指定的角色同步。你可以从账户菜单手动添加更多关联账户的角色。",
+        ["Sync Analytics"]                            = "同步分析",
+        ["Sync Recent Analytics"]                     = "同步近期分析",
+        [LID.ANALYTICS_PROF_MISMATCH]                 =
+        "|cFFFF0000CraftScan: 警告: 分析同步职业不匹配。物品: %s。本地职业: %s。关联职业: %s.|r",
+        [LID.RN_ANALYTICS]                            = "分析",
+        [LID.RN_ANALYTICS + 1]                        =
+        "CraftScan现在扫描聊天中的任何手工制作物品，结合你的全球关键词（例如，LF、recraft等...），即使你无法制作该物品。记录时间并检测到的物品会显示在聊天中的通常订单下方。",
+        [LID.RN_ANALYTICS + 2]                        =
+        "'重复'的概念用于判断物品的供应是否不足。CraftScan会记住谁在过去一小时内请求了什么，如果他们再次请求相同的物品，则记录为重复。新网格的列标题有工具提示解释其意图。",
+        [LID.RN_ANALYTICS + 3]                        =
+        "通过在交易聊天中停留足够长的时间，这应该能建立起哪些职业树的分支值得投资的良好视图。",
+        [LID.RN_ANALYTICS + 4]                        =
+        "分析可以在多个账户之间同步。你可以在交易中停留试用账户一天以收集数据，然后将其同步到你的主账户。你现在还可以与朋友创建仅分析的账户链接，支持双向同步，将你的分析合并在一起。一旦收集数据变得庞大，便有选项仅同步上次账户同步以来的数据。",
+        [LID.RN_ALERT_ICON_ANCHOR]                    = "警报图标锚定更新",
+        [LID.RN_ALERT_ICON_ANCHOR + 1]                =
+        "当UI隐藏时，警报图标将正确隐藏。这个变化稍微移动并缩放了我的屏幕。如果按钮因为这个而移出了你的屏幕，右键点击聊天订单页面右上角的'打开设置'按钮会有重置选项。",
+        [LID.BUSY_RIGHT_NOW]                          = "忙碌模式",
+        [LID.GREETING_BUSY]                           = "我现在很忙，但如果你发过来，我可以稍后制作。",
+        [LID.BUSY_HELP]                               =
+        "|cFFFFFFFF勾选时，在回复中附加忙碌问候。使用下面的按钮编辑你的忙碌问候。\n\n这旨在用于第二个账户代理订单，以便你在主账户外出时能接收订单。\n\n当前忙碌问候: |cFF00FF00%s|r|r",
+        ["Custom Explanations"]                       = "自定义说明",
+        ["Create"]                                    = "创建",
+        ["Modify"]                                    = "修改",
+        ["Delete"]                                    = "删除",
+        [LID.EXPLANATION_LABEL_DESC]                  =
+        "输入一个标签，你将在聊天中右键点击客户名称时看到它。",
+        [LID.EXPLANATION_DUPLICATE_LABEL]             = "该标签已在使用中。",
+        [LID.EXPLANATION_TEXT_DESC]                   = "输入当标签被点击时发送给客户的消息。新行作为单独消息发送。长行会被拆分以适应最大消息长度。",
+        ["Create an Explanation"]                     = "创建说明",
+        ["Save"]                                      = "保存",
+        ["Reset"]                                     = "重置",
+        [LID.MANUAL_MATCHING_TITLE]                   = "手动匹配",
+        [LID.MANUAL_MATCH]                            = "%s - %s", -- 制作者，职业
+        [LID.MANUAL_MATCHING_DESC]                    =
+        "忽略主要关键词并强制匹配此消息。CraftScan将尝试根据消息找到正确的制作者，但如果没有找到匹配项，将使用指定制作者的默认问候。匹配通过通常的方式报告，允许你点击横幅或表格行以发送问候。",
+
+        [LID.RN_MANUAL_MATCH]                         = "手动匹配",
+        [LID.RN_MANUAL_MATCH + 1]                     =
+        "在聊天中右键点击玩家名称时的上下文菜单现在包括CraftScan选项。",
+        [LID.RN_MANUAL_MATCH + 2]                     =
+        "此菜单包括你所有的制作者和职业。点击其中一个将强制再次匹配该消息，而不考虑“主要关键词”（例如LF、WTB、recraft等...），以防客户使用非标准术语。",
+        [LID.RN_MANUAL_MATCH + 3]                     =
+        "如果消息仍然不匹配，将强制使用你点击的制作者和职业的默认问候进行匹配。",
+        [LID.RN_MANUAL_MATCH + 4]                     =
+        "此点击不会自动发送消息给客户。它以通常方式生成匹配，然后你可以检查生成的回复并选择是否发送。",
+        [LID.RN_MANUAL_MATCH + 5]                     = "(抱歉，没有机器学习。)",
+        [LID.RN_CUSTOM_EXPLANATIONS]                  = "自定义说明",
+        [LID.RN_CUSTOM_EXPLANATIONS + 1]              =
+        "‘聊天订单’页面现在包括一个‘自定义说明’按钮。此处配置的说明也会出现在聊天上下文菜单中，点击它们将立即发送说明。",
+        [LID.RN_CUSTOM_EXPLANATIONS + 2]              =
+        "说明按字母顺序排序，因此你可以对它们编号以强制所需顺序。",
+        [LID.RN_BUSY_MODE]                            = "忙碌模式",
+        [LID.RN_BUSY_MODE + 1]                        =
+        "这个功能已经存在几次版本，但从未解释过。在‘聊天订单’页面上有一个新的‘忙碌模式’复选框。勾选时，在回复中附加忙碌问候。使用‘自定义问候’按钮编辑你的忙碌问候。",
+        [LID.RN_BUSY_MODE + 2]                        =
+        "这旨在用于第二个账户代理订单，以便你在主账户外出时能接收订单，客户会知道你不能立即制作。",
+        ["Release Notes"]                             = "发布说明",
+
 
     }
 end

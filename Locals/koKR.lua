@@ -218,6 +218,117 @@ function CraftScan.LOCAL_KO:GetData()
         ["alt name and then profession name"]         = "대체 이름 및 직업 이름",
         [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
         "이 텍스트는 %d개 이하의 %%s 자리 표시자를 포함해야 %s를 포함할 수 있습니다. %d개를 포함했습니다.\n\nCraftScan은 더 적은 자리 표시자로도 작동하지만, 컨텍스트를 위해 포함하는 것이 좋습니다.",
+        ["Pixels"]                                    = "픽셀",
+        ["Show button height"]                        = "버튼 높이 표시",
+        ["Alert icon scale"]                          = "경고 아이콘 비율",
+        ["Total"]                                     = "총계",
+        ["Repeat"]                                    = "반복",
+        ["Avg Per Day"]                               = "일일 평균",
+        ["Peak Per Hour"]                             = "시간당 최대",
+        ["Median Per Customer"]                       = "고객 중앙값",
+        ["Median Per Customer Filtered"]              = "고객 반복 중앙값",
+        ["No analytics data"]                         = "분석 데이터 없음",
+        ["Reset Analytics"]                           = "분석 초기화",
+        ["Analytics Options"]                         = "분석 옵션",
+
+        ["1 minute"]                                  = "1분",
+        ["15 minutes "]                               = "15분 ",
+        ["1 hour"]                                    = "1시간",
+        ["1 day"]                                     = "1일",
+        ["1 week "]                                   = "1주 ",
+        ["30 days"]                                   = "30일",
+        ["180 days"]                                  = "180일",
+        ["1 year"]                                    = "1년",
+        ["Clear recent data"]                         = "최근 데이터 삭제",
+        ["Newer than"]                                = "이전보다 최근",
+        ["Clear old data"]                            = "오래된 데이터 삭제",
+        ["Older than"]                                = "이전보다 오래됨",
+        ["1 Minute Bins"]                             = "1분 단위",
+        ["5 Minute Bins"]                             = "5분 단위",
+        ["10 Minute Bins"]                            = "10분 단위",
+        ["30 Minute Bins"]                            = "30분 단위",
+        ["1 Hour Bins"]                               = "1시간 단위",
+        ["6 Hour Bins"]                               = "6시간 단위",
+        ["12 Hour Bins"]                              = "12시간 단위",
+        ["24 Hour Bins"]                              = "24시간 단위",
+        ["1 Week Bins"]                               = "1주 단위",
+
+        [LID.ANALYTICS_ITEM_TOOLTIP]                  =
+        "아이템은 메시지가 글로벌 포함 및 제외 키워드와 일치하는지 확인한 다음 아이템 링크에서 품질 아이콘을 찾는 방식으로 매치됩니다. 제작된 아이템에 대한 글로벌 목록이나 itemID가 제작된 것인지 확인하는 방법이 없으므로, 이것이 우리가 할 수 있는 최선입니다.",
+        [LID.ANALYTICS_PROFESSION_TOOLTIP]            =
+        "아이템에서 그것을 제작하는 직업으로 역 검색하는 기능이 없습니다. 만약 당신의 캐릭터 중 하나가 아이템을 제작할 수 있다면, 직업이 자동으로 할당됩니다. 직업이 열리면 그 직업에 속한 알려지지 않은 아이템이 할당됩니다. 또한 직업을 수동으로 할당할 수도 있습니다.",
+        [LID.ANALYTICS_TOTAL_TOOLTIP]                 = "이 아이템이 요청된 총 횟수입니다. 같은 고객이 동일한 시간 내에 요청한 중복 요청은 포함되지 않습니다.",
+        [LID.ANALYTICS_REPEAT_TOOLTIP]                =
+        "같은 고객이 같은 시간 내에 여러 번 요청한 이 아이템의 총 요청 횟수입니다.\n\n이 값이 총계에 가깝다면, 이 아이템의 공급이 부족할 가능성이 높습니다.\n\n처음 요청한 후 15초 이내에 중복 요청은 무시됩니다.",
+        [LID.ANALYTICS_AVERAGE_TOOLTIP]               = "이 아이템의 일일 평균 요청 수입니다.",
+        [LID.ANALYTICS_PEAK_TOOLTIP]                  = "이 아이템의 시간당 최대 요청 수입니다.",
+        [LID.ANALYTICS_MEDIAN_TOOLTIP]                =
+        "동일한 고객이 동일한 시간 내에 요청한 이 아이템의 중앙값입니다.\n\n값이 1인 경우, 모든 요청의 최소 절반이 누군가에 의해 충족되고 있음을 나타내며, 이 아이템에 대한 수요가 만족되고 있음을 의미합니다.\n\n이 값이 높다면, 이 아이템을 제작할 수 있는 좋은 기회일 수 있습니다.",
+        [LID.ANALYTICS_MEDIAN_TOOLTIP_FILTERED]       =
+        "동일한 고객이 동일한 시간 내에 요청한 이 아이템의 중앙값이며, 여러 번 요청한 요청만 필터링합니다.\n\n이 값이 1이 아니지만 필터링되지 않은 중앙값이 1이라면, 수요가 충족되지 않는 경우가 있다는 것을 나타냅니다.",
+        ["Request Count"]                             = "요청 수",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
+        "'%s'가 계정 연결 요청을 보냈습니다.\n\n요청된 권한:\n\n%s\n\n요청을 보낸 것이 아니라면 전체 권한을 수락하지 마세요.\n\n상대 계정을 위한 별명을 입력하세요:",
+        [LID.LINKED_ACCOUNT_REJECTED]                 = "CraftScan: 연결된 계정 요청 실패. 이유: %s",
+        [LID.LINKED_ACCOUNT_USER_REJECTED]            = "대상 계정이 요청을 거부했습니다.",
+
+        [LID.LINKED_ACCOUNT_PERMISSION_FULL]          = "전체 제어",
+        [LID.LINKED_ACCOUNT_PERMISSION_ANALYTICS]     = "분석 동기화",
+        [LID.ACCOUNT_LINK_PERMISSIONS_DESC]           = "연결된 계정에서 다음 권한 요청.",
+        [LID.ACCOUNT_LINK_FULL_CONTROL_DESC]          = "모든 캐릭터 데이터를 동기화하고 모든 다른 권한을 지원합니다.",
+        [LID.ACCOUNT_LINK_ANALYTICS_DESC]             =
+        "두 계정 간에 수동으로 분석 데이터만 동기화합니다. 두 계정 중 어느 쪽도 언제든지 양방향 동기화를 시작할 수 있습니다. 자동으로는 절대 이루어지지 않습니다. 캐릭터가 가져오지 않으므로, 여기서 지정된 캐릭터와만 동기화됩니다. 연결된 계정의 추가 알트를 수동으로 계정 메뉴에서 추가할 수 있습니다.",
+        ["Sync Analytics"]                            = "분석 동기화",
+        ["Sync Recent Analytics"]                     = "최근 분석 동기화",
+        [LID.ANALYTICS_PROF_MISMATCH]                 = "|cFFFF0000CraftScan: 경고: 분석 동기화 직업 불일치. 아이템: %s. 로컬 직업: %s. 연결된 직업: %s.|r",
+        [LID.RN_ANALYTICS]                            = "분석",
+        [LID.RN_ANALYTICS + 1]                        =
+        "CraftScan은 이제 채팅에서 제작된 아이템과 글로벌 키워드(예: LF, 재제작 등...)가 결합된 모든 내용을 스캔합니다. 아이템을 제작할 수 없더라도, 시간은 기록되고 감지된 아이템은 채팅에서 일반적인 주문 아래에 표시됩니다.",
+        [LID.RN_ANALYTICS + 2]                        =
+        "'반복'이라는 개념은 아이템의 공급 부족을 판단하는 데 사용됩니다. CraftScan은 지난 한 시간 동안 누가 무엇을 요청했는지 기억하며, 동일한 것을 다시 요청하면 반복으로 기록됩니다. 새 그리드의 열 머리글에는 의도를 설명하는 툴팁이 있습니다.",
+        [LID.RN_ANALYTICS + 3]                        = "거래 채팅에서 충분한 시간 동안 주차된 캐릭터로, 직업 나무의 어떤 지점에 투자할 가치가 있는지를 잘 알 수 있습니다.",
+        [LID.RN_ANALYTICS + 4]                        =
+        "분석은 여러 계정 간에 동기화할 수 있습니다. 하루 종일 거래에서 데이터 수집을 위해 시험 계정을 주차할 수 있으며, 그 데이터를 주 계정으로 동기화할 수 있습니다. 이제 친구와 분석 전용 계정 링크를 만들 수 있으며, 양방향 동기화를 지원하여 분석을 통합합니다. 수집량이 많아지면, 마지막 동기화 이후의 데이터만 동기화하는 옵션이 있습니다.",
+        [LID.RN_ALERT_ICON_ANCHOR]                    = "경고 아이콘 고정 업데이트",
+        [LID.RN_ALERT_ICON_ANCHOR + 1]                =
+        "UI가 숨겨질 때 경고 아이콘이 올바르게 숨겨질 것입니다. 변경으로 인해 내 화면에서 약간 이동하고 축소되었습니다. 만약 이로 인해 버튼이 화면에서 이동했다면, 채팅 주문 페이지 오른쪽 상단의 '설정 열기' 버튼을 오른쪽 클릭하면 재설정 옵션이 있습니다.",
+        [LID.BUSY_RIGHT_NOW]                          = "바쁨 모드",
+        [LID.GREETING_BUSY]                           = "지금 바쁩니다. 하지만 나중에 만들 수 있습니다.",
+        [LID.BUSY_HELP]                               =
+        "|cFFFFFFFF체크할 경우, 응답에 바쁨 인사를 추가합니다. 아래 버튼으로 바쁨 인사를 수정하세요.\n\n이것은 주 계정으로 외출 중 주문을 받을 수 있도록 주문을 대리하는 두 번째 계정에서 사용하기 위한 것입니다.\n\n현재 바쁨 인사: |cFF00FF00%s|r|r",
+        ["Custom Explanations"]                       = "사용자 정의 설명",
+        ["Create"]                                    = "생성",
+        ["Modify"]                                    = "수정",
+        ["Delete"]                                    = "삭제",
+        [LID.EXPLANATION_LABEL_DESC]                  = "채팅에서 고객 이름을 오른쪽 클릭할 때 볼 수 있는 레이블을 입력하세요.",
+        [LID.EXPLANATION_DUPLICATE_LABEL]             = "이 레이블은 이미 사용 중입니다.",
+        [LID.EXPLANATION_TEXT_DESC]                   = "레이블을 클릭할 때 고객에게 보낼 메시지를 입력하세요. 새 줄은 별도의 메시지로 전송됩니다. 긴 줄은 최대 메시지 길이에 맞게 분할됩니다.",
+        ["Create an Explanation"]                     = "설명 만들기",
+        ["Save"]                                      = "저장",
+        ["Reset"]                                     = "재설정",
+        [LID.MANUAL_MATCHING_TITLE]                   = "수동 일치",
+        [LID.MANUAL_MATCH]                            = "%s - %s", -- 제작자, 직업
+        [LID.MANUAL_MATCHING_DESC]                    =
+        "주요 키워드를 무시하고 이 메시지에 대한 일치를 강제합니다. CraftScan은 메시지에 따라 올바른 제작자를 찾으려고 하지만, 일치하는 항목이 없으면 지정된 제작자에 대한 기본 인사가 사용됩니다. 일치는 일반적인 방법으로 보고되며, 배너 또는 테이블 행을 클릭하여 인사를 보낼 수 있습니다.",
+
+        [LID.RN_MANUAL_MATCH]                         = "수동 일치",
+        [LID.RN_MANUAL_MATCH + 1]                     = "채팅에서 플레이어 이름을 오른쪽 클릭할 때 컨텍스트 메뉴에 CraftScan 옵션이 추가되었습니다.",
+        [LID.RN_MANUAL_MATCH + 2]                     =
+        "이 메뉴에는 모든 제작자와 직업이 포함됩니다. 이 중 하나를 클릭하면 '주요 키워드'(예: LF, WTB, 재제작 등...)를 고려하지 않고 일치를 찾기 위해 메시지에 대한 또 다른 처리를 강제합니다.",
+        [LID.RN_MANUAL_MATCH + 3]                     = "메시지가 여전히 일치하지 않는 경우, 클릭한 제작자 및 직업에 대한 기본 인사로 일치를 강제합니다.",
+        [LID.RN_MANUAL_MATCH + 4]                     =
+        "이 클릭은 자동으로 고객에게 메시지를 보내지 않습니다. 일반적인 방법으로 일치를 생성한 후, 생성된 응답을 검사하고 보내거나 말거나 선택할 수 있습니다.",
+        [LID.RN_MANUAL_MATCH + 5]                     = "(죄송합니다, 기계 학습이 없습니다.)",
+        [LID.RN_CUSTOM_EXPLANATIONS]                  = "사용자 정의 설명",
+        [LID.RN_CUSTOM_EXPLANATIONS + 1]              =
+        "'채팅 주문' 페이지에 '사용자 정의 설명' 버튼이 추가되었습니다. 여기에서 구성된 설명은 채팅의 컨텍스트 메뉴에도 표시되며, 클릭하면 즉시 설명이 전송됩니다.",
+        [LID.RN_CUSTOM_EXPLANATIONS + 2]              = "설명은 알파벳순으로 정렬되므로, 원하는 순서를 강제로 만들기 위해 번호를 매길 수 있습니다.",
+        [LID.RN_BUSY_MODE]                            = "바쁨 모드",
+        [LID.RN_BUSY_MODE + 1]                        =
+        "몇 가지 릴리스 동안 존재했지만 설명되지 않았습니다. '채팅 주문' 페이지에 새로운 '바쁨 모드' 체크박스가 있습니다. 체크하면 응답에 바쁨 인사를 추가합니다. '인사 사용자 정의' 버튼으로 바쁨 인사를 수정합니다.",
+        [LID.RN_BUSY_MODE + 2]                        = "이는 주문을 대리하는 두 번째 계정과 함께 사용하기 위한 것으로, 외출 중에도 주문을 받을 수 있으며 고객은 즉시 제작할 수 없다는 것을 알게 됩니다.",
+        ["Release Notes"]                             = "릴리스 노트",
+
 
 
 

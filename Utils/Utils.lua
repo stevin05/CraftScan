@@ -48,10 +48,14 @@ function CraftScan.Utils.ColorizeProfessionName(profID, professionName)
     return CraftScan.Utils.ColorizeText(professionName, color);
 end
 
-function CraftScan.Utils.ColorizedProfessionNameByID(professionID)
+function CraftScan.Utils.ProfessionNameByID(professionID)
     local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(professionID);
-    return CraftScan.Utils.ColorizeProfessionName(profInfo.professionID,
-        profInfo.professionName)
+    return profInfo.professionName;
+end
+
+function CraftScan.Utils.ColorizedProfessionNameByID(professionID)
+    return CraftScan.Utils.ColorizeProfessionName(professionID,
+        CraftScan.Utils.ProfessionNameByID(professionID))
 end
 
 function CraftScan.Utils.SendResponses(responses, customer)
@@ -651,124 +655,6 @@ function CraftScan.Utils.GetSetting(key)
     return CraftScan.CONST.DEFAULT_SETTINGS[key];
 end
 
-CraftScan_RecentUpdatesMixin = {}
-
-local function CompareVersions(version1, version2)
-    local function extractVersion(version)
-        local numbers = {}
-        for num in version:gmatch("%d+") do
-            table.insert(numbers, tonumber(num))
-        end
-        return numbers
-    end
-
-    local v1 = extractVersion(version1);
-    local v2 = extractVersion(version2);
-    for i = 1, 3 do
-        if v1[i] < v2[i] then return -1 end
-        if v1[i] > v2[i] then return 1 end
-    end
-    return 0
-end
-
-CraftScan.CONST.CURRENT_VERSION = 'v1.2.6';
-
-function CraftScan_RecentUpdatesMixin:OnHide()
-    CraftScan.DB.settings.last_loaded_version = CraftScan.CONST.CURRENT_VERSION;
-    CraftScanRecentUpdatesFrame = nil;
-end
-
-local function NotifyRecentChanges()
-    local lastLoadedVersion = CraftScan.Utils.GetSetting('last_loaded_version');
-    if type(lastLoadedVersion) ~= 'string' then
-        lastLoadedVersion = 'v0.0.0';
-    end
-
-    if CompareVersions(CraftScan.CONST.CURRENT_VERSION, lastLoadedVersion) <= 0 then
-        return;
-    end
-
-    local releaseNotes = {
-        {
-            version = 'v1.0.0',
-            id = LID.RN_WELCOME,
-        },
-        {
-            version = 'v1.0.0',
-            id = LID.RN_INITIAL_SETUP,
-        },
-        {
-            version = 'v1.0.0',
-            id = LID.RN_INITIAL_TESTING,
-        },
-        {
-            version = 'v1.0.0',
-            id = LID.RN_MANAGING_CRAFTERS,
-        },
-        {
-            version = 'v1.0.0',
-            id = LID.RN_MANAGING_CUSTOMERS,
-        },
-        {
-            version = 'v1.0.0',
-            id = LID.RN_KEYBINDS,
-        },
-        {
-            version = 'v1.0.10',
-            id = LID.RN_CLEANUP,
-        },
-        {
-            version = 'v1.2.0',
-            id = LID.RN_LINKED_ACCOUNTS,
-        },
-        {
-            version = 'v1.2.5',
-            id = LID.RN_ANALYTICS,
-        },
-        {
-            version = 'v1.2.6',
-            id = LID.RN_ALERT_ICON_ANCHOR,
-        },
-    };
-
-
-    local anchor = AnchorUtil.CreateAnchor("TOP", CraftScanRecentUpdatesFrame.ScrollFrame.Content, "TOP");
-    local organizer = CraftScan.Frames.CreateVerticalLayoutOrganizer(anchor, 0, 0);
-
-    local function CreateSection(section)
-        local frame = CreateFrame("Frame", nil, CraftScanRecentUpdatesFrame.ScrollFrame.Content,
-            "CraftScan_RecentUpdatesSectionTemplate");
-        organizer:Add(frame);
-
-        frame.Header:SetText(L(section.id));
-        frame.Version:SetText(string.format("%s %s", L("Version"), section.version));
-
-        local body = L(section.id + 1);
-        local i = 2;
-        local b = L(section.id + i);
-        while b ~= section.id + i do
-            body = body .. '\n\n' .. b;
-            i = i + 1;
-            b = L(section.id + i);
-        end
-        frame.Body:SetText(body);
-        frame:SetSize(360, frame.Body:GetStringHeight() + 40)
-    end
-
-    for _, entry in ipairs(releaseNotes) do
-        if CompareVersions(entry.version, lastLoadedVersion) > 0 then
-            CreateSection(entry);
-        end
-    end
-
-    if not organizer:Empty() then
-        organizer:Layout();
-        CraftScan.Frames.makeMovable(CraftScanRecentUpdatesFrame)
-        CraftScanRecentUpdatesFrame.ScrollFrame:SetScrollChild(CraftScanRecentUpdatesFrame.ScrollFrame.Content)
-        CraftScanRecentUpdatesFrame:SetTitle(L("CraftScan Release Notes"));
-        CraftScanRecentUpdatesFrame:Show();
-    end
-end
 
 local once = false
 local function doOnce()
@@ -843,7 +729,7 @@ local function doOnce()
         });
     end
 
-    NotifyRecentChanges();
+    CraftScan.NotifyRecentChanges();
 
     CraftScanComm:ShareCharacterData();
 

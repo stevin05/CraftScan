@@ -112,6 +112,12 @@ CraftScan.CONST.TEXT = {
     BUSY_RIGHT_NOW                          = 108,
     GREETING_BUSY                           = 110,
     BUSY_HELP                               = 109,
+    EXPLANATION_LABEL_DESC                  = 110,
+    EXPLANATION_DUPLICATE_LABEL             = 111,
+    EXPLANATION_TEXT_DESC                   = 112,
+    MANUAL_MATCHING_TITLE                   = 113,
+    MANUAL_MATCH                            = 114,
+    MANUAL_MATCHING_DESC                    = 115,
 
 
 
@@ -127,6 +133,9 @@ CraftScan.CONST.TEXT = {
     RN_LINKED_ACCOUNTS = 10700,
     RN_ANALYTICS = 10800,
     RN_ALERT_ICON_ANCHOR = 10900,
+    RN_MANUAL_MATCH = 11000,
+    RN_CUSTOM_EXPLANATIONS = 12000,
+    RN_BUSY_MODE = 13000,
 }
 
 CraftScan.CONST.LOCALES = {

@@ -30,6 +30,7 @@ Locals/zhCN.lua
 Locals/Localization.lua
 
 Utils/Utils.xml
+Utils/ReleaseNotes.xml
 Utils/Comm.lua
 Utils/Dialog.xml
 Utils/TooltipPlot.lua

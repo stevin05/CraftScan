@@ -3,6 +3,7 @@
 ..\..\FrameXML\UI.xsd">
 
 	<Script file="OrderPage.lua"/>
+	<Script file="CustomExplanations.lua"/>
 
 	<Button name="CraftScanCrafterOrderListElementTemplate" mixin="CraftScanCrafterOrderListElementMixin" registerForClicks="LeftButtonUp, RightButtonUp, MiddleButtonUp" virtual="true">
 		<Size y="20"/>
@@ -248,6 +249,17 @@
 				<Size x="120" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="CraftScanCraftingOrderPage" relativePoint="TOPRIGHT" x="-32" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+
+			<Button parentKey="ReleaseNotesButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonUp" mixin="CraftScan_ReleaseNotesButtonMixin" frameLevel="510">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent.SettingsButton" relativePoint="LEFT" x="-2" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad method="OnLoad"/>
@@ -570,6 +582,15 @@
 						</Scripts>
 					</DropdownButton>
 
+					<DropdownButton parentKey="CustomExplanationsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_CustomExplanationsButtonMixin">
+						<Size x="120" y="22"/>
+						<Anchors>
+							<Anchor point="RIGHT" relativeKey="$parent.ResetAnalyticsButton" relativePoint="LEFT" x="-5" y="0"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+						</Scripts>
+					</DropdownButton>
 
 					<Frame parentKey="AnalyticsTable" mixin="CraftScanAnalyticsTableMixin">
 						<Size x="300" y="250"/>

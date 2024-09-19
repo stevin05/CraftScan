@@ -12,11 +12,11 @@ function CraftScan.LOCAL_PT:GetData()
         [LID.RENABLE_ADDONS]                          = "Reativar Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Salve sua lista de addons e, em seguida, desative-os, permitindo uma troca rápida para um personagem alternativo. Este botão pode ser clicado novamente para reativar os addons a qualquer momento.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Posso criar %s.",                        -- ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Posso criar %s.",                                -- ItemLink
         [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Meu personagem alternativo, %s, pode criar %s.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "isso",
-        [LID.GREETING_I_HAVE_PROF]                    = "Eu tenho %s.",                           -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "Meu personagem alternativo, %s, tem %s.", -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "Eu tenho %s.",                                   -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "Meu personagem alternativo, %s, tem %s.",        -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Me avise se você enviar um pedido para que eu possa fazer login.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Alternar Página de Pedido",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Saudar Cliente com Banner",
@@ -227,6 +227,127 @@ function CraftScan.LOCAL_PT:GetData()
         ["alt name and then profession name"]         = "nome alternativo e depois o nome da profissão",
         [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
         "Este texto deve conter %d ou menos marcadores %%s para conter o %s. Você incluiu %d.\n\nCraftScan funcionará com menos marcadores, mas você provavelmente vai querer incluí-los para contexto.",
+        ["Pixels"]                                    = "Pixels",
+        ["Show button height"]                        = "Mostrar altura do botão",
+        ["Alert icon scale"]                          = "Escala do ícone de alerta",
+        ["Total"]                                     = "Total",
+        ["Repeat"]                                    = "Repetir",
+        ["Avg Per Day"]                               = "Média/Dia",
+        ["Peak Per Hour"]                             = "Pico/Hora",
+        ["Median Per Customer"]                       = "Mediana/Cliente",
+        ["Median Per Customer Filtered"]              = "Mediana/Cliente Repetido",
+        ["No analytics data"]                         = "Sem dados de análise",
+        ["Reset Analytics"]                           = "Redefinir Análise",
+        ["Analytics Options"]                         = "Opções de Análise",
+
+        ["1 minute"]                                  = "1 minuto",
+        ["15 minutes "]                               = "15 minutos ",
+        ["1 hour"]                                    = "1 hora",
+        ["1 day"]                                     = "1 dia",
+        ["1 week "]                                   = "1 semana ",
+        ["30 days"]                                   = "30 dias",
+        ["180 days"]                                  = "180 dias",
+        ["1 year"]                                    = "1 ano",
+        ["Clear recent data"]                         = "Limpar dados recentes",
+        ["Newer than"]                                = "Mais recente que",
+        ["Clear old data"]                            = "Limpar dados antigos",
+        ["Older than"]                                = "Mais velho que",
+        ["1 Minute Bins"]                             = "1 Minuto",
+        ["5 Minute Bins"]                             = "5 Minutos",
+        ["10 Minute Bins"]                            = "10 Minutos",
+        ["30 Minute Bins"]                            = "30 Minutos",
+        ["1 Hour Bins"]                               = "1 Hora",
+        ["6 Hour Bins"]                               = "6 Horas",
+        ["12 Hour Bins"]                              = "12 Horas",
+        ["24 Hour Bins"]                              = "24 Horas",
+        ["1 Week Bins"]                               = "1 Semana",
+
+        [LID.ANALYTICS_ITEM_TOOLTIP]                  =
+        "Os itens são correspondidos verificando se a mensagem corresponde a palavras-chave globais de inclusão e exclusão, e então procurando o ícone de qualidade no link do item. Não há como verificar uma lista global de itens criados ou se um item foi criado por um itemID, então essa é a melhor que podemos fazer.",
+        [LID.ANALYTICS_PROFESSION_TOOLTIP]            =
+        "Não há funcionalidade de pesquisa reversa para encontrar a profissão que criou o item. Se um dos seus personagens pode criar o item, a profissão será atribuída automaticamente. Quando a profissão é aberta, um item desconhecido associado a essa profissão será atribuído. Você também pode atribuir a profissão manualmente.",
+        [LID.ANALYTICS_TOTAL_TOOLTIP]                 =
+        "Este é o número total de solicitações para este item. Solicitações duplicadas do mesmo cliente dentro do mesmo período não são incluídas.",
+        [LID.ANALYTICS_REPEAT_TOOLTIP]                =
+        "Este é o número total de solicitações para este item, feito várias vezes pelo mesmo cliente dentro do mesmo período.\n\nSe este valor estiver próximo do total, há uma alta chance de que a oferta deste item esteja escassa.\n\nSolicitações duplicadas feitas dentro de 15 segundos após o primeiro pedido são ignoradas.",
+        [LID.ANALYTICS_AVERAGE_TOOLTIP]               = "Este é o número médio de solicitações diárias para este item.",
+        [LID.ANALYTICS_PEAK_TOOLTIP]                  = "Este é o número máximo de solicitações por hora para este item.",
+        [LID.ANALYTICS_MEDIAN_TOOLTIP]                =
+        "Este é o valor mediano das solicitações para este item, feitas pelo mesmo cliente dentro do mesmo período.\n\nSe o valor for 1, isso indica que pelo menos metade de todos os pedidos foram atendidos por alguém, indicando que a demanda por este item está sendo atendida.\n\nSe esse valor for maior, pode haver uma boa oportunidade para fabricar este item.",
+        [LID.ANALYTICS_MEDIAN_TOOLTIP_FILTERED]       =
+        "Este é o valor mediano das solicitações para este item, feitas pelo mesmo cliente dentro do mesmo período, filtrando apenas os pedidos que foram feitos várias vezes.\n\nSe este valor não for 1, mas o valor mediano não filtrado for 1, isso indica que pode haver casos em que a demanda não está sendo atendida.",
+        ["Request Count"]                             = "Contagem de Solicitações",
+        [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
+        "'%s' enviou um pedido para conectar contas.\n\nPermissões solicitadas:\n\n%s\n\nNão aceite permissões totais a menos que tenha enviado o pedido.",
+        [LID.LINKED_ACCOUNT_REJECTED]                 = "CraftScan: Falha ao conectar conta. Razão: %s",
+        [LID.LINKED_ACCOUNT_USER_REJECTED]            = "A conta de destino rejeitou o pedido.",
+
+        [LID.LINKED_ACCOUNT_PERMISSION_FULL]          = "Controle Total",
+        [LID.LINKED_ACCOUNT_PERMISSION_ANALYTICS]     = "Sincronização de Análise",
+        [LID.ACCOUNT_LINK_PERMISSIONS_DESC]           = "Permissões solicitadas da conta conectada.",
+        [LID.ACCOUNT_LINK_FULL_CONTROL_DESC]          =
+        "Sincroniza todos os dados de personagens e suporta todas as outras permissões.",
+        [LID.ACCOUNT_LINK_ANALYTICS_DESC]             =
+        "Sincroniza apenas dados de análise entre as duas contas manualmente. Qualquer conta pode iniciar a sincronização bidirecional a qualquer momento. Nunca acontece automaticamente. Não importa qual personagem você está trazendo, apenas os que estão especificados aqui serão sincronizados. Personagens adicionais na conta conectada podem ser adicionados manualmente a partir do menu da conta.",
+        ["Sync Analytics"]                            = "Sincronizar Análise",
+        ["Sync Recent Analytics"]                     = "Sincronizar Análise Recente",
+        [LID.ANALYTICS_PROF_MISMATCH]                 =
+        "|cFFFF0000CraftScan: Aviso: Desvio de profissão na sincronização de análise. Item: %s. Profissão local: %s. Profissão conectada: %s.|r",
+        [LID.RN_ANALYTICS]                            = "Análises",
+        [LID.RN_ANALYTICS + 1]                        =
+        "CraftScan agora escaneia tudo que é combinado entre itens criados no chat e palavras-chave globais (ex: LF, WTB, recraft, etc...). Mesmo se você não puder criar um item, o tempo é registrado e os itens detectados aparecem sob pedidos normais no chat.",
+        [LID.RN_ANALYTICS + 2]                        =
+        "O conceito de 'repetição' é usado para determinar a escassez de oferta de itens. O CraftScan se lembra de quem pediu o que na última hora, e se você solicitar o mesmo item novamente, ele será registrado como uma repetição. O cabeçalho das colunas da nova grade tem uma dica de ferramenta explicando a intenção.",
+        [LID.RN_ANALYTICS + 3]                        =
+        "Com um personagem estacionado em comércio por um período suficiente, você pode saber onde vale a pena investir em um ponto da árvore de profissões.",
+        [LID.RN_ANALYTICS + 4]                        =
+        "Análises podem ser sincronizadas entre contas. Você pode estacionar uma conta de teste para coletar dados ao longo do dia em comércio e sincronizar esses dados com a conta principal. Agora você pode criar links de conta dedicados à análise com amigos, com suporte para sincronização bidirecional, unindo as análises. Com mais dados sendo coletados, há uma opção para sincronizar apenas os dados desde a última sincronização.",
+        [LID.RN_ALERT_ICON_ANCHOR]                    = "Atualização de âncora do ícone de alerta",
+        [LID.RN_ALERT_ICON_ANCHOR + 1]                =
+        "O ícone de alerta se esconderá corretamente quando a UI estiver oculta. A mudança resultou em um pequeno movimento e redução na minha tela. Se isso moveu o botão da tela, há uma opção de redefinir clicando com o botão direito no botão 'Abrir Configurações' no canto superior direito da página de pedidos do chat.",
+        [LID.BUSY_RIGHT_NOW]                          = "Modo Ocupado",
+        [LID.GREETING_BUSY]                           = "Estou ocupado agora. Mas poderei fazer isso mais tarde.",
+        [LID.BUSY_HELP]                               =
+        "|cFFFFFFFFSe selecionado, adicione uma saudação ocupada à sua resposta. Edite sua saudação ocupada com o botão abaixo.\n\nIsso é destinado ao uso com uma segunda conta que faz proxy de pedidos para que você possa capturar pedidos enquanto estiver fora com sua conta principal.\n\nSaudação ocupada atual: |cFF00FF00%s|r|r",
+        ["Custom Explanations"]                       = "Explicações Personalizadas",
+        ["Create"]                                    = "Criar",
+        ["Modify"]                                    = "Modificar",
+        ["Delete"]                                    = "Excluir",
+        [LID.EXPLANATION_LABEL_DESC]                  =
+        "Insira um rótulo que você verá ao clicar com o botão direito no nome do cliente no chat.",
+        [LID.EXPLANATION_DUPLICATE_LABEL]             = "Esse rótulo já está em uso.",
+        [LID.EXPLANATION_TEXT_DESC]                   =
+        "Insira uma mensagem para enviar ao cliente quando o rótulo for clicado. Novas linhas são enviadas como mensagens separadas. Linhas longas são quebradas para se adequar ao comprimento máximo da mensagem.",
+        ["Create an Explanation"]                     = "Criar uma Explicação",
+        ["Save"]                                      = "Salvar",
+        ["Reset"]                                     = "Redefinir",
+        [LID.MANUAL_MATCHING_TITLE]                   = "Correspondência Manual",
+        [LID.MANUAL_MATCH]                            = "%s - %s", -- artesão, profissão
+        [LID.MANUAL_MATCHING_DESC]                    =
+        "Ignora palavras-chave primárias e força uma correspondência para esta mensagem. CraftScan tentará encontrar o artesão correto com base na mensagem, mas se nenhuma correspondência for encontrada, a saudação padrão para o artesão especificado será usada. A correspondência é relatada pelos meios habituais, permitindo que você clique no banner ou na linha da tabela para enviar a saudação.",
+
+        [LID.RN_MANUAL_MATCH]                         = "Correspondência Manual",
+        [LID.RN_MANUAL_MATCH + 1]                     =
+        "O menu de contexto ao clicar com o botão direito no nome de um jogador no chat agora inclui opções do CraftScan.",
+        [LID.RN_MANUAL_MATCH + 2]                     =
+        "Este menu inclui todos os seus artesãos e profissões. Ao clicar em um deles, você forçará outra passada na mensagem para procurar uma correspondência sem considerar as 'Palavras-chave Primárias' (por exemplo, LF, WTB, recraft, etc...), caso o cliente esteja usando uma terminologia não padrão.",
+        [LID.RN_MANUAL_MATCH + 3]                     =
+        "Se a mensagem ainda não corresponder, uma correspondência será forçada com a saudação padrão para o artesão e profissão que você clicou.",
+        [LID.RN_MANUAL_MATCH + 4]                     =
+        "Esse clique não enviará automaticamente uma mensagem ao cliente. Depois de gerar a correspondência por métodos normais, você pode revisar a resposta gerada e decidir se deseja enviar ou não.",
+        [LID.RN_MANUAL_MATCH + 5]                     = "(Desculpe, não há aprendizado de máquina.)",
+        [LID.RN_CUSTOM_EXPLANATIONS]                  = "Explicações Personalizadas",
+        [LID.RN_CUSTOM_EXPLANATIONS + 1]              =
+        "Um novo botão 'Explicações Personalizadas' foi adicionado à página de 'Pedidos de Chat'. As explicações configuradas aqui também aparecerão no menu de contexto do chat e serão enviadas imediatamente quando clicadas.",
+        [LID.RN_CUSTOM_EXPLANATIONS + 2]              =
+        "As explicações são ordenadas alfabeticamente, então você pode forçá-las a aparecer em uma determinada ordem numerando-as.",
+        [LID.RN_BUSY_MODE]                            = "Modo Ocupado",
+        [LID.RN_BUSY_MODE + 1]                        =
+        "Este recurso existiu durante várias versões, mas não foi documentado. Há uma nova caixa de seleção 'Modo Ocupado' na página de 'Pedidos de Chat'. Se marcada, adicionará uma saudação ocupada à sua resposta. Você pode editar sua saudação ocupada com o botão 'Personalizar Saudação'.",
+        [LID.RN_BUSY_MODE + 2]                        =
+        "Esse recurso é destinado a ser usado com uma segunda conta de proxy para que você possa capturar pedidos enquanto estiver fora com sua conta principal.",
+        ["Release Notes"]                             = "Notas de Lançamento",
+
 
 
     }

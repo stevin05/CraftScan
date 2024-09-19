@@ -316,7 +316,43 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.GREETING_BUSY]                           = "I am busy now, but can craft that later if you send it.",
                 [LID.BUSY_HELP]                               =
                 "|cFFFFFFFFWhen checked, append the busy greeting in your response. Edit your busy greeting with the button below.\n\nThis is intended for use with a second account proxying orders so you can catch orders while out and about on your main.\n\nCurrent busy greeting: |cFF00FF00%s|r|r",
+                ["Custom Explanations"]                       = "Custom Explanations",
+                ["Create"]                                    = "Create",
+                ["Modify"]                                    = "Modify",
+                ["Delete"]                                    = "Delete",
+                [LID.EXPLANATION_LABEL_DESC]                  =
+                "Enter a label that you will see when right clicking the customer name in chat.",
+                [LID.EXPLANATION_DUPLICATE_LABEL]             = "This label is already in use.",
+                [LID.EXPLANATION_TEXT_DESC]                   = "Enter a message to send to the customer when the label is clicked. New lines are sent as separate messages. Long lines are split to fit within the max message length.",
+                ["Create an Explanation"]                     = "Create an Explanation",
+                ["Save"]                                      = "Save",
+                ["Reset"]                                     = "Reset",
+                [LID.MANUAL_MATCHING_TITLE]                   = "Manual Matching",
+                [LID.MANUAL_MATCH]                            = "%s - %s", -- crafter, profession
+                [LID.MANUAL_MATCHING_DESC]                    =
+                "Ignore primary keywords and force a match for this message. CraftScan will attempt to find the correct crafter based on the message, but if no matches are found, the default greeting for the specified crafter will be used. The match is reported via the usual means, allowing you to click the banner or table row to send the greeting.",
 
+                [LID.RN_MANUAL_MATCH]                         = "Manual Matching",
+                [LID.RN_MANUAL_MATCH + 1]                     =
+                "The context menu when right clicking a player name in chat now includes CraftScan options.",
+                [LID.RN_MANUAL_MATCH + 2]                     =
+                "This menu includes all of your crafters and professions. Clicking one of these will force another pass on the message to look for a match without considering the 'Primary Keywords' (e.g. LF, WTB, recraft, etc...), in case the customer is using non-standard terminology.",
+                [LID.RN_MANUAL_MATCH + 3]                     =
+                "If the message still does not match, a match is forced with the default greeting for the crafter and profession you clicked.",
+                [LID.RN_MANUAL_MATCH + 4]                     =
+                "This click will not automatically message the customer. It generates the match in the usual way, and then you can inspect the generated response and choose to send it or not.",
+                [LID.RN_MANUAL_MATCH + 5]                     = "(Sorry, no machine learning.)",
+                [LID.RN_CUSTOM_EXPLANATIONS]                  = "Custom Explanations",
+                [LID.RN_CUSTOM_EXPLANATIONS + 1]              =
+                "The 'Chat Orders' page now includes a 'Custom Explanations' button. Explanations configured here also appear in the chat context menu, and clicking them will immediately send the explanation.",
+                [LID.RN_CUSTOM_EXPLANATIONS + 2]              =
+                "Explanations are sorted alphabetically, so you can number them to force a desired order.",
+                [LID.RN_BUSY_MODE]                            = "Busy Mode",
+                [LID.RN_BUSY_MODE + 1]                        =
+                "This has been in for a few releases, but was never explained. There is a new 'Busy Mode' check box on the 'Chat Orders' page. When checked, append the busy greeting in your response. Edit your busy greeting with the 'Customize Greeting' button.",
+                [LID.RN_BUSY_MODE + 2]                        =
+                "This is intended for use with a second account proxying orders so you can catch orders while out and about on your main, and the customer will know you can't craft it immediately.",
+                ["Release Notes"]                             = "Release Notes",
 
 
                 -- ChatGPT prompt:

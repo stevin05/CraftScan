@@ -7,6 +7,7 @@ end
 local dialogPool = CreateFramePool("Frame", UIParent, "CraftScanDialogTemplate")
 local textPool = CreateFramePool("Frame", nil, "CraftScanDialogTextTemplate")
 local editBoxPool = CreateFramePool("EditBox", nil, "CraftScanDialogTextInputTemplate")
+local multiLineEditBoxPool = CreateFramePool("ScrollFrame", nil, "CraftScanDialogMultiLineTextInputTemplate")
 local defaultButtonPool = CreateFramePool("Button", nil, "CraftScan_DialogDefaultButtonTemplate")
 local checkButtonPool = CreateFramePool("CheckButton", nil, "CraftScanDialogCheckButtonTemplate")
 
@@ -26,27 +27,32 @@ function CraftScan_DialogCheckButtonMixin:OnClick()
     self:GetParent():CheckEnableSubmit()
 end
 
-CraftScan_DialogDefaultButtonMixin = {}
-
-function CraftScan_DialogDefaultButtonMixin:OnClick()
-    self.EditBox:SetText(self.default_text);
-    self.EditBox:OnEditFocusLost();
-    self:SetEnabled(false);
+-- We support both a basic EditBox and a multiline EditBox with a ScrollFrame
+-- around it. We want all the same validations on the text in the EditBox to be
+-- supported. The only real difference is whether we are nested in a
+-- ScrollFrame, so this is used to dereference the EditBox.
+local function EditBoxToFrame(editBox)
+    if editBox:IsMultiLine() then
+        return editBox:GetParent();
+    end
+    return editBox;
 end
 
-function CraftScan_DialogDefaultButtonMixin:Refresh()
-    if self.EditBox:GetText() == self.default_text then
-        self:SetEnabled(false);
-    else
-        self:SetEnabled(true);
+-- We also occasionally iterate the frames to collect inputs, so we need to be
+-- able to dereference a frame to get its EditBox. The EditBox can be either the
+-- frame itself or the EditBox within the ScrollFrame.
+local function FrameToEditBox(frame)
+    if frame.EditBox then
+        return frame.EditBox;
     end
+    return frame;
 end
 
 local function CreateArgs(dialog)
     local args = {};
     for _, frame in ipairs(dialog.frames) do
         if frame.type == CraftScan.Dialog.Element.EditBox then
-            table.insert(args, frame:GetText());
+            table.insert(args, FrameToEditBox(frame):GetText());
         end
         if frame.type == CraftScan.Dialog.Element.CheckButton then
             table.insert(args, frame:GetChecked())
@@ -60,7 +66,7 @@ CraftScanDialogMixin = {};
 function CraftScanDialogMixin:CheckEnableSubmit()
     for _, frame in ipairs(self.frames) do
         if frame.type == CraftScan.Dialog.Element.EditBox then
-            if frame:GetText() == "" or frame.error == true then
+            if FrameToEditBox(frame):GetText() == "" or frame.error == true then
                 self.SubmitButton:SetEnabled(false);
                 return;
             end
@@ -86,8 +92,20 @@ function CraftScanDialogMixin:OnHide()
         if self.frames then
             for _, frame in ipairs(self.frames) do
                 if frame.type == CraftScan.Dialog.Element.EditBox then
-                    frame:SetText("");
-                    editBoxPool:Release(frame);
+                    frame.InvalidInput.error = nil;
+                    frame.InvalidInput.warning = nil;
+                    frame.InvalidInput:Hide();
+                    frame.InvalidInput:Hide();
+                    frame.error = false;
+
+                    local editBox = FrameToEditBox(frame);
+                    editBox:SetText("");
+                    editBox.Validator = nil;
+                    if editBox == frame then
+                        editBoxPool:Release(frame);
+                    else
+                        multiLineEditBoxPool:Release(frame);
+                    end
                 elseif frame.type == CraftScan.Dialog.Element.DefaultButton then
                     defaultButtonPool:Release(frame);
                 elseif frame.type == CraftScan.Dialog.Element.CheckButton then
@@ -145,20 +163,30 @@ function CraftScanDialogTextInputMixin:OnLoad()
     self:SetAutoFocus(false);
 end
 
-function CraftScanDialogTextInputMixin:OnEscapePressed()
+CraftScanDialogMultiLineTextInputMixin = {};
+
+function CraftScanDialogMultiLineTextInputMixin:OnLoad()
+    local editBox = self.EditBox;
+    editBox:SetFontObject("ChatFontNormal")
+    editBox:SetAutoFocus(false);
+    editBox:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+    InputScrollFrame_OnLoad(self);
+end
+
+local function EditBox_OnEscapePressed(self)
     self:ClearFocus();
 end
 
-function CraftScanDialogTextInputMixin:OnTabPressed()
+local function EditBox_OnTabPressed(self)
     local next = false;
-    local dialog = self:GetParent();
+    local dialog = EditBoxToFrame(self):GetParent();
     for _, frame in ipairs(dialog.frames) do
         if frame.type == CraftScan.Dialog.Element.EditBox then
             if next then
-                frame:SetFocus(true);
+                FrameToEditBox(frame):SetFocus(true);
                 return;
             end
-            if frame == self then
+            if FrameToEditBox(frame) == self then
                 next = true;
             end
         end
@@ -166,56 +194,77 @@ function CraftScanDialogTextInputMixin:OnTabPressed()
     self:ClearFocus();
 end
 
-function CraftScanDialogTextInputMixin:OnEnterPressed()
+local function EditBox_OnEnterPressed(self)
     self:ClearFocus();
 
-    local dialog = self:GetParent();
+    local dialog = EditBoxToFrame(self):GetParent();
     if dialog.SubmitButton:IsEnabled() then
         dialog.SubmitButton:OnClick();
     else
-        self:OnTabPressed();
+        EditBox_OnTabPressed(self);
     end
 end
 
-function CraftScanDialogTextInputMixin:OnEditFocusLost(...)
+local function EditBox_OnEditFocusLost(self)
     local text = self:GetText()
 
-    if self.DefaultButton then
-        self.DefaultButton:Refresh();
+    local frame = EditBoxToFrame(self);
+
+    if frame.DefaultButton then
+        frame.DefaultButton:Refresh();
     end
+
     if self.Validator then
         local result = self.Validator(self.index, text);
-        self.error = false;
+        frame.error = false;
+
         if result ~= nil then
             if result.error then
                 GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
                 GameTooltip:SetText(result.error, 1, 0, 0, 1, true)
                 GameTooltip:Show()
-                self.InvalidInput:SetAtlas("common-icon-redx")
-                self.InvalidInput.error = result.error;
-                self.InvalidInput:Show();
-                self.InvalidInput:OnEnter();
-                self.error = true;
 
-                self:GetParent().SubmitButton:SetEnabled(false);
+                frame.InvalidInput:SetAtlas("common-icon-redx")
+                frame.InvalidInput.error = result.error;
+                frame.InvalidInput:Show();
+                frame.InvalidInput:OnEnter();
+                frame.error = true;
+
+                frame:GetParent().SubmitButton:SetEnabled(false);
                 return;
             end
             if result.warning then
                 GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-                self.InvalidInput:SetAtlas("UI-HUD-MicroMenu-Questlog-Mouseover")
-                self.InvalidInput.warning = result.warning;
-                self.InvalidInput:Show();
-                self.InvalidInput:OnEnter();
+                frame.InvalidInput:SetAtlas("UI-HUD-MicroMenu-Questlog-Mouseover")
+                frame.InvalidInput.warning = result.warning;
+                frame.InvalidInput:Show();
+                frame.InvalidInput:OnEnter();
             end
         else
             GameTooltip:Hide();
-            self.InvalidInput:Hide();
+            frame.InvalidInput:Hide();
         end
     end
-    self:GetParent():CheckEnableSubmit();
+    frame:GetParent():CheckEnableSubmit();
 end
 
-function LayoutFramesVertically(frames, parent, padding)
+CraftScan_DialogDefaultButtonMixin = {}
+
+function CraftScan_DialogDefaultButtonMixin:OnClick()
+    self.EditBox:SetText(self.default_text);
+    EditBox_OnEditFocusLost(self.EditBox);
+    self:SetEnabled(false);
+end
+
+function CraftScan_DialogDefaultButtonMixin:Refresh()
+    if FrameToEditBox(self:GetParent()):GetText() == self.default_text then
+        self:SetEnabled(false);
+    else
+        self:SetEnabled(true);
+    end
+end
+
+local function LayoutFramesVertically(frames, parent, padding)
     local totalHeight = 0;
     for _, frame in ipairs(frames) do
         if frame.type ~= CraftScan.Dialog.Element.DefaultButton then
@@ -256,26 +305,40 @@ function CraftScan.Dialog.Show(config)
         local widthAdjust = 0;
         local frame;
         if entry.type == CraftScan.Dialog.Element.EditBox then
-            frame = editBoxPool:Acquire();
-            if not firstEditBox then
-                firstEditBox = frame;
+            if entry.multiline then
+                frame = multiLineEditBoxPool:Acquire();
+            else
+                frame = editBoxPool:Acquire();
             end
             submitEnabled = false;
 
-            frame.Validator = entry.Validator;
-            frame.index = editBoxIndex;
+            local editBox = FrameToEditBox(frame);
+            if not firstEditBox then
+                firstEditBox = editBox;
+            end
+
+            editBox.Validator = entry.Validator;
+            editBox.index = editBoxIndex;
             editBoxIndex = editBoxIndex + 1;
 
+            if not entry.multiline then
+                editBox:SetScript("OnEnterPressed", function(self) EditBox_OnEnterPressed(self) end);
+            end
+            editBox:SetScript("OnEditFocusLost", function(self) EditBox_OnEditFocusLost(self) end);
+            editBox:SetScript("OnTabPressed", function(self) EditBox_OnTabPressed(self) end);
+            editBox:SetScript("OnEscapePressed", function(self) EditBox_OnEscapePressed(self) end);
+
             if entry.initial_text then
-                frame:SetText(entry.initial_text);
+                editBox:SetText(entry.initial_text);
             end
             if entry.default_text then
                 local defaultButton = defaultButtonPool:Acquire();
                 defaultButton:SetParent(frame);
-                defaultButton:SetText(L("Default"));
+                defaultButton:SetText(entry.default_label or L("Default"));
                 defaultButton:FitToText();
-                defaultButton:SetPoint("LEFT", frame, "RIGHT", 3);
-                defaultButton.EditBox = frame;
+                defaultButton:ClearAllPoints();
+                defaultButton:SetPoint("LEFT", frame, "RIGHT", entry.multiline and 8 or 3, 0);
+                defaultButton.EditBox = editBox;
                 frame.DefaultButton = defaultButton;
                 defaultButton.default_text = entry.default_text;
                 defaultButton:Refresh();
@@ -284,6 +347,12 @@ function CraftScan.Dialog.Show(config)
                 frame.alignLeft = true;
                 defaultButton.type = CraftScan.Dialog.Element.DefaultButton;
                 table.insert(dialog.frames, defaultButton);
+            end
+            if entry.multiline then
+                -- The scrollframe has some padding the edit box does not. This
+                -- aligns with the extra xOffset above.
+                widthAdjust = widthAdjust - 5;
+                editBox:SetWidth(elementWidth + widthAdjust - 20) -- -20 for the scrollbar
             end
         elseif entry.type == CraftScan.Dialog.Element.CheckButton then
             frame = checkButtonPool:Acquire();
@@ -334,8 +403,9 @@ function CraftScan.Dialog.Show(config)
 
     for _, frame in ipairs(dialog.frames) do
         if frame.type == CraftScan.Dialog.Element.EditBox then
-            if frame.Validator and #frame:GetText() then
-                frame:OnEditFocusLost();
+            local editBox = FrameToEditBox(frame);
+            if editBox.Validator and #editBox:GetText() then
+                EditBox_OnEditFocusLost(editBox);
             end
         end
     end
