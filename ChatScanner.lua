@@ -47,6 +47,7 @@ CraftScan.Utils.SplitResponse = SplitResponse;
 -- the [] of an item link.]
 local function HasMatch(message, tokens)
     local len = nil;
+    local numMatches = 0;
     for _, token in pairs(tokens) do
         local b, e = string.find(message, token)
         if b and e and (b == 1 or message:sub(b - 1, b - 1) == ' ' or (b > 2 and message:sub(b - 2, b - 1) == '|r')) and
@@ -54,9 +55,10 @@ local function HasMatch(message, tokens)
             if not len or len < #token then
                 len = #token;
             end
+            numMatches = numMatches + 1;
         end
     end
-    return len;
+    return len, numMatches;
 end
 
 local function TableConcat(t1, t2)
@@ -255,13 +257,15 @@ local function idForKeywords(message, profConfig, section)
     end
 
     local len = nil;
+    local num = 0;
     local result = nil;
     for id, config in pairs(sectionConfig) do
         if (profConfig.all_enabled or section ~= 'recipes' or config.enabled) and config.keywords then
-            local matchLen = HasMatch(message, ParseStringList(config.keywords));
+            local matchLen, numMatches = HasMatch(message, ParseStringList(config.keywords));
             if matchLen then
-                if not len or len < matchLen then
-                    len = matchLen
+                if not len or len < matchLen or len == matchLen and num < numMatches then
+                    len = matchLen;
+                    num = numMatches;
                     result = id;
                 end
             end
