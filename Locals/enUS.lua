@@ -232,8 +232,6 @@ function CraftScan.LOCAL_EN:GetData()
                 ["alt name and then profession name"]         = "alt name and then the profession name",
                 [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
                 "This text must contain %d or fewer %%s placeholders to hold the %s. You have included %d.\n\nCraftScan will work with fewer placeholders, but you likely want to include them for context.",
-
-                -- Translations complete above this line
                 ["Pixels"]                                    = "Pixels",
                 ["Show button height"]                        = "Show button height",
                 ["Alert icon scale"]                          = "Alert icon scale",
@@ -323,7 +321,8 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.EXPLANATION_LABEL_DESC]                  =
                 "Enter a label that you will see when right clicking the customer name in chat.",
                 [LID.EXPLANATION_DUPLICATE_LABEL]             = "This label is already in use.",
-                [LID.EXPLANATION_TEXT_DESC]                   = "Enter a message to send to the customer when the label is clicked. New lines are sent as separate messages. Long lines are split to fit within the max message length.",
+                [LID.EXPLANATION_TEXT_DESC]                   =
+                "Enter a message to send to the customer when the label is clicked. New lines are sent as separate messages. Long lines are split to fit within the max message length.",
                 ["Create an Explanation"]                     = "Create an Explanation",
                 ["Save"]                                      = "Save",
                 ["Reset"]                                     = "Reset",
@@ -354,6 +353,19 @@ function CraftScan.LOCAL_EN:GetData()
                 "This is intended for use with a second account proxying orders so you can catch orders while out and about on your main, and the customer will know you can't craft it immediately.",
                 ["Release Notes"]                             = "Release Notes",
 
+                -- Translations complete above this line
+                ["Secondary Keywords"]                        = "Secondary Keywords:",
+                [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
+                "For example: 'pvp, 610, algari' or '606, 610, 636' or '590', to differentiate the same keyword on multiple items.",
+                [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
+                "After matching a keyword above, check for any secondary keywords to refine the match, allowing the various crafts for the same item slot to be differentiated.",
+                [LID.RN_SECONDARY_KEYWORDS]                   = "Secondary Keywords",
+                [LID.RN_SECONDARY_KEYWORDS + 1]               =
+                "Items now support secondary keywords to refine a match. Each item slot usually has a Spark, PVP, and Blue version. Secondary keywords can be setup to differentiate them.",
+                [LID.RN_SECONDARY_KEYWORDS + 2]               = "Example secondary keywords:",
+                [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+                [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+                [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
 
                 -- ChatGPT prompt:
                 -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.

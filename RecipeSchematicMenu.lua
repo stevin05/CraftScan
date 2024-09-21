@@ -8,6 +8,7 @@ end
 CRAFT_SCAN_EXCLUSION_INSTRUCTIONS = L(LID.EXCLUSION_INSTRUCTIONS)
 CRAFT_SCAN_KEYWORD_INSTRUCTIONS = L(LID.KEYWORD_INSTRUCTIONS)
 CRAFT_SCAN_GREETING_INSTRUCTIONS = L(LID.GREETING_INSTRUCTIONS)
+CRAFT_SCAN_SECONDARY_KEYWORD_INSTRUCTIONS = L(LID.SECONDARY_KEYWORD_INSTRUCTIONS);
 
 -- References to our saved variables. These are populated as we get the
 -- information needed to populate them.
@@ -349,6 +350,17 @@ local function initMenu()
             return db_recipe and db_recipe.keywords or ""
         end,
         scrollFrame)
+    local itemSecondaryKeywords = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Secondary Keywords"), "",
+        "CraftScan_SecondaryKeywords",
+        function(self)
+            saved(db_recipes, cur.recipe.recipeID, {}).secondary_keywords = self:GetText()
+            OnConfigChange();
+        end, function()
+            local db_recipe = saved(db_recipes, cur.recipe.recipeID)
+            return db_recipe and db_recipe.secondary_keywords or ""
+        end,
+        scrollFrame)
+
     local itemGreeting = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 45, L("Item greeting"), "",
         "CraftScan_Greeting",
         function(self)
@@ -395,6 +407,7 @@ local function initMenu()
         end
     end)
     add(itemKeywords, 8)
+    add(itemSecondaryKeywords, 8)
     add(itemGreeting, 8)
     add(itemOverride, 3)
 
@@ -468,6 +481,7 @@ local function initMenu()
     AddHelp(primaryKeywordsSectionFrame.Label, LID.HELP_PRIMARY_KEYWORDS, 20);
 
     AddHelp(itemKeywords, LID.HELP_ITEM_KEYWORDS);
+    AddHelp(itemSecondaryKeywords, LID.HELP_ITEM_SECONDARY_KEYWORDS);
     AddHelp(itemGreeting, LID.HELP_ITEM_GREETING);
     AddHelp(itemOverride, LID.HELP_ITEM_OVERRIDE);
 

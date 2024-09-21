@@ -351,6 +351,19 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "Questo è destinato all'uso con un secondo account che proxy gli ordini in modo da poter catturare ordini mentre sei in giro con il tuo principale, e il cliente saprà che non puoi crearlo immediatamente.",
         ["Release Notes"]                             = "Note di Rilascio",
+        ["Secondary Keywords"]                        = "Parole chiave secondarie:",
+        [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
+        "Ad esempio: 'pvp, 610, algari' o '606, 610, 636' o '590', per differenziare la stessa parola chiave su più oggetti.",
+        [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
+        "Dopo aver trovato una corrispondenza con una parola chiave sopra, controlla le parole chiave secondarie per perfezionare la corrispondenza, consentendo di distinguere le diverse professioni per lo stesso slot di oggetto.",
+        [LID.RN_SECONDARY_KEYWORDS]                   = "Parole chiave secondarie",
+        [LID.RN_SECONDARY_KEYWORDS + 1]               =
+        "Gli oggetti ora supportano parole chiave secondarie per perfezionare una corrispondenza. Ogni slot di oggetto di solito ha una versione Scintilla, PVP e Blu. Le parole chiave secondarie possono essere impostate per differenziarle.",
+        [LID.RN_SECONDARY_KEYWORDS + 2]               = "Esempio di parole chiave secondarie:",
+        [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+        [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+        [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
 
 
 

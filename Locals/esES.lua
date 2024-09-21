@@ -354,6 +354,19 @@ function CraftScan.LOCAL_ES:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "Esto está destinado a ser utilizado con una segunda cuenta que proxy pedidos para que puedas recibir pedidos mientras estás fuera con tu cuenta principal, y el cliente sabrá que no puedes fabricarlo de inmediato.",
         ["Release Notes"]                             = "Notas de la Versión",
+        ["Secondary Keywords"]                        = "Palabras clave secundarias:",
+        [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
+        "Por ejemplo: 'pvp, 610, algari' o '606, 610, 636' o '590', para diferenciar la misma palabra clave en varios objetos.",
+        [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
+        "Después de coincidir con una palabra clave anterior, busca palabras clave secundarias para refinar la coincidencia, permitiendo diferenciar las varias artesanías del mismo tipo de objeto.",
+        [LID.RN_SECONDARY_KEYWORDS]                   = "Palabras clave secundarias",
+        [LID.RN_SECONDARY_KEYWORDS + 1]               =
+        "Ahora los objetos admiten palabras clave secundarias para refinar una coincidencia. Cada tipo de objeto generalmente tiene una versión de Chispa, PVP y Azul. Las palabras clave secundarias pueden configurarse para diferenciarlas.",
+        [LID.RN_SECONDARY_KEYWORDS + 2]               = "Ejemplo de palabras clave secundarias:",
+        [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+        [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+        [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
 
 
     }

@@ -352,6 +352,19 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "Cela est destiné à être utilisé avec un second compte qui prend des commandes pour que vous puissiez recevoir des commandes pendant que vous êtes en déplacement avec votre compte principal, et le client saura que vous ne pouvez pas le fabriquer immédiatement.",
         ["Release Notes"]                             = "Notes de Version",
+        ["Secondary Keywords"]                        = "Mots-clés secondaires:",
+        [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
+        "Par exemple : 'pvp, 610, algari' ou '606, 610, 636' ou '590', pour différencier le même mot-clé sur plusieurs objets.",
+        [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
+        "Après avoir trouvé une correspondance avec un mot-clé ci-dessus, recherchez des mots-clés secondaires pour affiner la correspondance, permettant de différencier les divers métiers pour le même emplacement d'objet.",
+        [LID.RN_SECONDARY_KEYWORDS]                   = "Mots-clés secondaires",
+        [LID.RN_SECONDARY_KEYWORDS + 1]               =
+        "Les objets prennent désormais en charge des mots-clés secondaires pour affiner une correspondance. Chaque emplacement d'objet a généralement une version Étincelle, PVP et Bleue. Les mots-clés secondaires peuvent être configurés pour les différencier.",
+        [LID.RN_SECONDARY_KEYWORDS + 2]               = "Exemple de mots-clés secondaires :",
+        [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+        [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+        [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
 
 
 

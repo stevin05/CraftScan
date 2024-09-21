@@ -333,6 +333,15 @@ function CraftScan.LOCAL_TW:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "這是為了與第二個賬戶代理訂單使用，以便你在主賬戶外出時能接收訂單，客戶會知道你不能立即製作。",
         ["Release Notes"]                             = "發布說明",
+        ["Secondary Keywords"]                        = "次要關鍵詞：",
+        [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          = "例如：'pvp, 610, algari' 或 '606, 610, 636' 或 '590'，用來區分同一關鍵詞在多個物品上的差異。",
+        [LID.HELP_ITEM_SECONDARY_KEYWORDS]            = "匹配主關鍵詞後，檢查次要關鍵詞以進一步精確匹配，允許區分同一裝備欄位的不同工藝。",
+        [LID.RN_SECONDARY_KEYWORDS]                   = "次要關鍵詞",
+        [LID.RN_SECONDARY_KEYWORDS + 1]               = "物品現在支持次要關鍵詞來進一步精確匹配。每個裝備欄位通常有火花、PVP和藍色版本。可以設置次要關鍵詞來區分它們。",
+        [LID.RN_SECONDARY_KEYWORDS + 2]               = "次要關鍵詞示例：",
+        [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+        [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+        [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
 
     }
 end

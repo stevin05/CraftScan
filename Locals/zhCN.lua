@@ -332,6 +332,16 @@ function CraftScan.LOCAL_CN:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "这旨在用于第二个账户代理订单，以便你在主账户外出时能接收订单，客户会知道你不能立即制作。",
         ["Release Notes"]                             = "发布说明",
+        ["Secondary Keywords"]                        = "次要关键词：",
+        [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          = "例如：'pvp, 610, algari' 或 '606, 610, 636' 或 '590'，以区分同一关键词在多个物品上的差异。",
+        [LID.HELP_ITEM_SECONDARY_KEYWORDS]            = "在匹配主关键词后，检查次要关键词以进一步精确匹配，允许区分同一装备槽的不同工艺。",
+        [LID.RN_SECONDARY_KEYWORDS]                   = "次要关键词",
+        [LID.RN_SECONDARY_KEYWORDS + 1]               = "物品现在支持次要关键词以进一步精确匹配。每个装备槽通常有火花、PVP和蓝色版本。可以设置次要关键词来区分它们。",
+        [LID.RN_SECONDARY_KEYWORDS + 2]               = "次要关键词示例：",
+        [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+        [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+        [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
 
 
     }

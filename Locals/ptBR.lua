@@ -348,6 +348,19 @@ function CraftScan.LOCAL_PT:GetData()
         "Esse recurso é destinado a ser usado com uma segunda conta de proxy para que você possa capturar pedidos enquanto estiver fora com sua conta principal.",
         ["Release Notes"]                             = "Notas de Lançamento",
 
+        ["Secondary Keywords"]                        = "Palavras-chave secundárias:",
+        [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
+        "Por exemplo: 'pvp, 610, algari' ou '606, 610, 636' ou '590', para diferenciar a mesma palavra-chave em vários itens.",
+        [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
+        "Após encontrar uma palavra-chave, verifique palavras-chave secundárias para refinar a correspondência, permitindo diferenciar os vários ofícios para o mesmo slot de item.",
+        [LID.RN_SECONDARY_KEYWORDS]                   = "Palavras-chave secundárias",
+        [LID.RN_SECONDARY_KEYWORDS + 1]               =
+        "Os itens agora suportam palavras-chave secundárias para refinar uma correspondência. Cada slot de item geralmente tem uma versão Faísca, PVP e Azul. As palavras-chave secundárias podem ser configuradas para diferenciá-las.",
+        [LID.RN_SECONDARY_KEYWORDS + 2]               = "Exemplo de palavras-chave secundárias:",
+        [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+        [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+        [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
 
 
     }

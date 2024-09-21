@@ -45,7 +45,7 @@ CraftScan.Utils.SplitResponse = SplitResponse;
 -- Given a string and a list of string tokens, return if the string
 -- contains one of the tokens, delimited by spaces, start/end, or
 -- the [] of an item link.]
-local function HasMatch(message, tokens)
+local function HasMatch(message, tokens, secondary_keywords)
     local len = nil;
     local numMatches = 0;
     for _, token in pairs(tokens) do
@@ -56,6 +56,11 @@ local function HasMatch(message, tokens)
                 len = #token;
             end
             numMatches = numMatches + 1;
+            if secondary_keywords then
+                local secondary_tokens = ParseStringList(secondary_keywords)
+                local secLen, secNum = HasMatch(message, secondary_tokens);
+                numMatches = numMatches + secNum;
+            end
         end
     end
     return len, numMatches;
@@ -261,7 +266,7 @@ local function idForKeywords(message, profConfig, section)
     local result = nil;
     for id, config in pairs(sectionConfig) do
         if (profConfig.all_enabled or section ~= 'recipes' or config.enabled) and config.keywords then
-            local matchLen, numMatches = HasMatch(message, ParseStringList(config.keywords));
+            local matchLen, numMatches = HasMatch(message, ParseStringList(config.keywords), config.secondary_keywords);
             if matchLen then
                 if not len or len < matchLen or len == matchLen and num < numMatches then
                     len = matchLen;

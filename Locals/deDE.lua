@@ -355,6 +355,19 @@ function CraftScan.LOCAL_DE:GetData()
         "Dies ist für die Verwendung mit einem zweiten Account gedacht, der Aufträge übernimmt, damit du Aufträge erhalten kannst, während du mit deinem Hauptaccount unterwegs bist, und der Kunde weiß, dass du es nicht sofort herstellen kannst.",
         ["Release Notes"]                             = "Versionshinweise",
 
+        ["Secondary Keywords"]                        = "Sekundäre Schlüsselwörter:",
+        [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
+        "Zum Beispiel: 'pvp, 610, algari' oder '606, 610, 636' oder '590', um dasselbe Schlüsselwort auf mehreren Gegenständen zu unterscheiden.",
+        [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
+        "Nachdem ein Schlüsselwort oben übereinstimmt, prüfen Sie auf sekundäre Schlüsselwörter, um die Übereinstimmung zu verfeinern und die verschiedenen Handwerke für denselben Gegenstandsslot zu unterscheiden.",
+        [LID.RN_SECONDARY_KEYWORDS]                   = "Sekundäre Schlüsselwörter",
+        [LID.RN_SECONDARY_KEYWORDS + 1]               =
+        "Gegenstände unterstützen nun sekundäre Schlüsselwörter, um eine Übereinstimmung zu verfeinern. Jeder Gegenstandsslot hat normalerweise eine Funkens-, PVP- und Blaue Version. Sekundäre Schlüsselwörter können eingerichtet werden, um sie zu unterscheiden.",
+        [LID.RN_SECONDARY_KEYWORDS + 2]               = "Beispiel für sekundäre Schlüsselwörter:",
+        [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+        [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+        [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
 
 
 

@@ -328,6 +328,18 @@ function CraftScan.LOCAL_KO:GetData()
         "몇 가지 릴리스 동안 존재했지만 설명되지 않았습니다. '채팅 주문' 페이지에 새로운 '바쁨 모드' 체크박스가 있습니다. 체크하면 응답에 바쁨 인사를 추가합니다. '인사 사용자 정의' 버튼으로 바쁨 인사를 수정합니다.",
         [LID.RN_BUSY_MODE + 2]                        = "이는 주문을 대리하는 두 번째 계정과 함께 사용하기 위한 것으로, 외출 중에도 주문을 받을 수 있으며 고객은 즉시 제작할 수 없다는 것을 알게 됩니다.",
         ["Release Notes"]                             = "릴리스 노트",
+        ["Secondary Keywords"]                        = "보조 키워드:",
+        [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
+        "예: 'pvp, 610, algari' 또는 '606, 610, 636' 또는 '590' 등 여러 아이템에서 동일한 키워드를 구분하기 위해 사용됩니다.",
+        [LID.HELP_ITEM_SECONDARY_KEYWORDS]            = "위의 키워드와 일치한 후, 보조 키워드를 확인하여 동일한 아이템 슬롯의 다양한 제작을 구분합니다.",
+        [LID.RN_SECONDARY_KEYWORDS]                   = "보조 키워드",
+        [LID.RN_SECONDARY_KEYWORDS + 1]               =
+        "아이템은 이제 매칭을 정교하게 하기 위한 보조 키워드를 지원합니다. 각 아이템 슬롯에는 보통 스파크, PVP 및 블루 버전이 있습니다. 보조 키워드를 설정하여 이를 구분할 수 있습니다.",
+        [LID.RN_SECONDARY_KEYWORDS + 2]               = "보조 키워드 예시:",
+        [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
+        [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
+        [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
 
 
 

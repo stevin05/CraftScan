@@ -71,6 +71,13 @@
       <KeyValue key="hideCharCount" value="true" type="boolean"/>
     </KeyValues>
   </ScrollFrame>
+  <ScrollFrame name="CraftScan_SecondaryKeywords" inherits="InputScrollFrameTemplate" virtual="true">
+    <KeyValues>
+      <KeyValue key="maxLetters" value="2047" type="number"/>
+      <KeyValue key="instructions" value="CRAFT_SCAN_SECONDARY_KEYWORD_INSTRUCTIONS" type="global" />
+      <KeyValue key="hideCharCount" value="true" type="boolean"/>
+    </KeyValues>
+  </ScrollFrame>
   <ScrollFrame name="CraftScan_Greeting" inherits="InputScrollFrameTemplate" virtual="true">
     <KeyValues>
       <KeyValue key="maxLetters" value="2047" type="number"/>
