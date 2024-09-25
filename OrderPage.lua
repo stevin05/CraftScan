@@ -41,9 +41,8 @@ local function removeOrder(orders, order)
     local customerInfo = CraftScan.OrderToCustomerInfo(order)
     local response = customerInfo.responses[order.responseID]
     local orderID = CraftScan.OrderToOrderID(order)
-    local order = orders[orderID]
 
-    if CraftScan.State.activeOrder == order then
+    if CraftScan.State.activeOrder == orders[orderID] then
         CraftScan.State.activeOrder = nil;
     end
 
@@ -60,6 +59,15 @@ local function removeOrder(orders, order)
         end
     end
     customerInfo.responses[order.responseID] = nil
+
+    -- I somehow managed to get a random empty entry in the responses table.
+    -- Clear that out in case there's a bug somewhere creating them. No idea how
+    -- it happened. Hopefully just something during development.
+    for key, value in pairs(customerInfo.responses) do
+        if not next(value) then
+            customerInfo.responses[key] = nil;
+        end
+    end
 
     if not next(customerInfo.responses) then
         -- No more orders with this customer, so close out the frames related to them.
@@ -97,9 +105,13 @@ function CraftScan.GreetCustomer(button, order)
         response.greeting_sent = true
         ChatFrame_SendTell(order.customerName, DEFAULT_CHAT_FRAME)
     elseif button == "RightButton" then
-        removeOrder(CraftScan.DB.listed_orders, order)
-        CraftScanCraftingOrderPage:ShowGeneric()
+        CraftScan.DismissOrder(order);
     end
+end
+
+function CraftScan.DismissOrder(order)
+    removeOrder(CraftScan.DB.listed_orders, order)
+    CraftScanCraftingOrderPage:ShowGeneric()
 end
 
 function CraftScanCrafterOrderListElementMixin:OnClick(button)
@@ -312,16 +324,31 @@ local function SortItemsByComparator(items, keys, comparator)
     end);
 end
 
+function CraftScanCraftingOrderPageMixin:DisableAnalytics()
+    self.BrowseFrame.AnalyticsTable:Hide();
+    self.BrowseFrame.ResizeButton:Hide();
+
+    self.BrowseFrame.OrderList:SetHeight(self.BrowseFrame.LeftPanel:GetHeight());
+end
+
+function CraftScanCraftingOrderPageMixin:EnableAnalytics()
+    self.BrowseFrame.AnalyticsTable:Show();
+    self.BrowseFrame.ResizeButton:Show();
+
+    self.BrowseFrame.OrderList:SetHeight(CraftScan.DB.settings.order_list_height or 250)
+end
+
 function CraftScanCraftingOrderPageMixin:UpdateAnalytics()
     if not self:IsShown() then return end
     self.BrowseFrame.AnalyticsTable:Refresh();
 end
 
 function CraftScanCraftingOrderPageMixin:ShowGeneric()
-    self.BrowseFrame.OrderList.ScrollBox:Show();
+    local scrollBox = self.BrowseFrame.OrderList.ScrollBox;
+    scrollBox:Show();
 
     local dataProvider = CreateDataProvider();
-    self.BrowseFrame.OrderList.ScrollBox:SetDataProvider(dataProvider);
+    scrollBox:SetDataProvider(dataProvider);
 
     local orders = {}
     for _, order in pairs(CraftScan.DB.listed_orders) do
@@ -344,7 +371,9 @@ function CraftScanCraftingOrderPageMixin:ShowGeneric()
             contextMenu = self.BrowseFrame.OrderList.ContextMenu
         });
     end
-    self.BrowseFrame.OrderList.ScrollBox:SetDataProvider(dataProvider);
+    scrollBox:SetDataProvider(dataProvider);
+
+    ScrollUtil.AddManagedScrollBarVisibilityBehavior(scrollBox, self.BrowseFrame.OrderList.ScrollBar, nil, nil);
 
     C_Timer.After(5, UpdateCells)
 end
@@ -720,6 +749,8 @@ end
 CraftScanAnalyticsTableMixin = {}
 
 function CraftScanAnalyticsTableMixin:Init()
+    if not CraftScan.DB.analytics.enabled then return; end
+
     self:ResetSortOrder();
 
     local pad = 5;
@@ -945,6 +976,8 @@ function TableSize(tbl)
 end
 
 function CraftScanAnalyticsTableMixin:Refresh()
+    if not CraftScan.DB.analytics.enabled then return; end
+
     self.ScrollBox:Show();
 
     local dataProvider = CreateDataProvider();
@@ -985,6 +1018,7 @@ function CraftScanAnalyticsTableMixin:Refresh()
         if #items ~= TableSize(seenItems) then
             -- Wait for all item links to be asynchronously loaded.
             C_Timer.After(0, OnAllItemsLoaded)
+            --return;
         end
 
         SortItemsByComparator(items, self, ApplyAnalyticsSortOrder);
@@ -1001,7 +1035,7 @@ function CraftScanAnalyticsTableMixin:Refresh()
     OnAllItemsLoaded();
 end
 
-function EscapeCSV(str)
+local function EscapeCSV(str)
     if str:find('[,"]') then
         -- Double up any existing quotes
         str = str:gsub('"', '""')
@@ -1011,34 +1045,59 @@ function EscapeCSV(str)
     return str
 end
 
+local function UpdateAnalyticsEnabled()
+    local enabled = CraftScan.DB.analytics.enabled;
+    if enabled then
+        CraftScanCraftingOrderPage:EnableAnalytics()
+    else
+        CraftScanCraftingOrderPage:DisableAnalytics()
+    end
+end
+
 CraftScan_ResetAnalyticsButtonMixin = {}
 
 function CraftScan_ResetAnalyticsButtonMixin:OnLoad()
     self:SetText(L("Analytics Options"))
     self:FitToText();
-    self:SetupMenu(function(owner, rootDescription)
-        rootDescription:CreateTitle(L("Reset Data"));
-        AddClearAnalytics(rootDescription);
-        rootDescription:QueueDivider();
-        rootDescription:QueueTitle(L("Export"));
-        rootDescription:CreateButton(L("Export CSV"), function()
-            local seenItems = CraftScan.DB.analytics.seen_items;
-            if not seenItems or not next(seenItems) then return; end
 
-            local csv = "itemID,name,time,count,wowhead" .. "\n";
-            for itemID, entry in pairs(seenItems) do
-                local item = Item:CreateFromItemID(itemID);
-                local name = EscapeCSV(item:GetItemName());
-                for _, time in ipairs(entry.times) do
-                    local t = type(time) == "table" and time.t or time;
-                    local c = type(time) == "table" and time.c or 1;
-                    csv = csv ..
-                        string.format("%d,%s,%d,%d,https://www.wowhead.com/item=%d/", itemID, name, t, c, itemID) .. "\n";
+    CraftScan.Utils.onLoad(function()
+        self:SetupMenu(function(owner, rootDescription)
+            do
+                local function IsSelected()
+                    return CraftScan.DB.analytics.enabled;
                 end
+
+                local function SetSelected()
+                    CraftScan.DB.analytics.enabled = not CraftScan.DB.analytics.enabled;
+                    UpdateAnalyticsEnabled();
+                end
+
+                rootDescription:CreateCheckbox(L("Gather Analytics"), IsSelected, SetSelected);
             end
-            CraftScan.Utils.DumpCopyableText(csv);
-        end)
-    end);
+            rootDescription:CreateTitle(L("Reset Data"));
+            AddClearAnalytics(rootDescription);
+            rootDescription:QueueDivider();
+            rootDescription:QueueTitle(L("Export"));
+            rootDescription:CreateButton(L("Export CSV"), function()
+                local seenItems = CraftScan.DB.analytics.seen_items;
+                if not seenItems or not next(seenItems) then return; end
+
+                local csv = "itemID,name,time,count,wowhead" .. "\n";
+                for itemID, entry in pairs(seenItems) do
+                    local item = Item:CreateFromItemID(itemID);
+                    local name = EscapeCSV(item:GetItemName());
+                    for _, time in ipairs(entry.times) do
+                        local t = type(time) == "table" and time.t or time;
+                        local c = type(time) == "table" and time.c or 1;
+                        csv = csv ..
+                            string.format("%d,%s,%d,%d,https://www.wowhead.com/item=%d/", itemID, name, t, c, itemID) ..
+                            "\n";
+                    end
+                end
+                CraftScan.Utils.DumpCopyableText(csv);
+            end)
+        end);
+    end)
 end
 
 CraftScan_ResizeOrderListButtonMixin = {}
@@ -1451,9 +1510,6 @@ end
 
 function CraftScan.OnPendingPeerAccepted()
     CraftScanCraftingOrderPage.BrowseFrame.LeftPanel.LinkedAccountList:Init();
-
-    CraftScan.Utils.printTable("my_uuid", CraftScan.DB.settings.my_uuid)
-    CraftScan.Utils.printTable("linked_accounts", CraftScan.DB.realm.linked_accounts)
 end
 
 CraftScan_LinkedAccountListMixin = {}
@@ -1954,7 +2010,7 @@ local function ResetAutoReplyTimeouts()
     end
 end
 
-local function IsSupportedPlayer()
+local function IsSupportedPlayer(player, meOnly)
     local bit = bit or bit32
 
     local function FNV1aHash(str)
@@ -1984,11 +2040,9 @@ local function IsSupportedPlayer()
     if next(supported_players_clear) then
         CraftScan.Utils.printTable("Players", hashed_players);
     end
- ]]
+    ]]
 
-    local supportedPlayers =
-    {
-        -- Myself
+    local itsMe = {
         [139713656] = 1,
         [3499597080] = 1,
         [966756688] = 1,
@@ -2000,7 +2054,11 @@ local function IsSupportedPlayer()
         [1720786156] = 1,
         [1480692192] = 1,
         [1986072520] = 1,
+        [618885168] = 1,
+        [1159252388] = 1,
+    }
 
+    local others = {
         -- Guild crafters
         [2693742840] = 1,
         [6574920] = 1,
@@ -2008,9 +2066,13 @@ local function IsSupportedPlayer()
         [914132312] = 1,
     }
 
-    local me = UnitName("player") .. '-' .. GetRealmName();
-    return supportedPlayers[FNV1aHash(me)] ~= nil;
+    local me = (player or UnitName("player")) .. '-' .. GetRealmName();
+    local hash = FNV1aHash(me)
+    if meOnly then return itsMe[hash]; end
+    return itsMe[hash] or others[hash];
 end
+
+CraftScan.Utils.ItsMe = IsSupportedPlayer;
 
 
 -- Timeout auto-replies after 5 minutes of not moving. Movement every minute

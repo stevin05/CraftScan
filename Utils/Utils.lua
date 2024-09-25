@@ -234,7 +234,7 @@ function CraftScan.Frames.CreateVerticalLayoutOrganizer(anchor, xPadding, yPaddi
     function OrganizerMixin:Resize(frame)
         local height = frame:GetTop() - self.entries[#self.entries].frame:GetBottom();
         if self.entries[#self.entries].frame.needsExtraYPadding then
-            height = height + 16
+            height = height + self.entries[#self.entries].frame.needsExtraYPadding;
         end
         if height < 200 then height = 200 end
         frame:SetSize(frame:GetWidth(), height);
@@ -328,7 +328,7 @@ function CraftScan.Frames.createCheckBox(labelText, parent, onClickCallback, upd
         end
     end
 
-    checkBox.needsExtraYPadding = true
+    checkBox.needsExtraYPadding = 16;
     checkBox.label = label;
     return checkBox
 end
@@ -646,6 +646,18 @@ local function UpgradePersistentConfig()
             end
         end
     end
+
+    -- We used to be always on. Now that we want to support customers, it's
+    -- opt-in. This keeps it on for existing users.
+    if CraftScan.DB.analytics.enabled == nil then
+        if CraftScan.DB.analytics.seen_items and next(CraftScan.DB.analytics.seen_items) then
+            CraftScan.DB.analytics.enabled = true;
+        end
+    end
+
+    if CraftScan.DB.settings.discoverable == nil then
+        CraftScan.DB.settings.discoverable = true;
+    end
 end
 
 function CraftScan.Utils.GetSetting(key)
@@ -654,7 +666,6 @@ function CraftScan.Utils.GetSetting(key)
 
     return CraftScan.CONST.DEFAULT_SETTINGS[key];
 end
-
 
 local once = false
 local function doOnce()
@@ -942,4 +953,12 @@ function CraftScan.Utils.ChatHistoryTooltip:Show(name, anchor, order, header, in
     tooltip:SetMinimumWidth(math.min(GetMaxTextLeftWidth(name), ChatFrame1:GetWidth()));
 
     tooltip:Show();
+end
+
+function CraftScan.Utils.SizeTooltipLikeChat(name, tooltip)
+    SpaceOutRightText(name);
+
+    -- Find the maximum text width so we can make the tooltip look sane. If it's
+    -- super long, cap at the chat frame width to match its text wrapping.
+    tooltip:SetMinimumWidth(math.min(GetMaxTextLeftWidth(name), ChatFrame1:GetWidth()));
 end

@@ -215,6 +215,19 @@ CraftScan.Utils.onLoad(function()
             end);
         --L(LID.CUSTOMER_TIMEOUT_TOOLTIP));
     end
+    do
+        local GetValue = function()
+            return CraftScan.DB.settings.discoverable;
+        end
+        local SetValue = function(value)
+            CraftScan.DB.settings.discoverable = value;
+        end
+
+        local setting = Settings.RegisterProxySetting(category, "CRAFTSCAN_DISCOVERABLE",
+            Settings.VarType.Boolean, L("Discoverable to customers"), Settings.Default.True, GetValue, SetValue);
+        local initializer = Settings.CreateCheckbox(category, setting, L(LID.DISCOVERABLE_SETTING));
+        initializer:AddSearchTags(L(LID.CRAFT_SCAN));
+    end
 
 
     Settings.RegisterAddOnCategory(category);

@@ -34,10 +34,25 @@ CraftScanComm = LibStub("AceAddon-3.0"):NewAddon("CraftScan", "AceComm-3.0")
 local LibSerialize = LibStub("LibSerialize")
 local LibDeflate = LibStub("LibDeflate")
 
+local broadcastChannel = "CraftScan";
 local CRAFT_SCAN_COMM_PREFIX = "CRAFT_SCAN"
 function CraftScanComm:OnEnable()
     self:RegisterComm(CRAFT_SCAN_COMM_PREFIX)
 end
+
+local function OnDefaultChannelsRegistered()
+    -- Make sure we unregister first, because we're about to trigger this event...
+    CraftScanScannerMenu:UnregisterEventCallback("CHANNEL_UI_UPDATE", OnDefaultChannelsRegistered);
+
+    -- We wait for the default channels to be setup so we don't hijack #1.
+    C_Timer.After(10, function()
+        -- Wait a bit more - really don't want to mess with people's chat
+        -- channels as they are a pain to fix.
+        JoinChannelByName(broadcastChannel)
+    end)
+end
+
+CraftScanScannerMenu:RegisterEventCallback("CHANNEL_UI_UPDATE", OnDefaultChannelsRegistered);
 
 CraftScanComm.Operations = {
     ShareCharacterData      = 'share_char_data',
@@ -47,6 +62,8 @@ CraftScanComm.Operations = {
     ShareCustomExplanations = 'share_custom_explanations',
     ShareAnalytics          = 'share_analytics',
     Ping                    = 'ping',
+    FindCrafter             = 'fc',
+    RequestCraft            = 'rc',
 }
 
 CraftScanComm.Permissions = {
@@ -67,6 +84,8 @@ CraftScanComm.PermissionStrings = {
 
 -- A flag to send the request to all known linked accounts
 local TARGET_ALL = nil;
+
+local TARGET_BROADCAST = 1;
 
 -- Accounts that respond to the initial sharing phase are stored here. From then
 -- on, we keep this updated with who is talking to us, and we only talk back to
@@ -200,8 +219,14 @@ local function ShareCharacterData_(state, target)
 
     local revisions = CreateRevisions();
     local peers = MyPeers();
-    local data = { revisions = revisions, peers = peers, greeting_revision = GreetingRevision(), explanations_revision =
-    ExplanationsRevision(), state = state };
+    local data = {
+        revisions = revisions,
+        peers = peers,
+        greeting_revision = GreetingRevision(),
+        explanations_revision =
+            ExplanationsRevision(),
+        state = state
+    };
     SendShareCharacterData(target, data);
 end
 
@@ -332,7 +357,6 @@ local function ReceiveShareCharacterData(sender, data, senderID)
         if next(responseCharacters) or greetingResponse or explanationsResponse then
             SendResponseCharacterData(sender, responseCharacters, greetingResponse, explanationsResponse);
         end
-
     end
 end
 
@@ -912,6 +936,67 @@ function CraftScanComm:RejectPeerRequest()
     CraftScan.pending_peer_request = nil;
 end
 
+function CraftScanComm:FindCrafters(itemID)
+    CraftScanComm:Transmit({ i = itemID }, CraftScanComm.Operations.FindCrafter, TARGET_BROADCAST);
+end
+
+local function ReceiveFindCrafter(sender, data)
+    if IsResting() or CraftScan.State.isBusy then
+        if data.i and not data.c then
+            if not CraftScan.DB.settings.discoverable then
+                return;
+            end
+            CraftScan.OnMessage("CHAT_MSG_CHANNEL", "", sender, nil,
+                {
+                    itemInfo = function()
+                        return true, nil, data.i;
+                    end,
+                    resultCallback = function(crafter, greeting, commission)
+                        CraftScanComm:Transmit(
+                            { i = data.i, c = crafter, g = greeting, b = CraftScan.State.isBusy, co = commission },
+                            CraftScanComm.Operations.FindCrafter,
+                            sender);
+                    end
+                });
+        elseif data.i and data.c and data.g then
+            CraftScan.SearchResultsReceived(data.i, sender, data.c, data.g, data.b, data.co);
+        end
+    end
+end
+
+local function CreateRequestCraftGreeting(itemID, OnReady)
+    local item = Item:CreateFromItemID(itemID);
+    item:ContinueOnItemLoad(function()
+        OnReady(string.format(L(LID.FOUND_VIA_CRAFT_SCAN), item:GetItemLink()));
+    end)
+end
+
+function CraftScanComm:RequestCraft(target, itemID)
+    -- Start by simply sending the message that we want something crafted.
+    CreateRequestCraftGreeting(itemID, function(message)
+        SendChatMessage(message, "WHISPER", GetDefaultLanguage("player"), target)
+
+        -- Also inject that message into the crafter's list since we aren't always
+        -- setup to listen for whispers.
+        CraftScanComm:Transmit({ i = itemID, g = UnitGUID("player") }, CraftScanComm.Operations.RequestCraft, target);
+    end)
+end
+
+local function ReceiveRequestCraft(sender, data)
+    if data.i then
+        local itemID = data.i;
+        local customerGUID = data.g;
+        CreateRequestCraftGreeting(itemID, function(message)
+            CraftScan.OnMessage("CHAT_MSG_CHANNEL", message, sender, customerGUID, {
+                itemInfo = function()
+                    return true, nil, itemID;
+                end,
+                greeted = true,
+            });
+        end)
+    end
+end
+
 local function SendMessage(encoded, target)
     CraftScanComm:SendCommMessage(CRAFT_SCAN_COMM_PREFIX, encoded, "WHISPER", target)
 end
@@ -985,6 +1070,12 @@ local function TransmitSerialized(serialized, target)
     local compressed = LibDeflate:CompressDeflate(serialized)
     local encoded = LibDeflate:EncodeForWoWAddonChannel(compressed)
 
+    if target == TARGET_BROADCAST then
+        local channelNumber = GetChannelName(broadcastChannel)
+        CraftScanComm:SendCommMessage(CRAFT_SCAN_COMM_PREFIX, encoded, "CHANNEL", channelNumber)
+        return;
+    end
+
     -- In responses, we're given an explicit character to send to, so we use it.
     -- Otherwise, generate a list of tarets based on our linked accounts. The
     -- offline message filter will hopefully be able to narrow that down to a
@@ -1020,6 +1111,11 @@ local function TransmitSerialized(serialized, target)
     filter:Clear();
 end
 
+local function IsPublicOperation(op)
+    return CraftScanComm.Operations.FindCrafter == op or
+        CraftScanComm.Operations.RequestCraft == op;
+end
+
 local asyncPool = CreateFramePool("Frame", UIParent);
 
 function CraftScanComm:Transmit(data, operation, target)
@@ -1027,8 +1123,12 @@ function CraftScanComm:Transmit(data, operation, target)
         operation = operation,
         version = CraftScan.CONST.CURRENT_VERSION,
         data = data,
-        senderID = CraftScan.DB.settings.my_uuid,
     };
+
+    if not IsPublicOperation(operation) then
+        msg.senderID = CraftScan.DB.settings.my_uuid;
+    end
+
     CraftScan.Utils.printTable("Sending msg", msg)
 
     local handler = LibSerialize:SerializeAsync(msg)
@@ -1073,13 +1173,23 @@ local function ReceiveDeserialized(msg, sender)
         ReceiveHandshake(sender, msg.data);
     else
         if msg.version ~= CraftScan.CONST.CURRENT_VERSION then
-            print(string.format(L(LID.VERSION_MISMATCH), msg.version, CraftScan.CONST.CURRENT_VERSION));
+            if not IsPublicOperation(msg.operation) or CraftScan.IsRemoteVersionMoreRecent(msg.version) then
+                print(string.format(L(LID.VERSION_MISMATCH), msg.version, CraftScan.CONST.CURRENT_VERSION));
+            end
+            return;
+        end
+
+        if msg.operation == CraftScanComm.Operations.FindCrafter then
+            ReceiveFindCrafter(sender, msg.data);
+            return;
+        elseif msg.operation == CraftScanComm.Operations.RequestCraft then
+            ReceiveRequestCraft(sender, msg.data);
             return;
         end
 
         local linkedAccounts = CraftScan.DB.realm.linked_accounts;
         if (not linkedAccounts or not linkedAccounts[msg.senderID]) then
-            CraftScan.Utils.printTable("Ignoring message from unknown account.", nil)
+            CraftScan.Utils.printTable("Ignoring message from unknown account.", msg.senderID)
             return;
         end
 
@@ -1093,20 +1203,15 @@ local function ReceiveDeserialized(msg, sender)
 
         if msg.operation == CraftScanComm.Operations.Ping then
             ReceivePing(sender, msg.data, msg.senderID);
-        end
-        if hasFull and msg.operation == CraftScanComm.Operations.ShareCharacterData then
+        elseif hasFull and msg.operation == CraftScanComm.Operations.ShareCharacterData then
             ReceiveShareCharacterData(sender, msg.data, msg.senderID);
-        end
-        if hasFull and msg.operation == CraftScanComm.Operations.ShareCustomerOrder then
+        elseif hasFull and msg.operation == CraftScanComm.Operations.ShareCustomerOrder then
             ReceiveShareCustomerOrder(sender, msg.data, msg.senderID);
-        end
-        if hasFull and msg.operation == CraftScanComm.Operations.ShareCustomGreeting then
+        elseif hasFull and msg.operation == CraftScanComm.Operations.ShareCustomGreeting then
             ReceiveShareCustomGreeting(sender, msg.data, msg.senderID);
-        end
-        if hasFull and msg.operation == CraftScanComm.Operations.ShareCustomExplanations then
+        elseif hasFull and msg.operation == CraftScanComm.Operations.ShareCustomExplanations then
             ReceiveShareCustomExplanations(sender, msg.data, msg.senderID);
-        end
-        if (hasFull or hasAnalytics) and msg.operation == CraftScanComm.Operations.ShareAnalytics then
+        elseif (hasFull or hasAnalytics) and msg.operation == CraftScanComm.Operations.ShareAnalytics then
             ReceiveShareAnalytics(sender, msg.data, msg.senderID);
         end
     end

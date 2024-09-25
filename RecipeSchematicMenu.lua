@@ -9,6 +9,7 @@ CRAFT_SCAN_EXCLUSION_INSTRUCTIONS = L(LID.EXCLUSION_INSTRUCTIONS)
 CRAFT_SCAN_KEYWORD_INSTRUCTIONS = L(LID.KEYWORD_INSTRUCTIONS)
 CRAFT_SCAN_GREETING_INSTRUCTIONS = L(LID.GREETING_INSTRUCTIONS)
 CRAFT_SCAN_SECONDARY_KEYWORD_INSTRUCTIONS = L(LID.SECONDARY_KEYWORD_INSTRUCTIONS);
+CRAFT_SCAN_COMMISSION_INSTRUCTIONS = L(LID.COMMISSION_INSTRUCTIONS);
 
 -- References to our saved variables. These are populated as we get the
 -- information needed to populate them.
@@ -275,7 +276,6 @@ local function initMenu()
         end,
         scrollFrame)
 
-
     -- The profession menu
     local profEnableAll = CraftScan.Frames.createCheckBox(L(LID.SCAN_ALL_RECIPES), contentFrame,
         function(self, button, down)
@@ -308,6 +308,15 @@ local function initMenu()
             return db_prof.greeting or ""
         end,
         scrollFrame)
+    local profCommission = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Profession commission"), nil,
+        "CraftScan_CommissionInput",
+        function(self)
+            db_prof.commission = self:GetText()
+        end, function()
+            return db_prof.commission or ""
+        end,
+        scrollFrame)
+    profCommission.needsExtraYPadding = 20; -- No idea why, but this one does
 
     -- The category (Weapons/Armory/Toxic etc...) menu
     local catKeywords = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Keywords"), nil,
@@ -371,6 +380,16 @@ local function initMenu()
             return db_recipe and db_recipe.greeting or ""
         end,
         scrollFrame)
+    local itemCommission = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 22, L("Commission"), "",
+        "CraftScan_CommissionInput",
+        function(self)
+            saved(db_recipes, cur.recipe.recipeID, {}).commission = self:GetText()
+        end, function()
+            local db_recipe = saved(db_recipes, cur.recipe.recipeID)
+            return db_recipe and db_recipe.commission or "";
+        end,
+        scrollFrame)
+
     local itemOverride = CraftScan.Frames.createCheckBox(L("Override greeting"), contentFrame,
         function(self, button, down)
             saved(db_recipes, cur.recipe.recipeID, {}).override = self:GetChecked()
@@ -409,6 +428,7 @@ local function initMenu()
     add(itemKeywords, 8)
     add(itemSecondaryKeywords, 8)
     add(itemGreeting, 8)
+    add(itemCommission, 8)
     add(itemOverride, 3)
 
     local enabledIndicator = CreateFrame("Frame", "CraftScan_ItemIndiciator", sectionFrame,
@@ -440,6 +460,7 @@ local function initMenu()
     add(profEnableAll, 3)
     add(profIsPrimary, 3)
     add(profGreeting, 8)
+    add(profCommission, 8)
     table.insert(menuFrames, sectionFrame)
     expansionLabel = sectionFrame.Label;
 
@@ -483,6 +504,7 @@ local function initMenu()
     AddHelp(itemKeywords, LID.HELP_ITEM_KEYWORDS);
     AddHelp(itemSecondaryKeywords, LID.HELP_ITEM_SECONDARY_KEYWORDS);
     AddHelp(itemGreeting, LID.HELP_ITEM_GREETING);
+    AddHelp(itemCommission, LID.HELP_ITEM_COMMISSION);
     AddHelp(itemOverride, LID.HELP_ITEM_OVERRIDE);
 
     AddHelp(catKeywords, LID.HELP_CATEGORY_KEYWORDS);
@@ -492,6 +514,7 @@ local function initMenu()
     AddHelp(profEnableAll, LID.HELP_SCAN_ALL);
     AddHelp(profIsPrimary, LID.HELP_PRIMARY_EXPANSION);
     AddHelp(profGreeting, LID.HELP_EXPANSION_GREETING);
+    AddHelp(profCommission, LID.HELP_ITEM_COMMISSION);
 
     AddHelp(profKeywords, LID.HELP_PROFESSION_KEYWORDS);
     AddHelp(profExclusions, LID.HELP_PROFESSION_EXCLUSIONS);

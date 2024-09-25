@@ -328,7 +328,7 @@ function CraftScan.LOCAL_KO:GetData()
         "몇 가지 릴리스 동안 존재했지만 설명되지 않았습니다. '채팅 주문' 페이지에 새로운 '바쁨 모드' 체크박스가 있습니다. 체크하면 응답에 바쁨 인사를 추가합니다. '인사 사용자 정의' 버튼으로 바쁨 인사를 수정합니다.",
         [LID.RN_BUSY_MODE + 2]                        = "이는 주문을 대리하는 두 번째 계정과 함께 사용하기 위한 것으로, 외출 중에도 주문을 받을 수 있으며 고객은 즉시 제작할 수 없다는 것을 알게 됩니다.",
         ["Release Notes"]                             = "릴리스 노트",
-        ["Secondary Keywords"]                        = "보조 키워드:",
+        ["Secondary Keywords"]                        = "보조 키워드",
         [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
         "예: 'pvp, 610, algari' 또는 '606, 610, 636' 또는 '590' 등 여러 아이템에서 동일한 키워드를 구분하기 위해 사용됩니다.",
         [LID.HELP_ITEM_SECONDARY_KEYWORDS]            = "위의 키워드와 일치한 후, 보조 키워드를 확인하여 동일한 아이템 슬롯의 다양한 제작을 구분합니다.",
@@ -339,6 +339,35 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
         [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
         [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+        ["Find Crafter"]                              = "제작자 찾기",
+        ["No Crafters Found"]                         = "제작자를 찾을 수 없습니다",
+        [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
+        [LID.GREET_FOUND_CRAFTER]                     = "|cffffd100좌클릭: 제작 요청|r",
+        ["Crafter Greeting"]                          = "|cFFFFFFFF제작자 인사말|r",
+        [LID.BUSY_ICON]                               = "|cFFFFFFFF제작자가 현재 바쁘다고 표시했지만 나중에 아이템을 제작할 수 있습니다.\n\n세부 사항은 인사말을 확인하세요.|r",
+        ["Potential Crafters"]                        = "가능성 있는 제작자",
+        [LID.FOUND_VIA_CRAFT_SCAN]                    = "CraftScan을 통해 당신을 찾았고 인사말을 보았습니다. 지금 %s를 제작해줄 수 있나요?",
+        [LID.COMMISSION_INSTRUCTIONS]                 = "예: '10000g', 기본값: '아무거나'\n이 텍스트는 고객의 '제작자 찾기' 표에 나타납니다.",
+        ["Commission"]                                = "수수료",
+        ["Crafter [Currently Playing]"]               = "제작자 [현재 플레이 중]",
+        ["Profession commission"]                     = "직업 수수료",
+        [LID.DEFAULT_COMMISSION]                      = "아무거나",
+        [LID.HELP_ITEM_COMMISSION]                    =
+        "CraftScan은 개인 주문 시 고객에게 '제작자 찾기' 버튼을 제공합니다. 당신의 이름, 인사말 및 이 수수료가 다른 제작자와 함께 표에 표시됩니다. 고객의 표에 잘 맞도록 길이는 12자로 제한됩니다.",
+        ["Discoverable"]                              = "고객에게 표시 가능",
+        [LID.DISCOVERABLE_SETTING]                    = "활성화되면 고객이 '제작자 찾기'를 클릭할 때, 당신의 이름이 아이템을 제작할 수 있는 경우 생성된 표에 나타납니다.",
+        [LID.RN_CUSTOMER_SEARCH]                      = "제작자 찾기",
+        [LID.RN_CUSTOMER_SEARCH + 1]                  =
+        "개인 주문을 보낼 수 있는 페이지에 '제작자 찾기' 버튼이 추가되었습니다. 이 버튼은 CraftScan 사용자를 대상으로 요청을 보내고 아이템을 제작할 수 있는 제작자를 표에 결과와 함께 보여줍니다.",
+        [LID.RN_CUSTOMER_SEARCH + 2]                  = "각 직업과 아이템에는 이제 이 표에 표시될 '수수료' 상자가 있으며, 텍스트는 12자로 제한됩니다.",
+        [LID.RN_CUSTOMER_SEARCH + 3]                  =
+        "'CraftScan' 채널에 가입했지만, 이를 활성화하거나 채널 메시지를 볼 필요는 없습니다. CraftScan이 사적인 요청을 전송할 수 있도록 존재합니다.",
+        [LID.RN_CUSTOMER_SEARCH + 4]                  = "제작자로서, 이미 당신이 무엇을 제작할 수 있는지 알고 있는 고객으로부터 갑작스러운 귓속말을 받을 수 있습니다.",
+        [LID.RN_CUSTOMER_SEARCH + 5]                  = "체험 계정은 제작 테이블에 접근할 수 없기 때문에 이 기능을 테스트하는 것이 약간 어렵습니다. 문제가 발생하면 기능을 비활성화할 수 있습니다.",
+        [LID.RN_CUSTOMER_SEARCH + 6]                  = "Blizzard 설정 메뉴에서 새 '발견 가능' 설정을 통해 이 표에서 제외될 수 있습니다.",
+        [LID.RN_CUSTOMER_SEARCH + 7]                  =
+        "고객이 애드온을 사용할 수 있기 때문에 분석 기능을 완전히 비활성화할 수 있으며, 기본적으로 비활성화되어 있습니다. 데이터를 이미 수집한 경우 기능이 계속 활성화된 상태로 유지됩니다."
+
 
 
 

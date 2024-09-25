@@ -355,7 +355,7 @@ function CraftScan.LOCAL_DE:GetData()
         "Dies ist für die Verwendung mit einem zweiten Account gedacht, der Aufträge übernimmt, damit du Aufträge erhalten kannst, während du mit deinem Hauptaccount unterwegs bist, und der Kunde weiß, dass du es nicht sofort herstellen kannst.",
         ["Release Notes"]                             = "Versionshinweise",
 
-        ["Secondary Keywords"]                        = "Sekundäre Schlüsselwörter:",
+        ["Secondary Keywords"]                        = "Sekundäre Schlüsselwörter",
         [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
         "Zum Beispiel: 'pvp, 610, algari' oder '606, 610, 636' oder '590', um dasselbe Schlüsselwort auf mehreren Gegenständen zu unterscheiden.",
         [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
@@ -367,6 +367,43 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
         [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
         [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
+        ["Find Crafter"]                              = "Handwerker finden",
+        ["No Crafters Found"]                         = "Keine Handwerker gefunden",
+        [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
+        [LID.GREET_FOUND_CRAFTER]                     = "|cffffd100Linksklick: Handwerksauftrag anfragen|r",
+        ["Crafter Greeting"]                          = "|cFFFFFFFFHandwerker Begrüßung|r",
+        [LID.BUSY_ICON]                               =
+        "|cFFFFFFFFDer Handwerker hat angegeben, dass er derzeit beschäftigt ist, aber später das Item herstellen kann.\n\nÜberprüfen Sie seine Begrüßung für Details.|r",
+        ["Potential Crafters"]                        = "Mögliche Handwerker",
+        [LID.FOUND_VIA_CRAFT_SCAN]                    =
+        "Ich habe dich über CraftScan gefunden und deine Begrüßung gesehen. Kannst du %s jetzt für mich herstellen?",
+        [LID.COMMISSION_INSTRUCTIONS]                 =
+        "z.B. '10000g', Standard: 'Beliebig'\nDieser Text erscheint in der 'Handwerker finden'-Tabelle des Kunden.",
+        ["Commission"]                                = "Provision",
+        ["Crafter [Currently Playing]"]               = "Handwerker [Zurzeit im Spiel]",
+        ["Profession commission"]                     = "Berufsprovision",
+        [LID.DEFAULT_COMMISSION]                      = "Beliebig",
+        [LID.HELP_ITEM_COMMISSION]                    =
+        "CraftScan bietet Kunden einen 'Handwerker finden'-Button bei persönlichen Aufträgen. Dein Name, deine Begrüßung und diese Provision erscheinen zusammen mit anderen Handwerkern in der Tabelle. Die Länge ist auf 12 Zeichen begrenzt, um gut in die Tabelle des Kunden zu passen.",
+        ["Discoverable"]                              = "Für Kunden auffindbar",
+        [LID.DISCOVERABLE_SETTING]                    =
+        "Wenn aktiviert, erscheint dein Name in der generierten Tabelle, wenn ein Kunde 'Handwerker finden' auswählt und du den Gegenstand herstellen kannst.",
+        [LID.RN_CUSTOMER_SEARCH]                      = "Handwerker finden",
+        [LID.RN_CUSTOMER_SEARCH + 1]                  =
+        "Die Seite zum Senden eines persönlichen Auftrags hat jetzt einen 'Handwerker finden'-Button. Dieser Button sendet eine Anfrage an alle CraftScan-Nutzer, um zu sehen, wer den Gegenstand herstellen kann, und zeigt die Ergebnisse in einer Tabelle mit der konfigurierten Provision des Handwerkers an.",
+        [LID.RN_CUSTOMER_SEARCH + 2]                  =
+        "Jeder Beruf und Gegenstand hat jetzt ein 'Provision'-Feld, um anzugeben, was in dieser Tabelle angezeigt wird. Der Text ist auf 12 Zeichen begrenzt, um in die Tabelle zu passen.",
+        [LID.RN_CUSTOMER_SEARCH + 3]                  =
+        "Du bist dem 'CraftScan'-Kanal beigetreten, aber du musst ihn nicht aktivieren oder Nachrichten im Kanal sehen. Er dient dazu, dass CraftScan private Anfragen wie üblich im Handelschat senden kann.",
+        [LID.RN_CUSTOMER_SEARCH + 4]                  =
+        "Als Handwerker kannst du jetzt unaufgeforderte Flüsternachrichten von Kunden erhalten, die bereits wissen, was du herstellen kannst.",
+        [LID.RN_CUSTOMER_SEARCH + 5]                  =
+        "Das ist etwas schwierig zu testen, da Testaccounts keinen Zugang zur Handwerkstabelle haben. Wenn du auf Probleme stößt, kannst du das Feature deaktivieren, bis ich es beheben kann.",
+        [LID.RN_CUSTOMER_SEARCH + 6]                  =
+        "Du kannst über die neue 'Auffindbar'-Einstellung im Hauptmenü der Blizzard-Einstellungen von dieser Tabelle ausgeschlossen werden.",
+        [LID.RN_CUSTOMER_SEARCH + 7]                  =
+        "Da Kunden möglicherweise anfangen, das Addon zu nutzen, kann die Analysefunktion vollständig deaktiviert werden. Standardmäßig ist sie jetzt deaktiviert. Wenn du bereits Daten gesammelt hast, bleibt sie aktiviert."
 
 
 

@@ -353,8 +353,7 @@ function CraftScan.LOCAL_EN:GetData()
                 "This is intended for use with a second account proxying orders so you can catch orders while out and about on your main, and the customer will know you can't craft it immediately.",
                 ["Release Notes"]                             = "Release Notes",
 
-                -- Translations complete above this line
-                ["Secondary Keywords"]                        = "Secondary Keywords:",
+                ["Secondary Keywords"]                        = "Secondary Keywords",
                 [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
                 "For example: 'pvp, 610, algari' or '606, 610, 636' or '590', to differentiate the same keyword on multiple items.",
                 [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
@@ -366,6 +365,44 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
                 [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
                 [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+
+                -- Translations complete above this line
+                ["Find Crafter"]                              = "Find Crafter",
+                ["No Crafters Found"]                         = "No Crafters Found",
+                [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
+                [LID.GREET_FOUND_CRAFTER]                     = "|cffffd100Left click: Request craft|r",
+                ["Crafter Greeting"]                          = "|cFFFFFFFFCrafter Greeting|r",
+                [LID.BUSY_ICON]                               =
+                "|cFFFFFFFFThe crafter has indicated they are currently busy, but can craft the item later.\n\nCheck their greeting for details.|r",
+                ["Potential Crafters"]                        = "Potential Crafters",
+                [LID.FOUND_VIA_CRAFT_SCAN]                    =
+                "I found you via CraftScan and have seen your greeting. Can you craft %s for me now?",
+                [LID.COMMISSION_INSTRUCTIONS]                 =
+                "e.g. '10000g', Default: 'Any'\nThis text appears in the customer's 'Find Crafter' table.",
+                ["Commission"]                                = "Commission",
+                ["Crafter [Currently Playing]"]               = "Crafter [Currently Playing]",
+                ["Profession commission"]                     = "Profession commission",
+                [LID.DEFAULT_COMMISSION]                      = "Any",
+                [LID.HELP_ITEM_COMMISSION]                    =
+                "CraftScan provides customers with a 'Find Crafter' button on personal orders. You name, greeting, and this commission will appear in the table along with other crafters. The length is limited to 12 characters to fit nicely in the customer's table.",
+                ["Discoverable"]                              = "Discoverable to customers",
+                [LID.DISCOVERABLE_SETTING]                    =
+                "When enabled, when a customer hits 'Find Crafter', your name will appear in the generated table if you can craft the item.",
+                [LID.RN_CUSTOMER_SEARCH]                      = "Find a Crafter",
+                [LID.RN_CUSTOMER_SEARCH + 1]                  =
+                "The page to send a Personal Order now has a 'Find Crafter' button. This button sends a request to all CraftScan users to see who can craft the item and presents the results in a table with the crafter's configured commission.",
+                [LID.RN_CUSTOMER_SEARCH + 2]                  =
+                "Each profession and item now has a 'Commission' box to configure what will show up in this table, and the text is limited to 12 characters to fit in the table.",
+                [LID.RN_CUSTOMER_SEARCH + 3]                  =
+                "You have joined the 'CraftScan' channel, but you don't need to enable it or see any messages in the channel. It exists to allow CraftScan to privately broadcast requests like players usually do in Trade chat.",
+                [LID.RN_CUSTOMER_SEARCH + 4]                  =
+                "As a crafter, you might now receive unprompted whispers from customers that already know what you can craft.",
+                [LID.RN_CUSTOMER_SEARCH + 5]                  =
+                "This one is a bit difficult to test since trial accounts aren't allowed access to the crafting table. If you run into any issues, you can disable the feature until I can fix it.",
+                [LID.RN_CUSTOMER_SEARCH + 6]                  =
+                "You can opt out of being included in this table via the new 'Discoverable' setting in main Blizzard Settings menu.",
+                [LID.RN_CUSTOMER_SEARCH + 7]                  =
+                "Since customers might start using the addon, the Analytics feature can be completely disabled, and defaults to being disabled now. If you already collected data, it will remain enabled.",
 
                 -- ChatGPT prompt:
                 -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.

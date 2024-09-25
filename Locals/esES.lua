@@ -354,7 +354,7 @@ function CraftScan.LOCAL_ES:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "Esto está destinado a ser utilizado con una segunda cuenta que proxy pedidos para que puedas recibir pedidos mientras estás fuera con tu cuenta principal, y el cliente sabrá que no puedes fabricarlo de inmediato.",
         ["Release Notes"]                             = "Notas de la Versión",
-        ["Secondary Keywords"]                        = "Palabras clave secundarias:",
+        ["Secondary Keywords"]                        = "Palabras clave secundarias",
         [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
         "Por ejemplo: 'pvp, 610, algari' o '606, 610, 636' o '590', para diferenciar la misma palabra clave en varios objetos.",
         [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
@@ -366,6 +366,43 @@ function CraftScan.LOCAL_ES:GetData()
         [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
         [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
         [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+        ["Find Crafter"]                              = "Encontrar Artesano",
+        ["No Crafters Found"]                         = "No se encontraron artesanos",
+        [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
+        [LID.GREET_FOUND_CRAFTER]                     = "|cffffd100Clic izquierdo: Solicitar fabricación|r",
+        ["Crafter Greeting"]                          = "|cFFFFFFFFSaludo del artesano|r",
+        [LID.BUSY_ICON]                               =
+        "|cFFFFFFFFEl artesano ha indicado que está ocupado, pero puede fabricar el objeto más tarde.\n\nVerifica su saludo para más detalles.|r",
+        ["Potential Crafters"]                        = "Artesanos potenciales",
+        [LID.FOUND_VIA_CRAFT_SCAN]                    =
+        "Te encontré a través de CraftScan y vi tu saludo. ¿Puedes fabricar %s para mí ahora?",
+        [LID.COMMISSION_INSTRUCTIONS]                 =
+        "Ej. '10000g', Predeterminado: 'Cualquiera'\nEste texto aparece en la tabla 'Encontrar artesano' del cliente.",
+        ["Commission"]                                = "Comisión",
+        ["Crafter [Currently Playing]"]               = "Artesano [Actualmente jugando]",
+        ["Profession commission"]                     = "Comisión de profesión",
+        [LID.DEFAULT_COMMISSION]                      = "Cualquiera",
+        [LID.HELP_ITEM_COMMISSION]                    =
+        "CraftScan ofrece a los clientes un botón de 'Encontrar artesano' en órdenes personales. Tu nombre, saludo y esta comisión aparecerán en la tabla junto con otros artesanos. La longitud está limitada a 12 caracteres para ajustarse en la tabla del cliente.",
+        ["Discoverable"]                              = "Visible para los clientes",
+        [LID.DISCOVERABLE_SETTING]                    =
+        "Cuando está activado, cuando un cliente pulsa 'Encontrar artesano', tu nombre aparecerá en la tabla generada si puedes fabricar el objeto.",
+        [LID.RN_CUSTOMER_SEARCH]                      = "Encontrar artesano",
+        [LID.RN_CUSTOMER_SEARCH + 1]                  =
+        "La página para enviar una orden personal ahora tiene un botón de 'Encontrar artesano'. Este botón envía una solicitud a todos los usuarios de CraftScan para ver quién puede fabricar el objeto y presenta los resultados en una tabla con la comisión configurada del artesano.",
+        [LID.RN_CUSTOMER_SEARCH + 2]                  =
+        "Cada profesión y objeto ahora tiene un cuadro de 'Comisión' para configurar lo que se mostrará en esta tabla, y el texto está limitado a 12 caracteres para caber en la tabla.",
+        [LID.RN_CUSTOMER_SEARCH + 3]                  =
+        "Te has unido al canal 'CraftScan', pero no necesitas activarlo ni ver mensajes en el canal. Existe para permitir que CraftScan envíe solicitudes privadas como normalmente se hace en el chat de Comercio.",
+        [LID.RN_CUSTOMER_SEARCH + 4]                  =
+        "Como artesano, ahora podrías recibir susurros no solicitados de clientes que ya saben lo que puedes fabricar.",
+        [LID.RN_CUSTOMER_SEARCH + 5]                  =
+        "Este es un poco difícil de probar ya que las cuentas de prueba no tienen acceso a la tabla de fabricación. Si encuentras algún problema, puedes desactivar la función hasta que pueda solucionarlo.",
+        [LID.RN_CUSTOMER_SEARCH + 6]                  =
+        "Puedes optar por no estar incluido en esta tabla a través de la nueva configuración de 'Visible' en el menú principal de configuración de Blizzard.",
+        [LID.RN_CUSTOMER_SEARCH + 7]                  =
+        "Dado que los clientes podrían empezar a usar el addon, la función de Análisis se puede desactivar por completo, y ahora está desactivada por defecto. Si ya has recopilado datos, seguirá habilitada."
+
 
 
 

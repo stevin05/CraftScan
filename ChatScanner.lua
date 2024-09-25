@@ -487,6 +487,8 @@ local function AddTimeToAnalytics(customer, item)
 end
 
 local function AddItemToAnalytics(customer, itemID, parentProfID)
+    if not CraftScan.DB.analytics.enabled then return; end
+
     local seen = saved(CraftScan.DB.analytics, "seen_items", {});
     local item = saved(seen, itemID, { times = {}, ppID = parentProfID });
     AddTimeToAnalytics(customer, item);
@@ -494,6 +496,8 @@ local function AddItemToAnalytics(customer, itemID, parentProfID)
 end
 
 local function AddMessageToAnalytics(customer, message)
+    if not CraftScan.DB.analytics.enabled then return; end
+
     local itemIDs = GetItemIDsFromQualityLinks(message);
     if not itemIDs then return; end
 
@@ -512,6 +516,8 @@ end
 -- the translation when a profession is opened scan any saved items and see if
 -- they are related to this profession.
 function CraftScan.Scanner.UpdateAnalyticsProfIDs(parentProfID)
+    if not CraftScan.DB.analytics.enabled then return; end
+
     if not CraftScan.DB.analytics.seen_items then return end
 
     local itemIDs = nil;
@@ -541,10 +547,10 @@ function CraftScan.Scanner.UpdateAnalyticsProfIDs(parentProfID)
     end
 end
 
-local function getCrafterForMessage(customer, message, forceCrafterInfo)
+local function getCrafterForMessage(customer, message, overrides)
     message = string.lower(message)
 
-    if not forceCrafterInfo then
+    if not overrides or (not overrides.forceCrafterInfo and not overrides.itemInfo) then
         if HasMatch(message, config.exclusions) then
             return nil
         end
@@ -568,8 +574,14 @@ local function getCrafterForMessage(customer, message, forceCrafterInfo)
         end
     end
 
-    -- Determine the profession via the item link or keywords in the message
-    local itemFound, _, itemID = string.find(message, "item:(%d+):")
+    local itemFound, _, itemID
+    if overrides and overrides.itemInfo then
+        -- If this is a request from another CraftScan user, they provided the itemID.
+        itemFound, _, itemID = overrides.itemInfo()
+    else
+        -- Determine the profession via the item link or keywords in the message
+        itemFound, _, itemID = string.find(message, "item:(%d+):")
+    end
 
     if itemFound then
         itemID = tonumber(itemID)
@@ -582,7 +594,7 @@ local function getCrafterForMessage(customer, message, forceCrafterInfo)
             end
         end
 
-        if not forceCrafterInfo then
+        if not overrides or not overrides.forceCrafterInfo then
             return nil;
         end
     end
@@ -631,8 +643,8 @@ local function getCrafterForMessage(customer, message, forceCrafterInfo)
         end
     end
 
-    if not bestMatch and forceCrafterInfo then
-        local crafterInfo, itemID, recipeInfo, categoryID = FindBestCrafter(forceCrafterInfo);
+    if not bestMatch and overrides and overrides.forceCrafterInfo then
+        local crafterInfo, itemID, recipeInfo, categoryID = FindBestCrafter(overrides.forceCrafterInfo);
         if crafterInfo then return crafterInfo, itemID, recipeInfo, categoryID; end
     end
 
@@ -820,23 +832,31 @@ end
 
 CraftScan.Utils.GetGreeting = GetGreeting;
 
-local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, item)
+local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, item, overrides)
     -- At this point, we have everything we need to generate a response to the message.
     local itemLink = item and item:GetItemLink() or nil
+
+    -- TODO - Want to make the item look 5*, but this doesn't send through chat.
+    --if itemLink then
+    --local tier5 = Professions.GetChatIconMarkupForQuality(5, true, 0);
+    --itemLink = itemLink .. " " .. tier5;
+    --end
+
 
     -- We keep a history of our customers to avoid spamming the same person repeatedly.
     local customerInfo = CraftScan.DB.customers[customer]
 
     -- Be as specific as possible about what we're responding to.
-    CraftScan.Utils.printTable("crafterInfo", crafterInfo);
     local profID = crafterInfo.profID
     local recipeID = recipeInfo and recipeInfo.recipeID
     local responseID = recipeID or categoryID or profID
 
+    local needsResultCallbackOnly = overrides and overrides.resultCallback;
+
     local responses = saved(customerInfo, "responses", {})
     local response = saved(responses, responseID, {})
     local firstInteraction = not next(response)
-    if response.greeting_sent then
+    if response.greeting_sent and not needsResultCallbackOnly then
         -- We already messaged the customer about this craft
         return
     end
@@ -873,6 +893,30 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
     local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[profID]
     greeting = concatGreetings(greeting, profGreeting(recipeID, categoryID, profConfig))
+
+    if needsResultCallbackOnly then
+        -- Erase the persistent state associated with this since it's just a
+        -- query the the crafter shouldn't know about yet until the customer
+        -- chooses to interact.
+        CraftScan.DismissOrder({
+            customerName = customer,
+            responseID = responseID
+        });
+
+        local function GetCommission()
+            local itemComm = profConfig.recipes[recipeID].commission;
+            if itemComm and #itemComm ~= 0 then
+                return itemComm;
+            end
+            local profComm = profConfig.commission;
+            if profComm and #profComm ~= 0 then
+                return profComm;
+            end
+            return nil;
+        end
+        overrides.resultCallback(crafter, greeting, GetCommission());
+        return;
+    end
 
     response.message = SplitResponse(greeting)
     local chat_history = saved(customerInfo, 'chat_history', {})
@@ -916,6 +960,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     response.recipeID = recipeID;
     response.time = now;
     response.responseID = responseID;
+    response.greeting_sent = overrides and overrides.greeted;
 
     if firstInteraction then
         local order = {
@@ -956,7 +1001,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     CraftScanComm:ShareCustomerOrder(message, customer, customerInfo.guid, chat_history[#chat_history]);
 end
 
-function CraftScan.OnMessage(event, message, customer, customerGuid, forceCrafterInfo)
+function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
     if not message or not customer then
         return false
     end
@@ -985,7 +1030,7 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, forceCrafte
         return false
     end
 
-    local crafterInfo, itemID, recipeInfo, categoryID = getCrafterForMessage(customer, message, forceCrafterInfo)
+    local crafterInfo, itemID, recipeInfo, categoryID = getCrafterForMessage(customer, message, overrides);
     if not crafterInfo then
         return false
     end
@@ -1004,7 +1049,7 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, forceCrafte
         if itemID then
             local item = Item:CreateFromItemID(itemID)
             item:ContinueOnItemLoad(function()
-                handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, item)
+                handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, item, overrides)
             end)
             return false
         end

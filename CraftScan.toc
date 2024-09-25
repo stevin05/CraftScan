@@ -31,13 +31,14 @@ Locals/Localization.lua
 
 Utils/Utils.xml
 Utils/ReleaseNotes.xml
-Utils/Comm.lua
 Utils/Dialog.xml
 Utils/TooltipPlot.lua
 
 RecipeSchematicMenu.xml
 
 AlertIcon.xml
+
+Utils/Comm.lua
 
 ChatScanner.lua
 
@@ -48,3 +49,5 @@ AnalyticsTableTemplate.xml
 OrderPage.xml
 
 Settings.xml
+
+CustomerPage.xml

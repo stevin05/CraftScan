@@ -120,25 +120,33 @@ CraftScan.CONST.TEXT = {
     MANUAL_MATCHING_DESC                    = 115,
     SECONDARY_KEYWORD_INSTRUCTIONS          = 116,
     HELP_ITEM_SECONDARY_KEYWORDS            = 117,
-
+    FOUND_CRAFTER_NAME_ENTRY                = 118,
+    GREET_FOUND_CRAFTER                     = 119,
+    BUSY_ICON                               = 120,
+    FOUND_VIA_CRAFT_SCAN                    = 121,
+    COMMISSION_INSTRUCTIONS                 = 122,
+    DEFAULT_COMMISSION                      = 123,
+    HELP_ITEM_COMMISSION                    = 124,
+    DISCOVERABLE_SETTING                    = 125,
 
 
 
     -- Release notes have multiple lines that are sequential. Spaced out by hundreds to give more than enough room.
-    RN_WELCOME = 10000,
-    RN_INITIAL_SETUP = 10100,
-    RN_INITIAL_TESTING = 10200,
-    RN_MANAGING_CRAFTERS = 10300,
-    RN_MANAGING_CUSTOMERS = 10400,
-    RN_KEYBINDS = 10500,
-    RN_CLEANUP = 10600,
-    RN_LINKED_ACCOUNTS = 10700,
-    RN_ANALYTICS = 10800,
-    RN_ALERT_ICON_ANCHOR = 10900,
-    RN_MANUAL_MATCH = 11000,
+    RN_WELCOME             = 10000,
+    RN_INITIAL_SETUP       = 10100,
+    RN_INITIAL_TESTING     = 10200,
+    RN_MANAGING_CRAFTERS   = 10300,
+    RN_MANAGING_CUSTOMERS  = 10400,
+    RN_KEYBINDS            = 10500,
+    RN_CLEANUP             = 10600,
+    RN_LINKED_ACCOUNTS     = 10700,
+    RN_ANALYTICS           = 10800,
+    RN_ALERT_ICON_ANCHOR   = 10900,
+    RN_MANUAL_MATCH        = 11000,
     RN_CUSTOM_EXPLANATIONS = 11100,
-    RN_BUSY_MODE = 11200,
-    RN_SECONDARY_KEYWORDS = 11300,
+    RN_BUSY_MODE           = 11200,
+    RN_SECONDARY_KEYWORDS  = 11300,
+    RN_CUSTOMER_SEARCH     = 11400,
 }
 
 CraftScan.CONST.LOCALES = {

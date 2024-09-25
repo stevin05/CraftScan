@@ -5,7 +5,7 @@ local function L(id)
     return CraftScan.LOCAL:GetText(id);
 end
 
-CraftScan.CONST.CURRENT_VERSION = 'v1.3.1';
+CraftScan.CONST.CURRENT_VERSION = 'v1.3.2';
 
 local function CompareVersions(version1, version2)
     local function extractVersion(version)
@@ -23,6 +23,10 @@ local function CompareVersions(version1, version2)
         if v1[i] > v2[i] then return 1 end
     end
     return 0
+end
+
+function CraftScan.IsRemoteVersionMoreRecent(remoteVersion)
+    return CompareVersions(remoteVersion, CraftScan.CONST.CURRENT_VERSION) > 0;
 end
 
 local function NotifyRecentChanges(lastLoadedVersion)
@@ -93,6 +97,10 @@ local function NotifyRecentChanges(lastLoadedVersion)
         {
             version = 'v1.3.1',
             id = LID.RN_SECONDARY_KEYWORDS,
+        },
+        {
+            version = 'v1.3.2',
+            id = LID.RN_CUSTOMER_SEARCH,
         },
     };
 

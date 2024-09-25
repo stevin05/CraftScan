@@ -351,7 +351,7 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "Questo è destinato all'uso con un secondo account che proxy gli ordini in modo da poter catturare ordini mentre sei in giro con il tuo principale, e il cliente saprà che non puoi crearlo immediatamente.",
         ["Release Notes"]                             = "Note di Rilascio",
-        ["Secondary Keywords"]                        = "Parole chiave secondarie:",
+        ["Secondary Keywords"]                        = "Parole chiave secondarie",
         [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
         "Ad esempio: 'pvp, 610, algari' o '606, 610, 636' o '590', per differenziare la stessa parola chiave su più oggetti.",
         [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
@@ -363,6 +363,43 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
         [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
         [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+        ["Find Crafter"]                              = "Trova Artigiano",
+        ["No Crafters Found"]                         = "Nessun artigiano trovato",
+        [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
+        [LID.GREET_FOUND_CRAFTER]                     = "|cffffd100Clic sinistro: Richiedi la creazione|r",
+        ["Crafter Greeting"]                          = "|cFFFFFFFFSaluto dell'artigiano|r",
+        [LID.BUSY_ICON]                               =
+        "|cFFFFFFFFL'artigiano ha indicato che è attualmente occupato, ma può creare l'oggetto in seguito.\n\nControlla il suo saluto per ulteriori dettagli.|r",
+        ["Potential Crafters"]                        = "Artigiani potenziali",
+        [LID.FOUND_VIA_CRAFT_SCAN]                    =
+        "Ti ho trovato tramite CraftScan e ho visto il tuo saluto. Puoi creare %s per me adesso?",
+        [LID.COMMISSION_INSTRUCTIONS]                 =
+        "es. '10000g', Predefinito: 'Qualsiasi'\nQuesto testo appare nella tabella 'Trova Artigiano' del cliente.",
+        ["Commission"]                                = "Commissione",
+        ["Crafter [Currently Playing]"]               = "Artigiano [Attualmente in gioco]",
+        ["Profession commission"]                     = "Commissione della professione",
+        [LID.DEFAULT_COMMISSION]                      = "Qualsiasi",
+        [LID.HELP_ITEM_COMMISSION]                    =
+        "CraftScan fornisce ai clienti un pulsante 'Trova Artigiano' negli ordini personali. Il tuo nome, saluto e questa commissione appariranno nella tabella insieme ad altri artigiani. La lunghezza è limitata a 12 caratteri per adattarsi alla tabella del cliente.",
+        ["Discoverable"]                              = "Visibile ai clienti",
+        [LID.DISCOVERABLE_SETTING]                    =
+        "Se abilitato, quando un cliente clicca su 'Trova Artigiano', il tuo nome apparirà nella tabella generata se puoi creare l'oggetto.",
+        [LID.RN_CUSTOMER_SEARCH]                      = "Trova Artigiano",
+        [LID.RN_CUSTOMER_SEARCH + 1]                  =
+        "La pagina per inviare un Ordine Personale ora ha un pulsante 'Trova Artigiano'. Questo pulsante invia una richiesta a tutti gli utenti di CraftScan per vedere chi può creare l'oggetto e presenta i risultati in una tabella con la commissione configurata dell'artigiano.",
+        [LID.RN_CUSTOMER_SEARCH + 2]                  =
+        "Ogni professione e oggetto ha ora una casella 'Commissione' per configurare ciò che apparirà in questa tabella, e il testo è limitato a 12 caratteri per adattarsi alla tabella.",
+        [LID.RN_CUSTOMER_SEARCH + 3]                  =
+        "Sei entrato nel canale 'CraftScan', ma non devi attivarlo o vedere i messaggi nel canale. Serve per consentire a CraftScan di inviare richieste private come solitamente avviene nel canale Commercio.",
+        [LID.RN_CUSTOMER_SEARCH + 4]                  =
+        "Come artigiano, potresti ora ricevere sussurri non richiesti da clienti che già sanno cosa puoi creare.",
+        [LID.RN_CUSTOMER_SEARCH + 5]                  =
+        "Questo è un po' difficile da testare poiché gli account di prova non hanno accesso alla tabella delle creazioni. Se riscontri problemi, puoi disattivare la funzione fino a quando non potrò risolverla.",
+        [LID.RN_CUSTOMER_SEARCH + 6]                  =
+        "Puoi scegliere di non essere incluso in questa tabella tramite la nuova impostazione 'Visibile' nel menu delle Impostazioni principali di Blizzard.",
+        [LID.RN_CUSTOMER_SEARCH + 7]                  =
+        "Poiché i clienti potrebbero iniziare a utilizzare l'addon, la funzione Analytics può essere completamente disabilitata e ora è disabilitata per impostazione predefinita. Se hai già raccolto dati, rimarrà abilitata."
+
 
 
 

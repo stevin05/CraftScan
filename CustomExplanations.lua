@@ -180,8 +180,10 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
                         local message = C_ChatInfo.GetChatLineText(contextData.lineID)
                         local customerGuid = C_ChatInfo.GetChatLineSenderGUID(contextData.lineID)
                         CraftScan.OnMessage(nil, message, customer, customerGuid, {
-                            crafter = char,
-                            parentProfID = ppID,
+                            forceCrafterInfo = {
+                                crafter = char,
+                                parentProfID = ppID,
+                            }
                         });
                     end);
             end

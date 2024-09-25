@@ -85,6 +85,13 @@
       <KeyValue key="hideCharCount" value="true" type="boolean"/>
     </KeyValues>
   </ScrollFrame>
+  <ScrollFrame name="CraftScan_CommissionInput" inherits="InputScrollFrameTemplate" virtual="true">
+    <KeyValues>
+      <KeyValue key="maxLetters" value="12" type="number"/>
+      <KeyValue key="instructions" value="CRAFT_SCAN_COMMISSION_INSTRUCTIONS" type="global" />
+      <KeyValue key="hideCharCount" value="true" type="boolean"/>
+    </KeyValues>
+  </ScrollFrame>
   <Frame name="CraftScanFrame" inherits="DefaultPanelFlatTemplate" mixin="CraftScan_CraftScanFrameMixin" parent="UIParent" movable="true" enableMouse="true" frameStrata="DIALOG" hidden="true">
     <Size x="400" y="658" />
     <Frames>

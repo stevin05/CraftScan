@@ -333,7 +333,7 @@ function CraftScan.LOCAL_TW:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "這是為了與第二個賬戶代理訂單使用，以便你在主賬戶外出時能接收訂單，客戶會知道你不能立即製作。",
         ["Release Notes"]                             = "發布說明",
-        ["Secondary Keywords"]                        = "次要關鍵詞：",
+        ["Secondary Keywords"]                        = "次要關鍵詞",
         [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          = "例如：'pvp, 610, algari' 或 '606, 610, 636' 或 '590'，用來區分同一關鍵詞在多個物品上的差異。",
         [LID.HELP_ITEM_SECONDARY_KEYWORDS]            = "匹配主關鍵詞後，檢查次要關鍵詞以進一步精確匹配，允許區分同一裝備欄位的不同工藝。",
         [LID.RN_SECONDARY_KEYWORDS]                   = "次要關鍵詞",
@@ -342,6 +342,31 @@ function CraftScan.LOCAL_TW:GetData()
         [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
         [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
         [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+        ["Find Crafter"]                              = "尋找工匠",
+        ["No Crafters Found"]                         = "未找到工匠",
+        [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
+        [LID.GREET_FOUND_CRAFTER]                     = "|cffffd100左鍵點擊：請求製作|r",
+        ["Crafter Greeting"]                          = "|cFFFFFFFF工匠問候語|r",
+        [LID.BUSY_ICON]                               = "|cFFFFFFFF工匠表示目前很忙，但稍後可以製作該物品。\n\n查看他們的問候語以獲取詳細信息。|r",
+        ["Potential Crafters"]                        = "潛在工匠",
+        [LID.FOUND_VIA_CRAFT_SCAN]                    = "我通過CraftScan找到你，並看到了你的問候語。你現在能為我製作 %s 嗎？",
+        [LID.COMMISSION_INSTRUCTIONS]                 = "例如 '10000g', 預設值：'任意'\n此文本將顯示在客戶的'尋找工匠'表中。",
+        ["Commission"]                                = "佣金",
+        ["Crafter [Currently Playing]"]               = "工匠 [當前在線]",
+        ["Profession commission"]                     = "職業佣金",
+        [LID.DEFAULT_COMMISSION]                      = "任意",
+        [LID.HELP_ITEM_COMMISSION]                    = "CraftScan為客戶提供了個人訂單的'尋找工匠'按鈕。你的名字、問候語以及佣金將與其他工匠一起出現在表中。長度限制為12個字元，以便在客戶的表中整齊顯示。",
+        ["Discoverable"]                              = "可被客戶發現",
+        [LID.DISCOVERABLE_SETTING]                    = "啟用時，當客戶點擊'尋找工匠'，如果你能製作該物品，你的名字將顯示在生成的表中。",
+        [LID.RN_CUSTOMER_SEARCH]                      = "尋找工匠",
+        [LID.RN_CUSTOMER_SEARCH + 1]                  = "現在，發送個人訂單的頁面有了'尋找工匠'按鈕。這個按鈕會向所有CraftScan用戶發送請求，看看誰能製作物品，並將結果顯示在包含工匠佣金的表中。",
+        [LID.RN_CUSTOMER_SEARCH + 2]                  = "每個職業和物品現在都有一個'佣金'框，用於配置在表中顯示的內容，文本限制為12個字元。",
+        [LID.RN_CUSTOMER_SEARCH + 3]                  = "你已加入'CraftScan'頻道，但你不需要啟用它或查看該頻道中的訊息。它的存在是為了讓CraftScan能像玩家通常在貿易頻道那樣私下發送請求。",
+        [LID.RN_CUSTOMER_SEARCH + 4]                  = "作為工匠，你現在可能會收到客戶發送的意外密語，他們已經知道你能製作什麼。",
+        [LID.RN_CUSTOMER_SEARCH + 5]                  = "由於試玩帳號無法訪問製作表，這個功能有些難以測試。如果遇到任何問題，你可以禁用此功能，直到我能修復它。",
+        [LID.RN_CUSTOMER_SEARCH + 6]                  = "你可以通過暴雪主設置菜單中的新'可被客戶發現'設置選擇不被列入該表中。",
+        [LID.RN_CUSTOMER_SEARCH + 7]                  = "由於客戶可能開始使用此插件，分析功能現在可以完全禁用，預設情況下已禁用。如果你已經收集了數據，它將保持啟用狀態。"
+
 
     }
 end

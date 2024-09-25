@@ -352,7 +352,7 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.RN_BUSY_MODE + 2]                        =
         "Cela est destiné à être utilisé avec un second compte qui prend des commandes pour que vous puissiez recevoir des commandes pendant que vous êtes en déplacement avec votre compte principal, et le client saura que vous ne pouvez pas le fabriquer immédiatement.",
         ["Release Notes"]                             = "Notes de Version",
-        ["Secondary Keywords"]                        = "Mots-clés secondaires:",
+        ["Secondary Keywords"]                        = "Mots-clés secondaires",
         [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
         "Par exemple : 'pvp, 610, algari' ou '606, 610, 636' ou '590', pour différencier le même mot-clé sur plusieurs objets.",
         [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
@@ -364,6 +364,43 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
         [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
         [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+        ["Find Crafter"]                              = "Trouver un Artisan",
+        ["No Crafters Found"]                         = "Aucun artisan trouvé",
+        [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
+        [LID.GREET_FOUND_CRAFTER]                     = "|cffffd100Clic gauche: Demander une fabrication|r",
+        ["Crafter Greeting"]                          = "|cFFFFFFFFSalutation de l'artisan|r",
+        [LID.BUSY_ICON]                               =
+        "|cFFFFFFFFL'artisan a indiqué qu'il est actuellement occupé, mais pourra fabriquer l'objet plus tard.\n\nVérifiez sa salutation pour plus de détails.|r",
+        ["Potential Crafters"]                        = "Artisans potentiels",
+        [LID.FOUND_VIA_CRAFT_SCAN]                    =
+        "Je vous ai trouvé via CraftScan et j'ai vu votre salutation. Pouvez-vous fabriquer %s pour moi maintenant?",
+        [LID.COMMISSION_INSTRUCTIONS]                 =
+        "par exemple '10000g', Défaut : 'N'importe lequel'\nCe texte apparaît dans la table 'Trouver un Artisan' du client.",
+        ["Commission"]                                = "Commission",
+        ["Crafter [Currently Playing]"]               = "Artisan [Actuellement en jeu]",
+        ["Profession commission"]                     = "Commission de profession",
+        [LID.DEFAULT_COMMISSION]                      = "N'importe lequel",
+        [LID.HELP_ITEM_COMMISSION]                    =
+        "CraftScan fournit aux clients un bouton 'Trouver un Artisan' pour les commandes personnelles. Votre nom, votre salutation et cette commission apparaîtront dans la table avec d'autres artisans. La longueur est limitée à 12 caractères pour tenir dans la table du client.",
+        ["Discoverable"]                              = "Découvrable par les clients",
+        [LID.DISCOVERABLE_SETTING]                    =
+        "Si activé, lorsque le client clique sur 'Trouver un Artisan', votre nom apparaîtra dans la table générée si vous pouvez fabriquer l'objet.",
+        [LID.RN_CUSTOMER_SEARCH]                      = "Trouver un Artisan",
+        [LID.RN_CUSTOMER_SEARCH + 1]                  =
+        "La page pour envoyer une commande personnelle comporte maintenant un bouton 'Trouver un Artisan'. Ce bouton envoie une requête à tous les utilisateurs de CraftScan pour voir qui peut fabriquer l'objet, et affiche les résultats dans une table avec la commission configurée de l'artisan.",
+        [LID.RN_CUSTOMER_SEARCH + 2]                  =
+        "Chaque profession et objet dispose désormais d'une case 'Commission' pour configurer ce qui apparaîtra dans cette table, et le texte est limité à 12 caractères pour s'adapter à la table.",
+        [LID.RN_CUSTOMER_SEARCH + 3]                  =
+        "Vous avez rejoint le canal 'CraftScan', mais vous n'avez pas besoin de l'activer ou de voir des messages dans le canal. Il permet à CraftScan d'envoyer des demandes privées, comme dans le chat commercial.",
+        [LID.RN_CUSTOMER_SEARCH + 4]                  =
+        "En tant qu'artisan, vous pourriez maintenant recevoir des chuchotements non sollicités de clients qui savent déjà ce que vous pouvez fabriquer.",
+        [LID.RN_CUSTOMER_SEARCH + 5]                  =
+        "C'est un peu difficile à tester car les comptes d'essai n'ont pas accès à la table d'artisanat. Si vous rencontrez des problèmes, vous pouvez désactiver cette fonction jusqu'à ce que je puisse la corriger.",
+        [LID.RN_CUSTOMER_SEARCH + 6]                  =
+        "Vous pouvez choisir de ne pas être inclus dans cette table via le nouveau paramètre 'Découvrable' dans le menu principal des paramètres de Blizzard.",
+        [LID.RN_CUSTOMER_SEARCH + 7]                  =
+        "Comme les clients peuvent commencer à utiliser l'addon, la fonction d'analyse peut être complètement désactivée, et elle est désormais désactivée par défaut. Si vous avez déjà collecté des données, elles resteront activées."
+
 
 
 
