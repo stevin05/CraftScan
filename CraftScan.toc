@@ -33,12 +33,11 @@ Utils/Utils.xml
 Utils/ReleaseNotes.xml
 Utils/Dialog.xml
 Utils/TooltipPlot.lua
+Utils/Comm.lua
 
 RecipeSchematicMenu.xml
 
 AlertIcon.xml
-
-Utils/Comm.lua
 
 ChatScanner.lua
 

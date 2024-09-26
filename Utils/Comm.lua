@@ -38,21 +38,17 @@ local broadcastChannel = "CraftScan";
 local CRAFT_SCAN_COMM_PREFIX = "CRAFT_SCAN"
 function CraftScanComm:OnEnable()
     self:RegisterComm(CRAFT_SCAN_COMM_PREFIX)
+
+    -- We want to make sure we've waited until after the other channels are
+    -- initialized so we don't plan CraftScan at /1. I tried being clever and
+    -- waiting for those, but I think it was intermittently registering the
+    -- event after it had happened, so we missed it and never registered. We
+    -- only really need to do this once, so using a long ass wait should make it
+    -- safe and only impacts the first login after upgrade.
+    C_Timer.After(60, function()
+        JoinChannelByName(broadcastChannel);
+    end);
 end
-
-local function OnDefaultChannelsRegistered()
-    -- Make sure we unregister first, because we're about to trigger this event...
-    CraftScanScannerMenu:UnregisterEventCallback("CHANNEL_UI_UPDATE", OnDefaultChannelsRegistered);
-
-    -- We wait for the default channels to be setup so we don't hijack #1.
-    C_Timer.After(10, function()
-        -- Wait a bit more - really don't want to mess with people's chat
-        -- channels as they are a pain to fix.
-        JoinChannelByName(broadcastChannel)
-    end)
-end
-
-CraftScanScannerMenu:RegisterEventCallback("CHANNEL_UI_UPDATE", OnDefaultChannelsRegistered);
 
 CraftScanComm.Operations = {
     ShareCharacterData      = 'share_char_data',
