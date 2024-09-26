@@ -949,6 +949,7 @@ local function ReceiveFindCrafter(sender, data)
                     end,
                     resultCallback = function(crafter, greeting, commission)
                         CraftScanComm:Transmit(
+                        -- TODO: Idle timer?
                             { i = data.i, c = crafter, g = greeting, b = CraftScan.State.isBusy, co = commission },
                             CraftScanComm.Operations.FindCrafter,
                             sender);

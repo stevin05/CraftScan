@@ -952,6 +952,8 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
     local now = time()
 
+    local customerStartedInteraction = overrides and overrides.customerStartedInteraction;
+
     response.crafterName = crafter;
     response.professionID = profID;
     response.parentProfID = profInfo.parentProfessionID;
@@ -960,7 +962,10 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     response.recipeID = recipeID;
     response.time = now;
     response.responseID = responseID;
-    response.greeting_sent = overrides and overrides.greeted;
+    response.greeting_sent = overrides and overrides.greeted or customerStartedInteraction;
+    if customerStartedInteraction then
+        response.customer_answered = true;
+    end
 
     if firstInteraction then
         local order = {
@@ -976,7 +981,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         if ppConfig.visual_alert_enabled then
             FlashClientIcon()
 
-            if not greeting_queued then
+            if not greeting_queued and not customerStartedInteraction then
                 CraftScanScannerMenu:TriggerAlert(string.format("%s\n%s (%s)",
                         CraftScan.ColorizePlayerName(customer, customerInfo.guid),
                         itemLink or
@@ -1016,18 +1021,28 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
         return false
     end
 
-    if event == "CHAT_MSG_WHISPER" and customerInfo then
-        local chat_history = saved(customerInfo, 'chat_history', {})
-        table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
+    if event == "CHAT_MSG_WHISPER" then
+        if customerInfo then
+            local chat_history = saved(customerInfo, 'chat_history', {})
+            table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
 
-        for _, response in pairs(customerInfo.responses) do
-            if response.greeting_sent then
-                response.customer_answered = true
+            for _, response in pairs(customerInfo.responses) do
+                if response.greeting_sent then
+                    response.customer_answered = true
+                end
             end
+            CraftScanCraftingOrderPage:ShowGeneric()
+            FlashClientIcon()
+            return false
         end
-        CraftScanCraftingOrderPage:ShowGeneric()
-        FlashClientIcon()
-        return false
+        if not overrides then
+            overrides = {};
+        end
+
+        -- If they are whispering us about a craft, we want to match it and get
+        -- it in our table so we can keep track of them, but we don't need a big
+        -- alert. We'll still flash the client icon so you know to tab back in.
+        overrides.customerStartedInteraction = true;
     end
 
     local crafterInfo, itemID, recipeInfo, categoryID = getCrafterForMessage(customer, message, overrides);
@@ -1055,7 +1070,7 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
         end
     end
 
-    handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, nil)
+    handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, nil, overrides)
 
     return false
 end
