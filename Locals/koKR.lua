@@ -12,11 +12,11 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.RENABLE_ADDONS]                          = "애드온 다시 활성화",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "애드온 목록을 저장한 후, 애드온을 비활성화하여 빠르게 다른 캐릭터로 전환할 수 있습니다. 이 버튼을 다시 클릭하여 언제든지 애드온을 다시 활성화할 수 있습니다.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "%s 제작 가능합니다.", -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "내 대체 캐릭터, %s가 %s를 제작할 수 있습니다.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "{item} 제작 가능합니다.", -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "내 대체 캐릭터, {crafter}가 {item}를 제작할 수 있습니다.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "이것",
-        [LID.GREETING_I_HAVE_PROF]                    = "%s을 가지고 있습니다.", -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "내 대체 캐릭터, %s가 %s을 가지고 있습니다.", -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "{profession}을 가지고 있습니다.", -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "내 대체 캐릭터, {crafter}가 {profession}을 가지고 있습니다.", -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "주문을 보내면 전환해서 확인할 수 있도록 알려주세요.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "주문 페이지 전환",
         [LID.GREET_BUTTON_BINDING_NAME]               = "인사 배너 고객",

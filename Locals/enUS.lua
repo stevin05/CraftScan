@@ -15,11 +15,11 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.RENABLE_ADDONS]                  = "Re-enable Addons",
                 [LID.DISABLE_ADDONS_TOOLTIP]          =
                 "Save your list of addons, and then disable them, allowing for a quick swap to an alt. This button can be clicked again to re-enable the addons at any time.",
-                [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft %s.",           -- ItemLink
-                [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, %s, can craft %s.", -- Crafter Name, ItemLink
+                [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft {item}.",           -- ItemLink
+                [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, {crafter}, can craft {item}.", -- Crafter Name, ItemLink
                 [LID.GREETING_LINK_BACKUP]            = "that",
-                [LID.GREETING_I_HAVE_PROF]            = "I have %s.",                -- Profession Name
-                [LID.GREETING_ALT_HAS_PROF]           = "My alt, %s, has %s.",       -- Crafter Name, Profession Name
+                [LID.GREETING_I_HAVE_PROF]            = "I have {profession}.",                -- Profession Name
+                [LID.GREETING_ALT_HAS_PROF]           = "My alt, {crafter}, has {profession}.",       -- Crafter Name, Profession Name
                 [LID.GREETING_ALT_SUFFIX]             = "Let me know if you send an order so I can log over.",
                 [LID.MAIN_BUTTON_BINDING_NAME]        = "Toggle Order Page",
                 [LID.GREET_BUTTON_BINDING_NAME]       = "Greet Banner Customer",

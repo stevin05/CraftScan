@@ -12,11 +12,11 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.RENABLE_ADDONS]                          = "Addons reaktivieren",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Speichern Sie Ihre Addon-Liste und deaktivieren Sie sie dann, um schnell zu einem anderen Charakter zu wechseln. Dieser Button kann erneut geklickt werden, um die Addons jederzeit wieder zu aktivieren.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Ich kann %s herstellen.",             -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mein Twink, %s, kann %s herstellen.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Ich kann {item} herstellen.",             -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mein Twink, {crafter}, kann {item} herstellen.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "das",
-        [LID.GREETING_I_HAVE_PROF]                    = "Ich habe %s.",                        -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "Mein Twink, %s, hat %s.",             -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "Ich habe {profession}.",                        -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "Mein Twink, {crafter}, hat {profession}.",             -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Lassen Sie es mich wissen, wenn Sie einen Auftrag senden, damit ich umloggen kann.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Auftragsseite umschalten",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Kunden begrüßen",

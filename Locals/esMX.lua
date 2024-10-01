@@ -11,11 +11,11 @@ function CraftScan.LOCAL_MX:GetData()
         [LID.RENABLE_ADDONS]                          = "Reactivar Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Guarda tu lista de addons y luego desactívalos, permitiendo un cambio rápido a un alter. Este botón puede ser pulsado de nuevo para reactivar los addons en cualquier momento.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Puedo fabricar %s.",               -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mi alter, %s, puede fabricar %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Puedo fabricar {item}.",               -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mi alter, {crafter}, puede fabricar {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "eso",
-        [LID.GREETING_I_HAVE_PROF]                    = "Tengo %s.",                        -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "Mi alter, %s, tiene %s.",          -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "Tengo {profession}.",                        -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "Mi alter, {crafter}, tiene {profession}.",          -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Avísame si envías una orden para que pueda cambiar de personaje.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Alternar Página de Órdenes",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Saludar al Cliente del Banner",

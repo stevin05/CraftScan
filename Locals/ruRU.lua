@@ -12,11 +12,11 @@ function CraftScan.LOCAL_RU:GetData()
         [LID.RENABLE_ADDONS]                          = "Включить аддоны",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Сохраните свой список аддонов и затем отключите их, чтобы быстро переключиться на альтернативного персонажа. Эту кнопку можно нажать снова, чтобы в любое время снова включить аддоны.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Я могу создать %s.", -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Мой альт, %s, может создать %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Я могу создать {item}.", -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Мой альт, {crafter}, может создать {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "это",
-        [LID.GREETING_I_HAVE_PROF]                    = "У меня есть %s.", -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "У моего альта, %s, есть %s.", -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "У меня есть {profession}.", -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "У моего альта, {crafter}, есть {profession}.", -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Сообщите мне, если вы отправите заказ, чтобы я мог перейти.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Переключить страницу заказа",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Приветствовать клиента",

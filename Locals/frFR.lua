@@ -12,11 +12,11 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.RENABLE_ADDONS]                          = "Réactiver les addons",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Enregistrez votre liste d'addons, puis désactivez-les, permettant un changement rapide vers un personnage alternatif. Ce bouton peut être cliqué à nouveau pour réactiver les addons à tout moment.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Je peux fabriquer %s.",             -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mon alter, %s, peut fabriquer %s.", -- Nom du fabriquant, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Je peux fabriquer {item}.",             -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mon alter, {crafter}, peut fabriquer {item}.", -- Nom du fabriquant, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "ça",
-        [LID.GREETING_I_HAVE_PROF]                    = "J'ai %s.",                          -- Nom du métier
-        [LID.GREETING_ALT_HAS_PROF]                   = "Mon alter, %s, a %s.",              -- Nom du fabriquant, Nom du métier
+        [LID.GREETING_I_HAVE_PROF]                    = "J'ai {profession}.",                          -- Nom du métier
+        [LID.GREETING_ALT_HAS_PROF]                   = "Mon alter, {crafter}, a {profession}.",              -- Nom du fabriquant, Nom du métier
         [LID.GREETING_ALT_SUFFIX]                     = "Faites-le moi savoir si vous envoyez une commande pour que je puisse me connecter.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Basculer la page de commande",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Saluer le client de la bannière",

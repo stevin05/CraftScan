@@ -12,11 +12,11 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.RENABLE_ADDONS]                          = "Riabilita Addon",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Salva la lista dei tuoi addon e disabilitali, consentendo uno scambio rapido ad un alt. Questo pulsante può essere premuto nuovamente per riabilitare gli addon in qualsiasi momento.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Posso creare %s.",                 -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Il mio alter, %s, può creare %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Posso creare {item}.",                 -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Il mio alter, {crafter}, può creare {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "quello",
-        [LID.GREETING_I_HAVE_PROF]                    = "Ho %s.",                           -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "Il mio alter, %s, ha %s.",         -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "Ho {profession}.",                           -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "Il mio alter, {crafter}, ha {profession}.",         -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Fammi sapere se invii un ordine così posso cambiare personaggio.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Mostra Pagina Ordini",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Saluta Cliente",

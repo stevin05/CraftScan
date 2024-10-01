@@ -12,11 +12,11 @@ function CraftScan.LOCAL_CN:GetData()
         [LID.RENABLE_ADDONS]                          = "重新启用插件",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "保存插件列表，然后禁用它们，以便快速切换到另一个角色。此按钮可再次点击以随时重新启用插件。",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "我可以制作 %s.", -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "我的小号，%s可以制作 %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "我可以制作 {item}.", -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "我的小号，{crafter}可以制作 {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "那个",
-        [LID.GREETING_I_HAVE_PROF]                    = "我有 %s.", -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "我的小号，%s，有 %s.", -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "我有 {profession}.", -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "我的小号，{crafter}，有 {profession}.", -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "如果您发送订单，请告诉我，我可以切换过去。",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "切换订单页面",
         [LID.GREET_BUTTON_BINDING_NAME]               = "打招呼横幅顾客",
