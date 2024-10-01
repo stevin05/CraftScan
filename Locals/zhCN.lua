@@ -204,15 +204,10 @@ function CraftScan.LOCAL_CN:GetData()
         ["Customize Greeting"]                        = "自定义问候语",
         [LID.CUSTOM_GREETING_INFO]                    = "CraftScan 使用这些句子根据情况向客户发送初始问候语。覆盖下方的部分或全部内容以创建自己的问候语。",
         ["Default"]                                   = "默认",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "错误: 预期的占位符数量为 %d 或更少。提供的文本中有 %d 个。",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "错误: 仅支持 %s 占位符。",
-
-        ["item link"]                                 = "物品链接",
-        ["alt name and then item link"]               = "替代名称和物品链接",
-        ["profession name"]                           = "职业名称",
-        ["alt name and then profession name"]         = "替代名称和职业名称",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "此文本必须包含 %d 个或更少的 %%s 占位符才能包含 %s。你已经包含了 %d 个。\n\nCraftScan 可以在更少的占位符下工作，但你可能希望为上下文包含它们。",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "您尚未包含 %s。 CraftScan 可以在更少的占位符下工作，但你可能希望为上下文包含它们。",
+        [LID.EXTRA_PLACEHOLDERS]              = "错误： %s 不是有效的占位符。",
+        
         ["Pixels"]                                    = "像素",
         ["Show button height"]                        = "显示按钮高度",
         ["Alert icon scale"]                          = "警报图标缩放",

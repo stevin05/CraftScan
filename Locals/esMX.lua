@@ -218,16 +218,10 @@ function CraftScan.LOCAL_MX:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan utiliza estas frases para crear el saludo inicial enviado a los clientes dependiendo de la situación. Sobrescribe algunas o todas a continuación para crear tu propio saludo.",
         ["Default"]                                   = "Predeterminado",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            =
-        "Error: Se esperaban %d o menos marcadores de posición %%s. El texto proporcionado tiene %d.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Error: Solo se admiten marcadores de posición %s.",
-
-        ["item link"]                                 = "enlace del objeto",
-        ["alt name and then item link"]               = "nombre alternativo y luego enlace del objeto",
-        ["profession name"]                           = "nombre de la profesión",
-        ["alt name and then profession name"]         = "nombre alternativo y luego el nombre de la profesión",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "Este texto debe contener %d o menos marcadores de posición %%s para contener el %s. Has incluido %d.\n\nCraftScan funcionará con menos marcadores de posición, pero probablemente quieras incluirlos para contexto.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "No has incluido %s. CraftScan funcionará con menos marcadores de posición, pero probablemente quieras incluirlos para contexto.",
+        [LID.EXTRA_PLACEHOLDERS]              = "Error: %s no son marcadores de posición válidos.",
+       
         ["Pixels"]                                    = "Píxeles",
         ["Show button height"]                        = "Mostrar altura del botón",
         ["Alert icon scale"]                          = "Escala del ícono de alerta",

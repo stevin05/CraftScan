@@ -222,16 +222,10 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan utilise ces phrases pour créer le message initial envoyé aux clients en fonction de la situation. Remplacez certaines ou toutes ci-dessous pour créer votre propre message.",
         ["Default"]                                   = "Par défaut",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            =
-        "Erreur : %d ou moins d'espaces réservés %%s attendus. Le texte fourni en contient %d.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Erreur : Seuls les espaces réservés %s sont pris en charge.",
-
-        ["item link"]                                 = "lien de l'objet",
-        ["alt name and then item link"]               = "nom alternatif puis lien de l'objet",
-        ["profession name"]                           = "nom de la profession",
-        ["alt name and then profession name"]         = "nom alternatif puis nom de la profession",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "Ce texte doit contenir %d espaces réservés %%s ou moins pour inclure le %s. Vous en avez inclus %d.\n\nCraftScan fonctionnera avec moins d'espaces réservés, mais vous souhaiterez probablement les inclure pour le contexte.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "Vous n'avez pas inclus %s. CraftScan fonctionnera avec moins d'espaces réservés, mais vous souhaiterez probablement les inclure pour le contexte.",
+        [LID.EXTRA_PLACEHOLDERS]              = "Erreur : %s ne sont pas des espaces réservés valides.",
+       
         ["Pixels"]                                    = "Pixels",
         ["Show button height"]                        = "Afficher la hauteur du bouton",
         ["Alert icon scale"]                          = "Échelle de l'icône d'alerte",

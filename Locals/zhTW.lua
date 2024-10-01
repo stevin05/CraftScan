@@ -205,15 +205,10 @@ function CraftScan.LOCAL_TW:GetData()
         ["Customize Greeting"]                        = "自訂問候語",
         [LID.CUSTOM_GREETING_INFO]                    = "CraftScan 使用這些句子根據情況向客戶發送初始問候語。覆蓋下方的部分或全部內容以創建自己的問候語。",
         ["Default"]                                   = "默認",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "錯誤: 預期的占位符數量為 %d 或更少。提供的文本中有 %d 個。",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "錯誤: 僅支持 %s 占位符。",
-
-        ["item link"]                                 = "物品鏈接",
-        ["alt name and then item link"]               = "替代名稱和物品鏈接",
-        ["profession name"]                           = "職業名稱",
-        ["alt name and then profession name"]         = "替代名稱和職業名稱",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "此文本必須包含 %d 個或更少的 %%s 占位符才能包含 %s。你已經包含了 %d 個。\n\nCraftScan 可以在更少的占位符下工作，但你可能希望為上下文包含它們。",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "您尚未包含 %s。 CraftScan 可以在更少的占位符下工作，但你可能希望為上下文包含它們。",
+        [LID.EXTRA_PLACEHOLDERS]              = "錯誤：%s 不是有效的佔位符。",
+        
         ["Pixels"]                                    = "像素",
         ["Show button height"]                        = "顯示按鈕高度",
         ["Alert icon scale"]                          = "警報圖示縮放",

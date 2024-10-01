@@ -209,15 +209,10 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan은 상황에 따라 고객에게 전송되는 초기 인사를 만들기 위해 이 문장을 사용합니다. 일부 또는 전부를 아래에서 덮어쓰고 자신만의 인사를 만드세요.",
         ["Default"]                                   = "기본값",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "오류: %d개 이하의 %%s 자리 표시자를 예상했습니다. 제공된 텍스트에 %d개가 포함되어 있습니다.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "오류: %s 자리 표시자만 지원됩니다.",
-
-        ["item link"]                                 = "아이템 링크",
-        ["alt name and then item link"]               = "대체 이름 및 아이템 링크",
-        ["profession name"]                           = "직업 이름",
-        ["alt name and then profession name"]         = "대체 이름 및 직업 이름",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "이 텍스트는 %d개 이하의 %%s 자리 표시자를 포함해야 %s를 포함할 수 있습니다. %d개를 포함했습니다.\n\nCraftScan은 더 적은 자리 표시자로도 작동하지만, 컨텍스트를 위해 포함하는 것이 좋습니다.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "%s을 포함하지 않았습니다. CraftScan은 더 적은 자리 표시자로도 작동하지만, 컨텍스트를 위해 포함하는 것이 좋습니다.",
+        [LID.EXTRA_PLACEHOLDERS]              = "오류: %s는 올바른 자리 표시자가 아닙니다.",
+       
         ["Pixels"]                                    = "픽셀",
         ["Show button height"]                        = "버튼 높이 표시",
         ["Alert icon scale"]                          = "경고 아이콘 비율",
