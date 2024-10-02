@@ -2254,10 +2254,10 @@ end
 
 function CraftScan_CustomGreetingButtonMixin:OnClick()
     local greetings = {
-        { key = 'GREETING_I_CAN_CRAFT_ITEM',   placeholders = {'{item}'}, suggestion = L("item link") },
-        { key = 'GREETING_I_HAVE_PROF',        placeholders = {'{profession}'}, suggestion = L("profession name") },
-        { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = {'{crafter}', '{item}'}, suggestion = L("alt name and then item link") },
-        { key = 'GREETING_ALT_HAS_PROF',       placeholders = {'{crafter}', '{profession}'}, suggestion = L("alt name and then profession name") },
+        { key = 'GREETING_I_CAN_CRAFT_ITEM',   placeholders = {'{item}'} },
+        { key = 'GREETING_I_HAVE_PROF',        placeholders = {'{profession}'} },
+        { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = {'{crafter}', '{item}'} },
+        { key = 'GREETING_ALT_HAS_PROF',       placeholders = {'{crafter}', '{profession}'} },
         { key = 'GREETING_ALT_SUFFIX',         placeholders = {}, },
         { key = 'GREETING_BUSY',               placeholders = {}, },
     };
