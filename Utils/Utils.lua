@@ -667,7 +667,6 @@ local function UpgradePersistentConfig()
         greeting['GREETING_ALT_HAS_PROF'] = string.format(greeting['GREETING_ALT_HAS_PROF'], "{crafter}", "{profession}");
         greeting['GREETING_I_CAN_CRAFT_ITEM'] = string.format(greeting['GREETING_I_CAN_CRAFT_ITEM'], "{item}");
         greeting['GREETING_I_HAVE_PROF'] = string.format(greeting['GREETING_I_HAVE_PROF'], "{profession}");
-        CraftScanComm:ShareCustomGreeting(greeting); -- not sure if this line is necessary
     end
 end
 

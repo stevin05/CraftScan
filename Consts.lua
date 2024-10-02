@@ -110,7 +110,6 @@ CraftScan.CONST.TEXT = {
     ACCOUNT_LINK_ANALYTICS_DESC             = 106,
     ANALYTICS_PROF_MISMATCH                 = 107,
     BUSY_RIGHT_NOW                          = 108,
-    GREETING_BUSY                           = 110,
     BUSY_HELP                               = 109,
     EXPLANATION_LABEL_DESC                  = 110,
     EXPLANATION_DUPLICATE_LABEL             = 111,
@@ -128,6 +127,7 @@ CraftScan.CONST.TEXT = {
     DEFAULT_COMMISSION                      = 123,
     HELP_ITEM_COMMISSION                    = 124,
     DISCOVERABLE_SETTING                    = 125,
+    GREETING_BUSY                           = 126,
 
 
 
