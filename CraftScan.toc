@@ -34,6 +34,7 @@ Utils/ReleaseNotes.xml
 Utils/Dialog.xml
 Utils/TooltipPlot.lua
 Utils/Comm.lua
+Utils/FStrings.lua
 
 RecipeSchematicMenu.xml
 

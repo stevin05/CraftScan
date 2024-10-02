@@ -12,11 +12,11 @@ function CraftScan.LOCAL_CN:GetData()
         [LID.RENABLE_ADDONS]                          = "重新启用插件",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "保存插件列表，然后禁用它们，以便快速切换到另一个角色。此按钮可再次点击以随时重新启用插件。",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "我可以制作 %s.", -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "我的小号，%s可以制作 %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "我可以制作 {item}.", -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "我的小号，{crafter}可以制作 {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "那个",
-        [LID.GREETING_I_HAVE_PROF]                    = "我有 %s.", -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "我的小号，%s，有 %s.", -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "我有 {profession}.", -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "我的小号，{crafter}，有 {profession}.", -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "如果您发送订单，请告诉我，我可以切换过去。",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "切换订单页面",
         [LID.GREET_BUTTON_BINDING_NAME]               = "打招呼横幅顾客",
@@ -204,15 +204,11 @@ function CraftScan.LOCAL_CN:GetData()
         ["Customize Greeting"]                        = "自定义问候语",
         [LID.CUSTOM_GREETING_INFO]                    = "CraftScan 使用这些句子根据情况向客户发送初始问候语。覆盖下方的部分或全部内容以创建自己的问候语。",
         ["Default"]                                   = "默认",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "错误: 预期的占位符数量为 %d 或更少。提供的文本中有 %d 个。",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "错误: 仅支持 %s 占位符。",
-
-        ["item link"]                                 = "物品链接",
-        ["alt name and then item link"]               = "替代名称和物品链接",
-        ["profession name"]                           = "职业名称",
-        ["alt name and then profession name"]         = "替代名称和职业名称",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "此文本必须包含 %d 个或更少的 %%s 占位符才能包含 %s。你已经包含了 %d 个。\n\nCraftScan 可以在更少的占位符下工作，但你可能希望为上下文包含它们。",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "您尚未包含 %s。 CraftScan 可以在更少的占位符下工作，但你可能希望为上下文包含它们。",
+        [LID.EXTRA_PLACEHOLDERS]              = "错误： %s 不是有效的占位符。",
+        [LID.LEGACY_PLACEHOLDERS]              = "警告：现在已弃用 %s。请使用命名占位符，例如：{placeholder}",
+        
         ["Pixels"]                                    = "像素",
         ["Show button height"]                        = "显示按钮高度",
         ["Alert icon scale"]                          = "警报图标缩放",

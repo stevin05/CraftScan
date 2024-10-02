@@ -12,11 +12,11 @@ function CraftScan.LOCAL_RU:GetData()
         [LID.RENABLE_ADDONS]                          = "Включить аддоны",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Сохраните свой список аддонов и затем отключите их, чтобы быстро переключиться на альтернативного персонажа. Эту кнопку можно нажать снова, чтобы в любое время снова включить аддоны.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Я могу создать %s.", -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Мой альт, %s, может создать %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Я могу создать {item}.", -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Мой альт, {crafter}, может создать {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "это",
-        [LID.GREETING_I_HAVE_PROF]                    = "У меня есть %s.", -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "У моего альта, %s, есть %s.", -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "У меня есть {profession}.", -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "У моего альта, {crafter}, есть {profession}.", -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Сообщите мне, если вы отправите заказ, чтобы я мог перейти.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Переключить страницу заказа",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Приветствовать клиента",
@@ -217,16 +217,11 @@ function CraftScan.LOCAL_RU:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan использует эти фразы для создания первоначального приветствия, отправляемого клиентам в зависимости от ситуации. Измените некоторые или все из них ниже, чтобы создать свое собственное приветствие.",
         ["Default"]                                   = "По умолчанию",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            =
-        "Ошибка: Ожидается %d или меньшее количество заполнителей %%s. Предоставленный текст содержит %d.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Ошибка: Поддерживаются только заполнители %s.",
-
-        ["item link"]                                 = "ссылка на предмет",
-        ["alt name and then item link"]               = "альтернативное имя и затем ссылка на предмет",
-        ["profession name"]                           = "название профессии",
-        ["alt name and then profession name"]         = "альтернативное имя и затем название профессии",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "Этот текст должен содержать %d или меньше заполнителей %%s, чтобы соответствовать %s. Вы включили %d.\n\nCraftScan будет работать с меньшим количеством заполнителей, но вы, вероятно, захотите включить их для контекста.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "Вы не включили %s. CraftScan будет работать с меньшим количеством заполнителей, но вы, вероятно, захотите включить их для контекста.",
+        [LID.EXTRA_PLACEHOLDERS]              = "Ошибка: %s не являются допустимыми заполнителями.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Предупреждение: использование %s теперь устарело. Пожалуйста, используйте именованные заполнители, например: {placeholder}",
+        
         ["Pixels"]                                    = "Пиксели",
         ["Show button height"]                        = "Показать высоту кнопки",
         ["Alert icon scale"]                          = "Масштаб значка оповещения",

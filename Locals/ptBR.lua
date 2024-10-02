@@ -12,11 +12,11 @@ function CraftScan.LOCAL_PT:GetData()
         [LID.RENABLE_ADDONS]                          = "Reativar Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Salve sua lista de addons e, em seguida, desative-os, permitindo uma troca rápida para um personagem alternativo. Este botão pode ser clicado novamente para reativar os addons a qualquer momento.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Posso criar %s.",                                -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Meu personagem alternativo, %s, pode criar %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Posso criar {item}.",                                -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Meu personagem alternativo, {crafter}, pode criar {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "isso",
-        [LID.GREETING_I_HAVE_PROF]                    = "Eu tenho %s.",                                   -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "Meu personagem alternativo, %s, tem %s.",        -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "Eu tenho {profession}.",                                   -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "Meu personagem alternativo, {crafter}, tem {profession}.",        -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Me avise se você enviar um pedido para que eu possa fazer login.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Alternar Página de Pedido",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Saudar Cliente com Banner",
@@ -218,15 +218,11 @@ function CraftScan.LOCAL_PT:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan usa estas frases para criar a saudação inicial enviada aos clientes dependendo da situação. Substitua algumas ou todas abaixo para criar sua própria saudação.",
         ["Default"]                                   = "Padrão",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "Erro: Esperava-se %d ou menos marcadores %%s. O texto fornecido tem %d.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Erro: Apenas marcadores %s são suportados.",
-
-        ["item link"]                                 = "link do item",
-        ["alt name and then item link"]               = "nome alternativo e depois link do item",
-        ["profession name"]                           = "nome da profissão",
-        ["alt name and then profession name"]         = "nome alternativo e depois o nome da profissão",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "Este texto deve conter %d ou menos marcadores %%s para conter o %s. Você incluiu %d.\n\nCraftScan funcionará com menos marcadores, mas você provavelmente vai querer incluí-los para contexto.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "Você não incluiu %s. CraftScan funcionará com menos marcadores, mas você provavelmente vai querer incluí-los para contexto.",
+        [LID.EXTRA_PLACEHOLDERS]              = "Erro: %s não são marcadores de posição válidos.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Aviso: O uso de %s agora está obsoleto. Use placeholders nomeados, como: {placeholder}",
+        
         ["Pixels"]                                    = "Pixels",
         ["Show button height"]                        = "Mostrar altura do botão",
         ["Alert icon scale"]                          = "Escala do ícone de alerta",

@@ -15,11 +15,11 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.RENABLE_ADDONS]                  = "Re-enable Addons",
                 [LID.DISABLE_ADDONS_TOOLTIP]          =
                 "Save your list of addons, and then disable them, allowing for a quick swap to an alt. This button can be clicked again to re-enable the addons at any time.",
-                [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft %s.",           -- ItemLink
-                [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, %s, can craft %s.", -- Crafter Name, ItemLink
+                [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft {item}.",           -- ItemLink
+                [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, {crafter}, can craft {item}.", -- Crafter Name, ItemLink
                 [LID.GREETING_LINK_BACKUP]            = "that",
-                [LID.GREETING_I_HAVE_PROF]            = "I have %s.",                -- Profession Name
-                [LID.GREETING_ALT_HAS_PROF]           = "My alt, %s, has %s.",       -- Crafter Name, Profession Name
+                [LID.GREETING_I_HAVE_PROF]            = "I have {profession}.",                -- Profession Name
+                [LID.GREETING_ALT_HAS_PROF]           = "My alt, {crafter}, has {profession}.",       -- Crafter Name, Profession Name
                 [LID.GREETING_ALT_SUFFIX]             = "Let me know if you send an order so I can log over.",
                 [LID.MAIN_BUTTON_BINDING_NAME]        = "Toggle Order Page",
                 [LID.GREET_BUTTON_BINDING_NAME]       = "Greet Banner Customer",
@@ -222,16 +222,11 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.CUSTOM_GREETING_INFO]                    =
                 "CraftScan uses these sentences to create the initial greeting sent to customers depending on the situation. Override some or all of them below to create your own greeting.",
                 ["Default"]                                   = "Default",
-                [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            =
-                "Error: Expected %d or fewer %%s placeholders. The provided text has %d.",
-                [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Error: Only %s placeholders are supported.",
+                [LID.MISSING_PLACEHOLDERS]            =
+                "You have not included %s. CraftScan will work with fewer placeholders, but you likely want to include them for context.",
+                [LID.EXTRA_PLACEHOLDERS]              = "Error: %s are not valid placeholders.",
+                [LID.LEGACY_PLACEHOLDERS]              = "Warning: The use of %s is now deprecated. Please use named placeholders, like so: {placeholder}",
 
-                ["item link"]                                 = "item link",
-                ["alt name and then item link"]               = "alt name and then an item link",
-                ["profession name"]                           = "profession name",
-                ["alt name and then profession name"]         = "alt name and then the profession name",
-                [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-                "This text must contain %d or fewer %%s placeholders to hold the %s. You have included %d.\n\nCraftScan will work with fewer placeholders, but you likely want to include them for context.",
                 ["Pixels"]                                    = "Pixels",
                 ["Show button height"]                        = "Show button height",
                 ["Alert icon scale"]                          = "Alert icon scale",

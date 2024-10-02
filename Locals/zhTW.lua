@@ -12,11 +12,11 @@ function CraftScan.LOCAL_TW:GetData()
         [LID.RENABLE_ADDONS]                          = "重新啟用插件",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "保存插件清單，然後停用它們，讓您可以快速切換到其他角色。您隨時可以再次點擊此按鈕以重新啟用插件。",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "我可以製造%s。", -- 物品連結
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "我的小號%s可以製造%s。", -- 製造者名稱，物品連結
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "我可以製造{item}。", -- 物品連結
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "我的小號{crafter}可以製造{item}。", -- 製造者名稱，物品連結
         [LID.GREETING_LINK_BACKUP]                    = "這",
-        [LID.GREETING_I_HAVE_PROF]                    = "我會%s。", -- 職業名稱
-        [LID.GREETING_ALT_HAS_PROF]                   = "我的小號%s會%s。", -- 製造者名稱，職業名稱
+        [LID.GREETING_I_HAVE_PROF]                    = "我會{profession}。", -- 職業名稱
+        [LID.GREETING_ALT_HAS_PROF]                   = "我的小號{crafter}會{profession}。", -- 製造者名稱，職業名稱
         [LID.GREETING_ALT_SUFFIX]                     = "如果您下訂單，請通知我，我可以轉過去。",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "切換訂單頁面",
         [LID.GREET_BUTTON_BINDING_NAME]               = "問候橫幅客戶",
@@ -205,15 +205,11 @@ function CraftScan.LOCAL_TW:GetData()
         ["Customize Greeting"]                        = "自訂問候語",
         [LID.CUSTOM_GREETING_INFO]                    = "CraftScan 使用這些句子根據情況向客戶發送初始問候語。覆蓋下方的部分或全部內容以創建自己的問候語。",
         ["Default"]                                   = "默認",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "錯誤: 預期的占位符數量為 %d 或更少。提供的文本中有 %d 個。",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "錯誤: 僅支持 %s 占位符。",
-
-        ["item link"]                                 = "物品鏈接",
-        ["alt name and then item link"]               = "替代名稱和物品鏈接",
-        ["profession name"]                           = "職業名稱",
-        ["alt name and then profession name"]         = "替代名稱和職業名稱",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "此文本必須包含 %d 個或更少的 %%s 占位符才能包含 %s。你已經包含了 %d 個。\n\nCraftScan 可以在更少的占位符下工作，但你可能希望為上下文包含它們。",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "您尚未包含 %s。 CraftScan 可以在更少的占位符下工作，但你可能希望為上下文包含它們。",
+        [LID.EXTRA_PLACEHOLDERS]              = "錯誤：%s 不是有效的佔位符。",
+        [LID.LEGACY_PLACEHOLDERS]              = "警告：現在不建議使用 %s。請使用命名佔位符，如下圖所示：{placeholder}",
+        
         ["Pixels"]                                    = "像素",
         ["Show button height"]                        = "顯示按鈕高度",
         ["Alert icon scale"]                          = "警報圖示縮放",

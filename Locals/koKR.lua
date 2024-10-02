@@ -12,11 +12,11 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.RENABLE_ADDONS]                          = "애드온 다시 활성화",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "애드온 목록을 저장한 후, 애드온을 비활성화하여 빠르게 다른 캐릭터로 전환할 수 있습니다. 이 버튼을 다시 클릭하여 언제든지 애드온을 다시 활성화할 수 있습니다.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "%s 제작 가능합니다.", -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "내 대체 캐릭터, %s가 %s를 제작할 수 있습니다.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "{item} 제작 가능합니다.", -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "내 대체 캐릭터, {crafter}가 {item}를 제작할 수 있습니다.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "이것",
-        [LID.GREETING_I_HAVE_PROF]                    = "%s을 가지고 있습니다.", -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "내 대체 캐릭터, %s가 %s을 가지고 있습니다.", -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "{profession}을 가지고 있습니다.", -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "내 대체 캐릭터, {crafter}가 {profession}을 가지고 있습니다.", -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "주문을 보내면 전환해서 확인할 수 있도록 알려주세요.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "주문 페이지 전환",
         [LID.GREET_BUTTON_BINDING_NAME]               = "인사 배너 고객",
@@ -209,15 +209,11 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan은 상황에 따라 고객에게 전송되는 초기 인사를 만들기 위해 이 문장을 사용합니다. 일부 또는 전부를 아래에서 덮어쓰고 자신만의 인사를 만드세요.",
         ["Default"]                                   = "기본값",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            = "오류: %d개 이하의 %%s 자리 표시자를 예상했습니다. 제공된 텍스트에 %d개가 포함되어 있습니다.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "오류: %s 자리 표시자만 지원됩니다.",
-
-        ["item link"]                                 = "아이템 링크",
-        ["alt name and then item link"]               = "대체 이름 및 아이템 링크",
-        ["profession name"]                           = "직업 이름",
-        ["alt name and then profession name"]         = "대체 이름 및 직업 이름",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "이 텍스트는 %d개 이하의 %%s 자리 표시자를 포함해야 %s를 포함할 수 있습니다. %d개를 포함했습니다.\n\nCraftScan은 더 적은 자리 표시자로도 작동하지만, 컨텍스트를 위해 포함하는 것이 좋습니다.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "%s을 포함하지 않았습니다. CraftScan은 더 적은 자리 표시자로도 작동하지만, 컨텍스트를 위해 포함하는 것이 좋습니다.",
+        [LID.EXTRA_PLACEHOLDERS]              = "오류: %s는 올바른 자리 표시자가 아닙니다.",
+        [LID.LEGACY_PLACEHOLDERS]              = "경고: %s의 사용은 더 이상 사용되지 않습니다. 다음과 같이 명명된 플레이스홀더를 사용하세요: {placeholder}",
+       
         ["Pixels"]                                    = "픽셀",
         ["Show button height"]                        = "버튼 높이 표시",
         ["Alert icon scale"]                          = "경고 아이콘 비율",

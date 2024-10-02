@@ -2254,63 +2254,47 @@ end
 
 function CraftScan_CustomGreetingButtonMixin:OnClick()
     local greetings = {
-        { key = 'GREETING_I_CAN_CRAFT_ITEM',   placeholders = 1, suggestion = L("item link") },
-        { key = 'GREETING_I_HAVE_PROF',        placeholders = 1, suggestion = L("profession name") },
-        { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = 2, suggestion = L("alt name and then item link") },
-        { key = 'GREETING_ALT_HAS_PROF',       placeholders = 2, suggestion = L("alt name and then profession name") },
-        { key = 'GREETING_ALT_SUFFIX',         placeholders = 0, },
-        { key = 'GREETING_BUSY',               placeholders = 0, },
+        { key = 'GREETING_I_CAN_CRAFT_ITEM',   placeholders = {'{item}'}, suggestion = L("item link") },
+        { key = 'GREETING_I_HAVE_PROF',        placeholders = {'{profession}'}, suggestion = L("profession name") },
+        { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = {'{crafter}', '{item}'}, suggestion = L("alt name and then item link") },
+        { key = 'GREETING_ALT_HAS_PROF',       placeholders = {'{crafter}', '{profession}'}, suggestion = L("alt name and then profession name") },
+        { key = 'GREETING_ALT_SUFFIX',         placeholders = {}, },
+        { key = 'GREETING_BUSY',               placeholders = {}, },
     };
 
     local function Validator(index, text)
-        local function HasOnlyPercentS(inputString)
-            -- Thanks ChatGPT. Hope it works...
-            local length = #inputString
-            local i = 1
-            while i <= length do
-                local char = inputString:sub(i, i)
-
-                if char == "%" then
-                    -- Check if the % is escaped
-                    local isEscaped = i > 1 and inputString:sub(i - 1, i - 1) == "%"
-
-                    if not isEscaped then
-                        -- Look ahead to the next character
-                        local nextChar = inputString:sub(i + 1, i + 1)
-                        if nextChar ~= "s" and nextChar ~= "%" and nextChar ~= "" then
-                            return false -- Found a non-%s specifier
-                        end
-                        -- Skip the next character if it's part of the format specifier
-                        i = i + 1
-                    end
-                end
-
-                i = i + 1
+        local extra_placeholders = {};
+        local num_extra_placeholders = 0;
+        for placeholder in string.gmatch(text, "%b{}") do
+            if not CraftScan.Utils.Contains(greetings[index].placeholders, placeholder) then
+                table.insert(extra_placeholders, placeholder);
+                num_extra_placeholders = num_extra_placeholders + 1;
             end
-
-            return true -- Only %s specifiers found, or no specifiers found
+        end
+        local missing_placeholders = {};
+        local num_missing_placeholders = 0;
+        for i,placeholder in ipairs(greetings[index].placeholders) do
+            if not text:match(placeholder) then
+                table.insert(missing_placeholders, placeholder);
+                num_missing_placeholders = num_missing_placeholders + 1;
+            end
         end
 
-        local count = 0
-        for _ in string.gmatch(text, "([^%%])%%s") do
-            count = count + 1
+        local messages = {};
+        if num_extra_placeholders > 0 then
+           table.insert(messages, string.format(L(LID.EXTRA_PLACEHOLDERS), table.concat(extra_placeholders, ", ")));
         end
-
-        local expected = greetings[index].placeholders;
-        if count > expected then
-            return { error = string.format(L(LID.WRONG_NUMBER_OF_PLACEHOLDERS), expected, count), };
+        if text:match("%%s") then
+            table.insert(messages, L(LID.LEGACY_PLACEHOLDERS))
         end
-
-        if not HasOnlyPercentS(text) then
-            return { error = L(LID.WRONG_TYPE_OF_PLACEHOLDERS) };
+        if num_missing_placeholders > 0 then
+            table.insert(messages, string.format(L(LID.MISSING_PLACEHOLDERS), table.concat(missing_placeholders, ", ")));
         end
-
-        if count ~= expected then
-            return {
-                warning = string.format(L(LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION), expected,
-                    greetings[index].suggestion,
-                    count),
-            }
+        local message = table.concat(messages, "\n\n");
+        if num_extra_placeholders > 0 then
+            return {error = message};
+        elseif message ~= '' then
+            return {warning = message};
         end
 
         return nil;

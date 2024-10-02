@@ -12,11 +12,11 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.RENABLE_ADDONS]                          = "Riabilita Addon",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Salva la lista dei tuoi addon e disabilitali, consentendo uno scambio rapido ad un alt. Questo pulsante può essere premuto nuovamente per riabilitare gli addon in qualsiasi momento.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Posso creare %s.",                 -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Il mio alter, %s, può creare %s.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Posso creare {item}.",                 -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Il mio alter, {crafter}, può creare {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "quello",
-        [LID.GREETING_I_HAVE_PROF]                    = "Ho %s.",                           -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "Il mio alter, %s, ha %s.",         -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "Ho {profession}.",                           -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "Il mio alter, {crafter}, ha {profession}.",         -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Fammi sapere se invii un ordine così posso cambiare personaggio.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Mostra Pagina Ordini",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Saluta Cliente",
@@ -221,16 +221,11 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan utilizza queste frasi per creare il saluto iniziale inviato ai clienti a seconda della situazione. Sovrascrivi alcune o tutte qui sotto per creare il tuo saluto.",
         ["Default"]                                   = "Predefinito",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            =
-        "Errore: Sono previsti %d o meno segnaposto %%s. Il testo fornito ne contiene %d.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Errore: Sono supportati solo segnaposto %s.",
-
-        ["item link"]                                 = "link dell'oggetto",
-        ["alt name and then item link"]               = "nome alternativo e poi link dell'oggetto",
-        ["profession name"]                           = "nome della professione",
-        ["alt name and then profession name"]         = "nome alternativo e poi nome della professione",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "Questo testo deve contenere %d segnaposto %%s o meno per contenere il %s. Ne hai inclusi %d.\n\nCraftScan funzionerà con meno segnaposto, ma probabilmente vorrai includerli per il contesto.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "Non hai incluso %s. CraftScan funzionerà con meno segnaposto, ma probabilmente vorrai includerli per il contesto.",
+        [LID.EXTRA_PLACEHOLDERS]              = "Errore: %s non sono segnaposto validi.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Attenzione: l'uso di %s è ora deprecato. Si prega di utilizzare segnaposto denominati, come segue: {placeholder}",
+    
         ["Pixels"]                                    = "Pixeli",
         ["Show button height"]                        = "Mostra altezza del pulsante",
         ["Alert icon scale"]                          = "Scala icona di avviso",

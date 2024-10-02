@@ -12,11 +12,11 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.RENABLE_ADDONS]                          = "Addons reaktivieren",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Speichern Sie Ihre Addon-Liste und deaktivieren Sie sie dann, um schnell zu einem anderen Charakter zu wechseln. Dieser Button kann erneut geklickt werden, um die Addons jederzeit wieder zu aktivieren.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Ich kann %s herstellen.",             -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mein Twink, %s, kann %s herstellen.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Ich kann {item} herstellen.",             -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mein Twink, {crafter}, kann {item} herstellen.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "das",
-        [LID.GREETING_I_HAVE_PROF]                    = "Ich habe %s.",                        -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "Mein Twink, %s, hat %s.",             -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "Ich habe {profession}.",                        -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "Mein Twink, {crafter}, hat {profession}.",             -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Lassen Sie es mich wissen, wenn Sie einen Auftrag senden, damit ich umloggen kann.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Auftragsseite umschalten",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Kunden begrüßen",
@@ -224,16 +224,11 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan verwendet diese Sätze, um die anfängliche Begrüßung je nach Situation an Kunden zu senden. Überschreiben Sie unten einige oder alle, um Ihre eigene Begrüßung zu erstellen.",
         ["Default"]                                   = "Standard",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            =
-        "Fehler: Erwartet %d oder weniger %%s Platzhalter. Der bereitgestellte Text enthält %d.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Fehler: Nur %s Platzhalter werden unterstützt.",
-
-        ["item link"]                                 = "Gegenstandslink",
-        ["alt name and then item link"]               = "alternativer Name und dann Gegenstandslink",
-        ["profession name"]                           = "Berufsname",
-        ["alt name and then profession name"]         = "alternativer Name und dann Berufsname",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "Dieser Text muss %d oder weniger %%s Platzhalter enthalten, um das %s zu halten. Sie haben %d eingefügt.\n\nCraftScan funktioniert mit weniger Platzhaltern, aber Sie möchten sie wahrscheinlich für den Kontext einfügen.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "Sie haben %s nicht eingeschlossen. CraftScan funktioniert mit weniger Platzhaltern, aber Sie möchten sie wahrscheinlich für den Kontext einfügen.",
+        [LID.EXTRA_PLACEHOLDERS]              = "Fehler: %s sind keine gültigen Platzhalter.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Achtung: Die Verwendung von %s ist mittlerweile veraltet. Bitte verwenden Sie benannte Platzhalter, wie folgt: {placeholder}",
+        
         ["Pixels"]                                    = "Pixel",
         ["Show button height"]                        = "Buttonhöhe anzeigen",
         ["Alert icon scale"]                          = "Alarm-Icon-Skalierung",

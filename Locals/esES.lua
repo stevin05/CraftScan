@@ -15,11 +15,11 @@ function CraftScan.LOCAL_ES:GetData()
         [LID.RENABLE_ADDONS]                          = "Addons reaktivieren",
         [LID.DISABLE_ADDONS_TOOLTIP]                  =
         "Speichern Sie Ihre Addon-Liste und deaktivieren Sie sie dann, um schnell zu einem anderen Charakter zu wechseln. Dieser Button kann erneut geklickt werden, um die Addons jederzeit wieder zu aktivieren.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Ich kann %s herstellen.",             -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mein Twink, %s, kann %s herstellen.", -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]               = "Ich kann {item} herstellen.",             -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]             = "Mein Twink, {crafter}, kann {item} herstellen.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                    = "das",
-        [LID.GREETING_I_HAVE_PROF]                    = "Ich habe %s.",                        -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]                   = "Mein Twink, %s, hat %s.",             -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                    = "Ich habe {profession}.",                        -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]                   = "Mein Twink, {crafter}, hat {profession}.",             -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                     = "Lassen Sie es mich wissen, wenn Sie einen Auftrag senden, damit ich umloggen kann.",
         [LID.MAIN_BUTTON_BINDING_NAME]                = "Auftragsseite umschalten",
         [LID.GREET_BUTTON_BINDING_NAME]               = "Kunden begrüßen",
@@ -224,16 +224,11 @@ function CraftScan.LOCAL_ES:GetData()
         [LID.CUSTOM_GREETING_INFO]                    =
         "CraftScan utiliza estas frases para crear el saludo inicial enviado a los clientes dependiendo de la situación. Sobrescriba algunas o todas a continuación para crear su propio saludo.",
         ["Default"]                                   = "Predeterminado",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS]            =
-        "Error: Se esperaban %d o menos marcadores de posición %%s. El texto proporcionado tiene %d.",
-        [LID.WRONG_TYPE_OF_PLACEHOLDERS]              = "Error: Solo se admiten marcadores de posición %s.",
-
-        ["item link"]                                 = "enlace del objeto",
-        ["alt name and then item link"]               = "nombre alternativo y luego enlace del objeto",
-        ["profession name"]                           = "nombre de la profesión",
-        ["alt name and then profession name"]         = "nombre alternativo y luego el nombre de la profesión",
-        [LID.WRONG_NUMBER_OF_PLACEHOLDERS_SUGGESTION] =
-        "Este texto debe contener %d o menos marcadores de posición %%s para contener el %s. Has incluido %d.\n\nCraftScan funcionará con menos marcadores de posición, pero probablemente quieras incluirlos para contexto.",
+        [LID.MISSING_PLACEHOLDERS]            =
+        "No has incluido %s. CraftScan funcionará con menos marcadores de posición, pero probablemente quieras incluirlos para contexto.",
+        [LID.EXTRA_PLACEHOLDERS]              = "Error: %s no son marcadores de posición válidos.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Advertencia: El uso de %s ya no está recomendado. Utilice marcadores de posición con nombre, como por ejemplo: {placeholder}",
+       
         ["Pixels"]                                    = "Píxeles",
         ["Show button height"]                        = "Mostrar altura del botón",
         ["Alert icon scale"]                          = "Escala del ícono de alerta",

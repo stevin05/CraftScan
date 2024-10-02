@@ -869,10 +869,11 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     local greeting = '';
     if alt_craft then
         if itemID then
-            greeting = string.format(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'), crafter,
-                itemLink or L(LID.GREETING_LINK_BACKUP));
+            local item = itemLink or L(LID.GREETING_LINK_BACKUP);
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'), {['crafter']=crafter, ['item']=item});
         else
-            greeting = string.format(GetGreeting('GREETING_ALT_HAS_PROF'), crafter, profInfo.parentProfessionName);
+            local profession = profInfo.parentProfessionName;
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_HAS_PROF'), {['crafter']=crafter, ['profession']=profession});
         end
         if CraftScan.State.isBusy then
             greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
@@ -882,9 +883,11 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         end
     else
         if itemID then
-            greeting = string.format(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'), itemLink or L(LID.GREETING_LINK_BACKUP));
+            local item = itemLink or L(LID.GREETING_LINK_BACKUP);
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'), {['item']=item});
         else
-            greeting = string.format(GetGreeting('GREETING_I_HAVE_PROF'), profInfo.parentProfessionName);
+            local profession = profInfo.parentProfessionName;
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_HAVE_PROF'), {['profession']=profession});
         end
         if CraftScan.State.isBusy then
             greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
