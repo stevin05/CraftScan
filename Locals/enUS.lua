@@ -225,6 +225,7 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.MISSING_PLACEHOLDERS]            =
                 "You have not included %s. CraftScan will work with fewer placeholders, but you likely want to include them for context.",
                 [LID.EXTRA_PLACEHOLDERS]              = "Error: %s are not valid placeholders.",
+                [LID.LEGACY_PLACEHOLDERS]              = "Warning: The use of %s is now deprecated. Please use named placeholders, like so: {placeholder}",
 
                 ["Pixels"]                                    = "Pixels",
                 ["Show button height"]                        = "Show button height",

@@ -93,6 +93,7 @@ CraftScan.CONST.TEXT = {
     CUSTOM_GREETING_INFO                    = 89,
     EXTRA_PLACEHOLDERS                      = 90,
     MISSING_PLACEHOLDERS                    = 91,
+    LEGACY_PLACEHOLDERS                     = 92,
     ANALYTICS_ITEM_TOOLTIP                  = 93,
     ANALYTICS_PROFESSION_TOOLTIP            = 94,
     ANALYTICS_TOTAL_TOOLTIP                 = 95,

@@ -227,6 +227,7 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.MISSING_PLACEHOLDERS]            =
         "Sie haben %s nicht eingeschlossen. CraftScan funktioniert mit weniger Platzhaltern, aber Sie möchten sie wahrscheinlich für den Kontext einfügen.",
         [LID.EXTRA_PLACEHOLDERS]              = "Fehler: %s sind keine gültigen Platzhalter.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Achtung: Die Verwendung von %s ist mittlerweile veraltet. Bitte verwenden Sie benannte Platzhalter, wie folgt: {placeholder}",
         
         ["Pixels"]                                    = "Pixel",
         ["Show button height"]                        = "Buttonhöhe anzeigen",

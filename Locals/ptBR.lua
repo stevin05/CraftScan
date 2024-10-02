@@ -221,6 +221,7 @@ function CraftScan.LOCAL_PT:GetData()
         [LID.MISSING_PLACEHOLDERS]            =
         "Você não incluiu %s. CraftScan funcionará com menos marcadores, mas você provavelmente vai querer incluí-los para contexto.",
         [LID.EXTRA_PLACEHOLDERS]              = "Erro: %s não são marcadores de posição válidos.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Aviso: O uso de %s agora está obsoleto. Use placeholders nomeados, como: {placeholder}",
         
         ["Pixels"]                                    = "Pixels",
         ["Show button height"]                        = "Mostrar altura do botão",

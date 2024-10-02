@@ -207,6 +207,7 @@ function CraftScan.LOCAL_CN:GetData()
         [LID.MISSING_PLACEHOLDERS]            =
         "您尚未包含 %s。 CraftScan 可以在更少的占位符下工作，但你可能希望为上下文包含它们。",
         [LID.EXTRA_PLACEHOLDERS]              = "错误： %s 不是有效的占位符。",
+        [LID.LEGACY_PLACEHOLDERS]              = "警告：现在已弃用 %s。请使用命名占位符，例如：{placeholder}",
         
         ["Pixels"]                                    = "像素",
         ["Show button height"]                        = "显示按钮高度",

@@ -224,6 +224,7 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.MISSING_PLACEHOLDERS]            =
         "Non hai incluso %s. CraftScan funzionerà con meno segnaposto, ma probabilmente vorrai includerli per il contesto.",
         [LID.EXTRA_PLACEHOLDERS]              = "Errore: %s non sono segnaposto validi.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Attenzione: l'uso di %s è ora deprecato. Si prega di utilizzare segnaposto denominati, come segue: {placeholder}",
     
         ["Pixels"]                                    = "Pixeli",
         ["Show button height"]                        = "Mostra altezza del pulsante",

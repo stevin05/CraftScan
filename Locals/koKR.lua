@@ -212,6 +212,7 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.MISSING_PLACEHOLDERS]            =
         "%s을 포함하지 않았습니다. CraftScan은 더 적은 자리 표시자로도 작동하지만, 컨텍스트를 위해 포함하는 것이 좋습니다.",
         [LID.EXTRA_PLACEHOLDERS]              = "오류: %s는 올바른 자리 표시자가 아닙니다.",
+        [LID.LEGACY_PLACEHOLDERS]              = "경고: %s의 사용은 더 이상 사용되지 않습니다. 다음과 같이 명명된 플레이스홀더를 사용하세요: {placeholder}",
        
         ["Pixels"]                                    = "픽셀",
         ["Show button height"]                        = "버튼 높이 표시",

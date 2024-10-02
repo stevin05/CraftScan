@@ -225,6 +225,7 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.MISSING_PLACEHOLDERS]            =
         "Vous n'avez pas inclus %s. CraftScan fonctionnera avec moins d'espaces réservés, mais vous souhaiterez probablement les inclure pour le contexte.",
         [LID.EXTRA_PLACEHOLDERS]              = "Erreur : %s ne sont pas des espaces réservés valides.",
+        [LID.LEGACY_PLACEHOLDERS]              = "Attention : l'utilisation de %s est désormais obsolète. Veuillez utiliser des espaces réservés nommés, comme ceci : {placeholder}",
        
         ["Pixels"]                                    = "Pixels",
         ["Show button height"]                        = "Afficher la hauteur du bouton",

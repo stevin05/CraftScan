@@ -658,6 +658,17 @@ local function UpgradePersistentConfig()
     if CraftScan.DB.settings.discoverable == nil then
         CraftScan.DB.settings.discoverable = true;
     end
+
+    -- After changing placeholders in customer greetings from %s to {placeholder},
+    -- existing configs must be updated to replace %s placeholders with the new ones.
+    local greeting = CraftScan.DB.settings.greeting;
+    if greeting ~= nil then
+        greeting['GREETING_ALT_CAN_CRAFT_ITEM'] = string.format(greeting['GREETING_ALT_CAN_CRAFT_ITEM'], "{crafter}", "{item}");
+        greeting['GREETING_ALT_HAS_PROF'] = string.format(greeting['GREETING_ALT_HAS_PROF'], "{crafter}", "{profession}");
+        greeting['GREETING_I_CAN_CRAFT_ITEM'] = string.format(greeting['GREETING_I_CAN_CRAFT_ITEM'], "{item}");
+        greeting['GREETING_I_HAVE_PROF'] = string.format(greeting['GREETING_I_HAVE_PROF'], "{profession}");
+        CraftScanComm:ShareCustomGreeting(greeting); -- not sure if this line is necessary
+    end
 end
 
 function CraftScan.Utils.GetSetting(key)

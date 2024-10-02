@@ -2267,30 +2267,33 @@ function CraftScan_CustomGreetingButtonMixin:OnClick()
         local num_extra_placeholders = 0;
         for placeholder in string.gmatch(text, "%b{}") do
             if not CraftScan.Utils.Contains(greetings[index].placeholders, placeholder) then
-                table.insert(extra_placeholders, placeholder)
-                num_extra_placeholders = num_extra_placeholders + 1
+                table.insert(extra_placeholders, placeholder);
+                num_extra_placeholders = num_extra_placeholders + 1;
             end
         end
         local missing_placeholders = {};
         local num_missing_placeholders = 0;
         for i,placeholder in ipairs(greetings[index].placeholders) do
             if not text:match(placeholder) then
-                table.insert(missing_placeholders, placeholder)
-                num_missing_placeholders = num_missing_placeholders + 1
+                table.insert(missing_placeholders, placeholder);
+                num_missing_placeholders = num_missing_placeholders + 1;
             end
         end
 
-        local message = ""
+        local messages = {};
         if num_extra_placeholders > 0 then
-            message = message..string.format(L(LID.EXTRA_PLACEHOLDERS), table.concat(extra_placeholders, ", "))
+           table.insert(messages, string.format(L(LID.EXTRA_PLACEHOLDERS), table.concat(extra_placeholders, ", ")));
+        end
+        if text:match("%%s") then
+            table.insert(messages, L(LID.LEGACY_PLACEHOLDERS))
         end
         if num_missing_placeholders > 0 then
-            if num_extra_placeholders > 0 then message = message..'\n\n' end
-            message = message..string.format(L(LID.MISSING_PLACEHOLDERS), table.concat(missing_placeholders, ", "))
+            table.insert(messages, string.format(L(LID.MISSING_PLACEHOLDERS), table.concat(missing_placeholders, ", ")));
         end
+        local message = table.concat(messages, "\n\n");
         if num_extra_placeholders > 0 then
             return {error = message};
-        elseif num_missing_placeholders > 0 then
+        elseif message ~= '' then
             return {warning = message};
         end
 
