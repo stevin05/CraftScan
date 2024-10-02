@@ -7,7 +7,6 @@ end
 
 CraftScan.Frames = {}
 CraftScan.Utils = {}
-CraftScan.Utils.DIAG_PRINT_ENABLED = false;
 
 function CraftScan.Utils.Contains(array, value)
     for _, v in ipairs(array) do
@@ -161,53 +160,14 @@ local function DisplayDiagText()
 end
 
 function CraftScan.Utils.printTable(label, tbl, indent)
-    if not CraftScan.Utils.DIAG_PRINT_ENABLED then
-        return
-    end
-
-    indent = indent or 0
-    local checkedTables = {} -- To keep track of tables we've already printed
-
-    diagText = diagText .. label .. ": "
-    local function innerPrint(tbl, indent)
-        for k, v in pairs(tbl) do
-            -- Check if v is a table and hasn't been printed before
-            if type(v) == "table" then
-                if checkedTables[v] then
-                    diagText = diagText .. string.rep("  ", indent) .. tostring(k) .. " = " .. tostring(v) ..
-                        ' (repeat reference)\n'
-                else
-                    checkedTables[v] = true   -- Mark table as checked
-                    diagText = diagText .. string.rep("  ", indent) .. tostring(k) .. " = {" .. '\n'
-                    innerPrint(v, indent + 1) -- Recursive call
-                    diagText = diagText .. string.rep("  ", indent) .. "}" .. '\n'
-                end
-            else
-                diagText = diagText .. string.rep("  ", indent) .. tostring(k) .. " = " .. tostring(v) .. '\n'
-            end
-        end
-    end
-
-    if type(tbl) == "table" then
-        diagText = diagText .. '{' .. '\n'
-        innerPrint(tbl, indent + 1)
-        diagText = diagText .. '}' .. '\n'
-    else
-        diagText = diagText .. tostring(tbl) .. '\n'
-    end
-
-    DisplayDiagText();
+    -- Should go through and mass replace at some point. We used to print JSON
+    -- to a debug frame, but now support DevTool instead.
+    CraftScan.Debug.Print(tbl, label)
 end
 
 function CraftScan.Utils.DumpCopyableText(value)
     diagText = value;
     DisplayDiagText();
-end
-
-function CraftScan.Utils.debug_print(...)
-    if CraftScan.Utils.DIAG_PRINT_ENABLED then
-        print(...)
-    end
 end
 
 function CraftScan.Frames.CreateVerticalLayoutOrganizer(anchor, xPadding, yPadding)

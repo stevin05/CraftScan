@@ -631,7 +631,7 @@ local function MergeTimes(myTimes, otherTimes)
 end
 
 CraftScan.Utils.onLoad(function()
-    if CraftScan.Utils.DIAG_PRINT_ENABLED == false then
+    if not CraftScan.Debug.IsEnabled() then
         return;
     end
 

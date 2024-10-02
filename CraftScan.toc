@@ -35,6 +35,7 @@ Utils/Dialog.xml
 Utils/TooltipPlot.lua
 Utils/Comm.lua
 Utils/FStrings.lua
+Utils/Debug.lua
 
 RecipeSchematicMenu.xml
 
