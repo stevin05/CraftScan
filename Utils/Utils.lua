@@ -619,6 +619,10 @@ local function UpgradePersistentConfig()
         CraftScan.DB.settings.discoverable = true;
     end
 
+    if CraftScan.DB.settings.permissive_matching == nil then
+        CraftScan.DB.settings.permissive_matching = false;
+    end
+
     -- After changing placeholders in customer greetings from %s to {placeholder},
     -- existing configs must be updated to replace %s placeholders with the new ones.
     local greeting = CraftScan.DB.settings.greeting;
@@ -720,6 +724,8 @@ local function doOnce()
         CraftScan.DB.realm = realmDB;
 
         UpgradePersistentConfig()
+
+        CraftScan.UpdateHasMatchStyle()
     else
         CraftScan.DB.settings = {}
         CraftScan.DB.settings.inclusions = L(LID.GLOBAL_INCLUSION_DEFAULT);

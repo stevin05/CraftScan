@@ -361,7 +361,6 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
                 [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
 
-                -- Translations complete above this line
                 ["Find Crafter"]                              = "Find Crafter",
                 ["No Crafters Found"]                         = "No Crafters Found",
                 [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
@@ -399,7 +398,13 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.RN_CUSTOMER_SEARCH + 7]                  =
                 "Since customers might start using the addon, the Analytics feature can be completely disabled, and defaults to being disabled now. If you already collected data, it will remain enabled.",
 
+                -- Translations complete above this line
+
                 -- ChatGPT prompt:
                 -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.
+                ["Permissive keyword matching"] = "Permissive keyword matching",
+                [LID.PERMISSIVE_MATCH_SETTING]                    =
+                "When checked, CraftScan will stop caring about spaces and other delimiters when checking for keyword matches. By default, CraftScan will only match a keyword if it is clearly delimited from the surrounding text to avoid incorrectly matching short keywords embedded in other words. For languages that don't use spaces to delimit keywords, enable this option.",
+
         }
 end

@@ -228,6 +228,21 @@ CraftScan.Utils.onLoad(function()
         local initializer = Settings.CreateCheckbox(category, setting, L(LID.DISCOVERABLE_SETTING));
         initializer:AddSearchTags(L(LID.CRAFT_SCAN));
     end
+    do
+        local GetValue = function()
+            return CraftScan.DB.settings.permissive_matching;
+        end
+        local SetValue = function(value)
+            CraftScan.DB.settings.permissive_matching = value;
+            CraftScan.UpdateHasMatchStyle()
+        end
+
+        local setting = Settings.RegisterProxySetting(category, "CRAFTSCAN_PERMISSIVE_MATCHING",
+            Settings.VarType.Boolean, L("Permissive keyword matching"), Settings.Default.True, GetValue, SetValue);
+        local initializer = Settings.CreateCheckbox(category, setting, L(LID.PERMISSIVE_MATCH_SETTING));
+        initializer:AddSearchTags(L(LID.CRAFT_SCAN));
+    end
+
 
 
     Settings.RegisterAddOnCategory(category);

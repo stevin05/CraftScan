@@ -9,11 +9,19 @@ local saved = CraftScan.Utils.saved
 
 CraftScan.MessageType = EnumUtil.MakeEnum("General", "Whisper");
 
+local function NonEmptyStrSplit(delimiter, text)
+    local result = {}
+    for part in string.gmatch(text, "([^" .. delimiter .. "]+)") do
+        table.insert(result, part)
+    end
+    return result
+end
+
 -- Split and normalize a comma separated list of strings
 local function ParseStringList(list)
     if not list then return {} end;
 
-    local items = { strsplit(",", list) }
+    local items = NonEmptyStrSplit(",", list)
     for i, item in ipairs(items) do
         items[i] = string.lower(item:gsub("^%s*(.-)%s*$", "%1"))
     end
@@ -42,6 +50,28 @@ local function SplitResponse(raw_response)
 end
 CraftScan.Utils.SplitResponse = SplitResponse;
 
+local function DelimitedHasMatchCheck(b, e, message)
+    return b and e and (b == 1 or message:sub(b - 1, b - 1) == ' ' or (b > 2 and message:sub(b - 2, b - 1) == '|r')) and
+        (e == #message or message:sub(e + 1, e + 1) == ' ' or message:sub(e + 1, e + 1) == '|')
+end
+
+local function PermissiveHasMatchCheck(b, e, message)
+    return b and e
+end
+
+-- Support with or without caring about space delimiters so languages that don't
+-- use spaces can disable the space checking.
+local HasMatchCheck = DelimitedHasMatchCheck
+function CraftScan.UpdateHasMatchStyle()
+    if CraftScan.DB.settings.permissive_matching then
+        CraftScan.Debug.Print("Permissive matching enabled")
+        HasMatchCheck = PermissiveHasMatchCheck
+    else
+        CraftScan.Debug.Print("Delimited matching enabled")
+        HasMatchCheck = DelimitedHasMatchCheck
+    end
+end
+
 -- Given a string and a list of string tokens, return if the string
 -- contains one of the tokens, delimited by spaces, start/end, or
 -- the [] of an item link.]
@@ -50,8 +80,7 @@ local function HasMatch(message, tokens, secondary_keywords)
     local numMatches = 0;
     for _, token in pairs(tokens) do
         local b, e = string.find(message, token)
-        if b and e and (b == 1 or message:sub(b - 1, b - 1) == ' ' or (b > 2 and message:sub(b - 2, b - 1) == '|r')) and
-            (e == #message or message:sub(e + 1, e + 1) == ' ' or message:sub(e + 1, e + 1) == '|') then
+        if HasMatchCheck(b, e, message) then
             if not len or len < #token then
                 len = #token;
             end
@@ -870,10 +899,12 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     if alt_craft then
         if itemID then
             local item = itemLink or L(LID.GREETING_LINK_BACKUP);
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'), {['crafter']=crafter, ['item']=item});
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'),
+                { ['crafter'] = crafter, ['item'] = item });
         else
             local profession = profInfo.parentProfessionName;
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_HAS_PROF'), {['crafter']=crafter, ['profession']=profession});
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_HAS_PROF'),
+                { ['crafter'] = crafter, ['profession'] = profession });
         end
         if CraftScan.State.isBusy then
             greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
@@ -884,10 +915,10 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     else
         if itemID then
             local item = itemLink or L(LID.GREETING_LINK_BACKUP);
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'), {['item']=item});
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'), { ['item'] = item });
         else
             local profession = profInfo.parentProfessionName;
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_HAVE_PROF'), {['profession']=profession});
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_HAVE_PROF'), { ['profession'] = profession });
         end
         if CraftScan.State.isBusy then
             greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
