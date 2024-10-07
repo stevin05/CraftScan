@@ -68,7 +68,7 @@ function CraftScan.Frames.createLabel(labelText, parent, anchorParent, anchorA, 
     label:SetText(labelText)
     label:SetPoint(anchorA, anchorParent, anchorB, offsetX, offsetY)
     label:SetTextColor(1, 1, 1)
-    label:SetFont("Fonts\\FRIZQT__.TTF", 12, "NONE")
+    label:SetFontObject("GameFontHighlight")
 
     if updateDisplay then
         label.updateDisplay = function()
@@ -274,7 +274,7 @@ function CraftScan.Frames.createCheckBox(labelText, parent, onClickCallback, upd
     label:SetText(labelText)
     label:SetPoint("LEFT", checkBox, "RIGHT", 0, 0) -- Position to the right of the checkbox
     label:SetTextColor(1, 1, 1)
-    label:SetFont("Fonts\\FRIZQT__.TTF", 11, "NONE")
+    label:SetFontObject("GameFontHighlight")
 
     if updateDisplay then
         checkBox.updateDisplay = function()
