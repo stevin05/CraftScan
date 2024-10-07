@@ -623,10 +623,44 @@ local function UpgradePersistentConfig()
     -- existing configs must be updated to replace %s placeholders with the new ones.
     local greeting = CraftScan.DB.settings.greeting;
     if greeting ~= nil then
-        greeting['GREETING_ALT_CAN_CRAFT_ITEM'] = string.format(greeting['GREETING_ALT_CAN_CRAFT_ITEM'], "{crafter}", "{item}");
+        greeting['GREETING_ALT_CAN_CRAFT_ITEM'] = string.format(greeting['GREETING_ALT_CAN_CRAFT_ITEM'], "{crafter}",
+            "{item}");
         greeting['GREETING_ALT_HAS_PROF'] = string.format(greeting['GREETING_ALT_HAS_PROF'], "{crafter}", "{profession}");
         greeting['GREETING_I_CAN_CRAFT_ITEM'] = string.format(greeting['GREETING_I_CAN_CRAFT_ITEM'], "{item}");
         greeting['GREETING_I_HAVE_PROF'] = string.format(greeting['GREETING_I_HAVE_PROF'], "{profession}");
+    end
+
+    -- Account link users are hitting a case where they have a parent profession
+    -- with no associated child professions. I think this has to do with
+    -- abandoning professions for artisan acuity shuffling. Look for
+    -- unexpected states and wipe them out.
+    for char, charConfig in pairs(CraftScan.DB.characters) do
+        if not charConfig.professions or not charConfig.parent_professions then
+            CraftScan.DB.characters[char] = nil
+        else
+            -- Wipe out any child professions configs that don't have a
+            -- corresponding parent prof config.
+            for profID, profConfig in pairs(charConfig.professions) do
+                if not charConfig.parent_professions[profConfig.parentProfID] then
+                    charConfig.professions[profID] = nil
+                end
+            end
+
+            -- Wipe out any parent prof configs that don't have any corresponding
+            -- child prof configs.
+            for ppID, _ in pairs(charConfig.parent_professions) do
+                local found = false
+                for _, profConfig in pairs(charConfig.professions) do
+                    if profConfig.parentProfID == ppID then
+                        found = true
+                        break
+                    end
+                end
+                if not found then
+                    charConfig.parent_professions[ppID] = nil
+                end
+            end
+        end
     end
 end
 

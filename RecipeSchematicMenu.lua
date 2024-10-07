@@ -359,7 +359,8 @@ local function initMenu()
             return db_recipe and db_recipe.keywords or ""
         end,
         scrollFrame)
-    local itemSecondaryKeywords = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Secondary Keywords"), "",
+    local itemSecondaryKeywords = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Secondary Keywords"),
+        "",
         "CraftScan_SecondaryKeywords",
         function(self)
             saved(db_recipes, cur.recipe.recipeID, {}).secondary_keywords = self:GetText()
@@ -579,8 +580,12 @@ local function OnRecipeSelected()
     end
 
     db_player.parent_professions = db_player.parent_professions or {}
-    db_parent_prof = saved(db_player.parent_professions, cur.profession.parentProfessionID,
-        CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG));
+    db_parent_prof = db_player.parent_professions[cur.profession.parentProfessionID]
+    local is_new = not db_parent_prof
+    if is_new then
+        db_parent_prof = CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG);
+        db_player.parent_professions[cur.profession.parentProfessionID] = db_parent_prof
+    end
 
     if db_parent_prof.character_disabled then
         HideSchematicOptions();
@@ -612,6 +617,10 @@ local function OnRecipeSelected()
         menuInitialized = true
     end
 
+    if is_new then
+        -- Seed the profession on any linked accounts
+        CraftScanComm:ShareCharacterData()
+    end
     onSchematicChange()
 end
 
