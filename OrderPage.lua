@@ -2327,6 +2327,7 @@ function CraftScan_CustomGreetingButtonMixin:OnClick()
             initial_text = sv[greeting.key] or default,
             default_text = default,
             Validator = Validator,
+            allowEmpty = true,
             padding = 5,
         })
     end

@@ -66,7 +66,8 @@ CraftScanDialogMixin = {};
 function CraftScanDialogMixin:CheckEnableSubmit()
     for _, frame in ipairs(self.frames) do
         if frame.type == CraftScan.Dialog.Element.EditBox then
-            if FrameToEditBox(frame):GetText() == "" or frame.error == true then
+            local editBox = FrameToEditBox(frame)
+            if (not editBox.allowEmpty and (editBox:GetText() == "")) or frame.error == true then
                 self.SubmitButton:SetEnabled(false);
                 return;
             end
@@ -319,6 +320,7 @@ function CraftScan.Dialog.Show(config)
 
             editBox.Validator = entry.Validator;
             editBox.index = editBoxIndex;
+            editBox.allowEmpty = entry.allowEmpty;
             editBoxIndex = editBoxIndex + 1;
 
             if not entry.multiline then
