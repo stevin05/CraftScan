@@ -554,17 +554,17 @@ local function OnRecipeSelected()
 
     cur.profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(cur.recipe.recipeID)
 
-    if not seen_profs[cur.profession.parentProfessionID] then
-        seen_profs[cur.profession.parentProfessionID] = true;
-        CraftScan.Scanner.UpdateAnalyticsProfIDs(cur.profession.parentProfessionID);
-    end
-
     if not cur.profession.isPrimaryProfession or not cur.profession.parentProfessionID or not CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID] then
         -- Ignore Cooking, Fishing, gathering professions (we don't have
         -- default keywords for them), and weird 'professions' like Emerald
         -- Dream rep boxes (no parentProfessionID).
         HideSchematicOptions();
         return
+    end
+
+    if not seen_profs[cur.profession.parentProfessionID] then
+        seen_profs[cur.profession.parentProfessionID] = true;
+        CraftScan.Scanner.UpdateAnalyticsProfIDs(cur.profession.parentProfessionID);
     end
 
     -- At this point, the player has opened a tradeskill window, so it makes
