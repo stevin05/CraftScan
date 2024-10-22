@@ -554,6 +554,12 @@ local function OnRecipeSelected()
 
     cur.profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(cur.recipe.recipeID)
 
+    if cur.profession.parentProfessionID == nil then
+    -- Handle cases like Runeforging or other non-standard professions
+    HideSchematicOptions();
+    return;
+    end
+    
     if not seen_profs[cur.profession.parentProfessionID] then
         seen_profs[cur.profession.parentProfessionID] = true;
         CraftScan.Scanner.UpdateAnalyticsProfIDs(cur.profession.parentProfessionID);
