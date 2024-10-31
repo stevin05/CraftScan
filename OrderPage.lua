@@ -2254,10 +2254,10 @@ end
 
 function CraftScan_CustomGreetingButtonMixin:OnClick()
     local greetings = {
-        { key = 'GREETING_I_CAN_CRAFT_ITEM',   placeholders = {'{item}'} },
-        { key = 'GREETING_I_HAVE_PROF',        placeholders = {'{profession}'} },
-        { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = {'{crafter}', '{item}'} },
-        { key = 'GREETING_ALT_HAS_PROF',       placeholders = {'{crafter}', '{profession}'} },
+        { key = 'GREETING_I_CAN_CRAFT_ITEM',   placeholders = { '{item}' } },
+        { key = 'GREETING_I_HAVE_PROF',        placeholders = { '{profession}' } },
+        { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = { '{crafter}', '{item}' } },
+        { key = 'GREETING_ALT_HAS_PROF',       placeholders = { '{crafter}', '{profession}' } },
         { key = 'GREETING_ALT_SUFFIX',         placeholders = {}, },
         { key = 'GREETING_BUSY',               placeholders = {}, },
     };
@@ -2273,7 +2273,7 @@ function CraftScan_CustomGreetingButtonMixin:OnClick()
         end
         local missing_placeholders = {};
         local num_missing_placeholders = 0;
-        for i,placeholder in ipairs(greetings[index].placeholders) do
+        for i, placeholder in ipairs(greetings[index].placeholders) do
             if not text:match(placeholder) then
                 table.insert(missing_placeholders, placeholder);
                 num_missing_placeholders = num_missing_placeholders + 1;
@@ -2282,7 +2282,7 @@ function CraftScan_CustomGreetingButtonMixin:OnClick()
 
         local messages = {};
         if num_extra_placeholders > 0 then
-           table.insert(messages, string.format(L(LID.EXTRA_PLACEHOLDERS), table.concat(extra_placeholders, ", ")));
+            table.insert(messages, string.format(L(LID.EXTRA_PLACEHOLDERS), table.concat(extra_placeholders, ", ")));
         end
         if text:match("%%s") then
             table.insert(messages, L(LID.LEGACY_PLACEHOLDERS))
@@ -2292,9 +2292,9 @@ function CraftScan_CustomGreetingButtonMixin:OnClick()
         end
         local message = table.concat(messages, "\n\n");
         if num_extra_placeholders > 0 then
-            return {error = message};
+            return { error = message };
         elseif message ~= '' then
-            return {warning = message};
+            return { warning = message };
         end
 
         return nil;
@@ -2341,6 +2341,17 @@ function CraftScan_CustomGreetingButtonMixin:OnClick()
     })
 end
 
+local openChatOrdersFrame = nil
+function CraftScan.UpdateShowChatOrdersTab()
+    if openChatOrdersFrame then
+        if CraftScan.DB.settings.show_chat_orders_tab == false then
+            openChatOrdersFrame:Hide()
+        else
+            openChatOrdersFrame:Show()
+        end
+    end
+end
+
 CraftScan.Utils.onLoad(function()
     local frame = CraftScanCraftingOrderPage
     CraftScan.Frames.OrdersPage = frame
@@ -2372,10 +2383,11 @@ CraftScan.Utils.onLoad(function()
     local initialized = false;
     ProfessionsFrame:HookScript("OnShow", function()
         if not initialized then
-            local openChatOrdersFrame = CreateFrame("Button", "OpenChatOrdersButton", ProfessionsFrame,
+            openChatOrdersFrame = CreateFrame("Button", "OpenChatOrdersButton", ProfessionsFrame,
                 "CraftScan_OpenChatOrdersButtonTemplate");
             openChatOrdersFrame:Init();
             openChatOrdersFrame:SetPoint("TOPLEFT", ProfessionsFrame.TabSystem, "TOPRIGHT", 2, 0);
+            CraftScan.UpdateShowChatOrdersTab()
 
             initialized = true;
         end

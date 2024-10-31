@@ -623,6 +623,10 @@ local function UpgradePersistentConfig()
         CraftScan.DB.settings.permissive_matching = false;
     end
 
+    if CraftScan.DB.settings.show_chat_orders_tab == nil then
+        CraftScan.DB.settings.show_chat_orders_tab = true;
+    end
+
     -- After changing placeholders in customer greetings from %s to {placeholder},
     -- existing configs must be updated to replace %s placeholders with the new ones.
     local greeting = CraftScan.DB.settings.greeting;

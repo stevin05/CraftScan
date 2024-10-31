@@ -242,6 +242,21 @@ CraftScan.Utils.onLoad(function()
         local initializer = Settings.CreateCheckbox(category, setting, L(LID.PERMISSIVE_MATCH_SETTING));
         initializer:AddSearchTags(L(LID.CRAFT_SCAN));
     end
+    do
+        local GetValue = function()
+            return CraftScan.DB.settings.show_chat_orders_tab;
+        end
+        local SetValue = function(value)
+            CraftScan.DB.settings.show_chat_orders_tab = value;
+            CraftScan.UpdateShowChatOrdersTab()
+        end
+
+        local setting = Settings.RegisterProxySetting(category, "CRAFTSCAN_SHOW_CHAT_ORDERS_BUTTON",
+            Settings.VarType.Boolean, L("Show chat orders tab"), Settings.Default.True, GetValue, SetValue);
+        local initializer = Settings.CreateCheckbox(category, setting, L(LID.SHOW_CHAT_ORDER_TAB));
+        initializer:AddSearchTags(L(LID.CRAFT_SCAN));
+    end
+
 
 
 

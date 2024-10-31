@@ -193,7 +193,8 @@ function CraftScan.Scanner.LoadConfig()
     -- keyword matches, we find the primary crafter first. We also ignore
     -- duplicate recipes from crafters that aren't the primary. These could be
     -- considered a misconfig since the user has to enable scanning for the same
-    -- item on two characters, but that's bound to happen.
+    -- item on two characters, but that's bound to happen. If no primary crafter
+    -- is marked, the current character is treated as the primary.
     local parentProfessions = {};
     for crafter, crafterConfig in pairs(CraftScan.DB.characters) do
         for parentProfID, parentProf in pairs(crafterConfig.parent_professions) do
@@ -217,14 +218,23 @@ function CraftScan.Scanner.LoadConfig()
         end
     end
 
+    local playerNameWithRealm = CraftScan.GetPlayerName(true)
     table.sort(parentProfessions, function(lhs, rhs)
         if lhs.parentProfession.primary_crafter then
-            if rhs.parentProfession.primary_crafter then
-                return false;
+            if not rhs.parentProfession.primary_crafter then
+                return true;
             end
-            return true;
+        elseif rhs.parentProfession.primary_crafter then
+            return false;
         end
-        return false;
+        if lhs.crafter == playerNameWithRealm then
+            if rhs.crafter ~= playerNameWithRealm then
+                return true;
+            end
+        elseif rhs.crafter == playerNameWithRealm then
+            return false;
+        end
+        return lhs.crafter < rhs.crafter;
     end)
 
     -- Flatten the keywords, storing the path back to their source so we can
@@ -870,7 +880,6 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     --local tier5 = Professions.GetChatIconMarkupForQuality(5, true, 0);
     --itemLink = itemLink .. " " .. tier5;
     --end
-
 
     -- We keep a history of our customers to avoid spamming the same person repeatedly.
     local customerInfo = CraftScan.DB.customers[customer]

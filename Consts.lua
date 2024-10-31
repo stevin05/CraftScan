@@ -129,6 +129,7 @@ CraftScan.CONST.TEXT = {
     DISCOVERABLE_SETTING                = 125,
     GREETING_BUSY                       = 126,
     PERMISSIVE_MATCH_SETTING            = 127,
+    SHOW_CHAT_ORDER_TAB                 = 128,
 
 
 
