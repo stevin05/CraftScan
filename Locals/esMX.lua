@@ -11,16 +11,16 @@ function CraftScan.LOCAL_MX:GetData()
         [LID.RENABLE_ADDONS]                      = "Reactivar Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]              =
         "Guarda tu lista de addons y luego desactívalos, permitiendo un cambio rápido a un alter. Este botón puede ser pulsado de nuevo para reactivar los addons en cualquier momento.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]           = "Puedo fabricar {item}.",                          -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]         = "Mi alter, {crafter}, puede fabricar {item}.",     -- Crafter Name, ItemLink
+        [LID.GREETING_I_CAN_CRAFT_ITEM]           = "Puedo fabricar {item}.",                      -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]         = "Mi alter, {crafter}, puede fabricar {item}.", -- Crafter Name, ItemLink
         [LID.GREETING_LINK_BACKUP]                = "eso",
-        [LID.GREETING_I_HAVE_PROF]                = "Tengo {profession}.",                             -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]               = "Mi alter, {crafter}, tiene {profession}.",        -- Crafter Name, Profession Name
+        [LID.GREETING_I_HAVE_PROF]                = "Tengo {profession}.",                         -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]               = "Mi alter, {crafter}, tiene {profession}.",    -- Crafter Name, Profession Name
         [LID.GREETING_ALT_SUFFIX]                 = "Avísame si envías una orden para que pueda cambiar de personaje.",
         [LID.MAIN_BUTTON_BINDING_NAME]            = "Alternar Página de Órdenes",
         [LID.GREET_BUTTON_BINDING_NAME]           = "Saludar al Cliente del Banner",
         [LID.DISMISS_BUTTON_BINDING_NAME]         = "Despedir al Cliente del Banner",
-        [LID.TOGGLE_CHAT_TOOLTIP]                 = "Alternar órdenes de chat%s",     -- Keybind
+        [LID.TOGGLE_CHAT_TOOLTIP]                 = "Alternar órdenes de chat%s", -- Keybind
         [LID.SCANNER_CONFIG_SHOW]                 = "Mostrar CraftScan",
         [LID.SCANNER_CONFIG_HIDE]                 = "Ocultar CraftScan",
         [LID.CRAFT_SCAN_OPTIONS]                  = "Opciones de CraftScan",
@@ -48,7 +48,7 @@ function CraftScan.LOCAL_MX:GetData()
         [LID.HELP_GLOBAL_KEYWORDS]                = "Un mensaje debe incluir uno de estos términos.",
         [LID.HELP_GLOBAL_EXCLUSIONS]              = "Un mensaje será ignorado si contiene uno de estos términos.",
         [LID.SCAN_ALL_RECIPES]                    = "Escanear todas las recetas",
-        [LID.SCANNING_ENABLED]                    = "El escaneo está habilitado porque '%s' está marcado.",     -- SCAN_ALL_RECIPES or ITEM_SCAN_CHECK
+        [LID.SCANNING_ENABLED]                    = "El escaneo está habilitado porque '%s' está marcado.", -- SCAN_ALL_RECIPES or ITEM_SCAN_CHECK
         [LID.SCANNING_DISABLED]                   = "El escaneo está deshabilitado.",
         [LID.PRIMARY_KEYWORDS]                    = "Palabras clave primarias",
         [LID.HELP_PRIMARY_KEYWORDS]               =
@@ -159,7 +159,7 @@ function CraftScan.LOCAL_MX:GetData()
         ["Primary Crafter"]                       = "Artesano Principal",
         [LID.PRIMARY_CRAFTER_TOOLTIP]             =
         "Marca %s como tu artesano principal para %s. Este artesano tendrá prioridad sobre otros si hay varias coincidencias con la misma solicitud.",
-        ["Chat History"]                          = "Historial de chat con %s",     -- customer, left-click-help
+        ["Chat History"]                          = "Historial de chat con %s", -- customer, left-click-help
         ["Greet Help"]                            = "|cffffd100Clic izquierdo: Saludar al cliente%s|r",
         ["Chat Help"]                             = "|cffffd100Clic izquierdo: Abrir susurro|r",
         ["Chat Override"]                         = "|cffffd100Clic medio: Abrir susurro%s|r",
@@ -170,7 +170,7 @@ function CraftScan.LOCAL_MX:GetData()
         [LID.ADDON_WHITELIST_LABEL]               = "Lista blanca de addons",
         [LID.ADDON_WHITELIST_TOOLTIP]             =
         "Cuando presionas el botón para desactivar temporalmente todos los addons, mantén los addons seleccionados aquí activados. CraftScan siempre estará habilitado. Mantén solo lo que necesitas para fabricar eficientemente.",
-        [LID.MULTI_SELECT_BUTTON_TEXT]            = "%d seleccionados",     -- Count
+        [LID.MULTI_SELECT_BUTTON_TEXT]            = "%d seleccionados", -- Count
 
         [LID.ACCOUNT_LINK_DESC]                   =
         "Comparte artesanos entre varias cuentas.\n\nAl iniciar sesión o después de un cambio de configuración, CraftScan propagará la información más reciente entre los artesanos configurados en cualquiera de las cuentas para asegurarse de que ambos lados de una cuenta vinculada estén siempre sincronizados.",
@@ -192,7 +192,7 @@ function CraftScan.LOCAL_MX:GetData()
         ["proxy_receive_enabled"]                 = "Recibir órdenes proxy",
         ["proxy_receive_enabled_tooltip"]         =
         "Cuando otra cuenta detecta y envía un pedido de cliente, esta cuenta lo recibirá. El botón CraftScan se mostrará para mostrar la alerta si es necesario.",
-        [LID.LINK_ACTIVE]                         = "|cFF00FF00%s (visto por última vez %s)|r",     -- Crafter, Time
+        [LID.LINK_ACTIVE]                         = "|cFF00FF00%s (visto por última vez %s)|r", -- Crafter, Time
         [LID.ACCOUNT_LINK_DELETE_INFO]            =
         "Elimina el enlace a '%s' y todos los personajes importados. Esta cuenta dejará de comunicarse con la otra parte. La otra parte seguirá intentando establecer conexiones hasta que el enlace también se elimine manualmente allí.\n\nArtesanos importados que se eliminarán:\n%s",
         [LID.ACCOUNT_LINK_ADD_CHAR]               =
@@ -319,7 +319,7 @@ function CraftScan.LOCAL_MX:GetData()
         ["Save"]                                  = "Guardar",
         ["Reset"]                                 = "Restablecer",
         [LID.MANUAL_MATCHING_TITLE]               = "Coincidencia Manual",
-        [LID.MANUAL_MATCH]                        = "%s - %s",     -- creador, profesión
+        [LID.MANUAL_MATCH]                        = "%s - %s", -- creador, profesión
         [LID.MANUAL_MATCHING_DESC]                =
         "Ignora palabras clave primarias y fuerza una coincidencia para este mensaje. CraftScan intentará encontrar el creador correcto basado en el mensaje, pero si no se encuentran coincidencias, se utilizará el saludo predeterminado para el creador especificado. La coincidencia se informa a través de los medios habituales, permitiéndote hacer clic en el banner o en la fila de la tabla para enviar el saludo.",
 
@@ -395,5 +395,15 @@ function CraftScan.LOCAL_MX:GetData()
         ["Permissive keyword matching"]           = "Coincidencia permisiva de palabras clave",
         [LID.PERMISSIVE_MATCH_SETTING]            =
         "Cuando está activada, CraftScan dejará de preocuparse por los espacios y otros delimitadores al buscar coincidencias de palabras clave. Por defecto, CraftScan solo coincidirá con una palabra clave si está claramente delimitada del texto circundante para evitar coincidencias incorrectas de palabras clave cortas incrustadas en otras palabras. Para los idiomas que no usan espacios para delimitar palabras clave, active esta opción.",
+        ["Show chat orders tab"]                  = "Mostrar pestaña de órdenes del chat",
+        [LID.SHOW_CHAT_ORDER_TAB]                 =
+        "Muestra u oculta la pestaña 'Órdenes del Chat' en la ventana de profesiones. Si está oculta, puedes abrirla haciendo clic en el botón CraftScan donde aparecen las alertas.",
+        [LID.IGNORE]                              = "Ignorar",
+        [LID.IGNORE_TOOLTIP]                      =
+        "Añade a este jugador a tu lista de ignorados en CraftScan. CraftScan ignorará todos los mensajes de este jugador. Este menú permite quitar al jugador de la lista.",
+        [LID.UNIGNORE]                            = "Quitar de ignorados",
+        [LID.UNIGNORE_TOOLTIP]                    =
+        "Este jugador está en tu lista de ignorados de CraftScan. Esta opción lo quitará de la lista.",
+
     }
 end

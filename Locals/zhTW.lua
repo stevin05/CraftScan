@@ -304,7 +304,7 @@ function CraftScan.LOCAL_TW:GetData()
         ["Save"]                                  = "保存",
         ["Reset"]                                 = "重置",
         [LID.MANUAL_MATCHING_TITLE]               = "手動匹配",
-        [LID.MANUAL_MATCH]                        = "%s - %s",     -- 制作者，職業
+        [LID.MANUAL_MATCH]                        = "%s - %s", -- 制作者，職業
         [LID.MANUAL_MATCHING_DESC]                =
         "忽略主要關鍵詞並強制匹配此消息。CraftScan將根據消息嘗試找到正確的制作者，但如果找不到匹配，將使用指定制作者的默認問候。匹配將通過通常的方式報告，允許你點擊橫幅或表格行以發送問候。",
 
@@ -365,5 +365,12 @@ function CraftScan.LOCAL_TW:GetData()
         ["Permissive keyword matching"]           = "寬鬆的關鍵詞匹配",
         [LID.PERMISSIVE_MATCH_SETTING]            =
         "選中後，CraftScan 在檢查關鍵詞匹配時將不再關注空格和其他分隔符。預設情況下，CraftScan 僅在關鍵詞與周圍文本明顯分隔的情況下進行匹配，以避免錯誤匹配嵌入在其他詞中的短關鍵詞。對於不使用空格來分隔關鍵詞的語言，請啟用此選項。",
+        ["Show chat orders tab"]                  = "顯示聊天訂單標籤",
+        [LID.SHOW_CHAT_ORDER_TAB]                 = "在專業視窗顯示或隱藏「聊天訂單」標籤。若隱藏，可點擊顯示警報的 CraftScan 按鈕以打開聊天訂單頁面。",
+        [LID.IGNORE]                              = "忽略",
+        [LID.IGNORE_TOOLTIP]                      = "將此玩家加入 CraftScan 忽略列表。CraftScan 會忽略該玩家發送的所有訊息。此選單可用於將玩家從列表中移除。",
+        [LID.UNIGNORE]                            = "移除忽略",
+        [LID.UNIGNORE_TOOLTIP]                    = "此玩家在您的 CraftScan 忽略列表中。此選項將其從列表中移除。",
+
     }
 end

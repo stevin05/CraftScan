@@ -130,6 +130,10 @@ CraftScan.CONST.TEXT = {
     GREETING_BUSY                       = 126,
     PERMISSIVE_MATCH_SETTING            = 127,
     SHOW_CHAT_ORDER_TAB                 = 128,
+    IGNORE                              = 129,
+    UNIGNORE                            = 130,
+    IGNORE_TOOLTIP                      = 131,
+    UNIGNORE_TOOLTIP                    = 132,
 
 
 

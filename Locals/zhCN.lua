@@ -303,7 +303,7 @@ function CraftScan.LOCAL_CN:GetData()
         ["Save"]                                  = "保存",
         ["Reset"]                                 = "重置",
         [LID.MANUAL_MATCHING_TITLE]               = "手动匹配",
-        [LID.MANUAL_MATCH]                        = "%s - %s",     -- 制作者，职业
+        [LID.MANUAL_MATCH]                        = "%s - %s", -- 制作者，职业
         [LID.MANUAL_MATCHING_DESC]                =
         "忽略主要关键词并强制匹配此消息。CraftScan将尝试根据消息找到正确的制作者，但如果没有找到匹配项，将使用指定制作者的默认问候。匹配通过通常的方式报告，允许你点击横幅或表格行以发送问候。",
 
@@ -364,5 +364,12 @@ function CraftScan.LOCAL_CN:GetData()
         ["Permissive keyword matching"]           = "宽松的关键词匹配",
         [LID.PERMISSIVE_MATCH_SETTING]            =
         "选中后，CraftScan 在检查关键词匹配时将不再关注空格和其他分隔符。默认情况下，CraftScan 仅在关键词与周围文本明显分隔的情况下进行匹配，以避免错误匹配嵌入在其他词中的短关键词。对于不使用空格来分隔关键词的语言，请启用此选项。",
+        ["Show chat orders tab"]                  = "显示聊天订单标签",
+        [LID.SHOW_CHAT_ORDER_TAB]                 = "在专业窗口显示或隐藏“聊天订单”标签。如果隐藏，可以点击CraftScan按钮（显示警报的地方）打开聊天订单页面。",
+        [LID.IGNORE]                              = "忽略",
+        [LID.IGNORE_TOOLTIP]                      = "将此玩家加入CraftScan忽略列表。CraftScan会忽略此玩家发送的所有消息。此菜单可用于从列表中移除此玩家。",
+        [LID.UNIGNORE]                            = "移除忽略",
+        [LID.UNIGNORE_TOOLTIP]                    = "此玩家在您的CraftScan忽略列表中。此选项将其从列表中移除。",
+
     }
 end

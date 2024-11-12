@@ -407,5 +407,9 @@ function CraftScan.LOCAL_EN:GetData()
                 -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.
                 ["Show chat orders tab"] = "Show chat orders tab",
                 [LID.SHOW_CHAT_ORDER_TAB] = "Show or hide the 'Chat Orders' tab on the profession window. If hidden, you can open the chat orders page by clicking the CraftScan button where alerts appear.",
+                [LID.IGNORE] = "Ignore",
+                [LID.IGNORE_TOOLTIP] = "Add this player to your CraftScan ignore list. CraftScan will ignore all messages sent by this player. This menu can be used to remove the player from the list.",
+                [LID.UNIGNORE] = "Remove Ignore",
+                [LID.UNIGNORE_TOOLTIP] = "This player is on your CraftScan ignore list. This option will remove them from the list.",
         }
 end

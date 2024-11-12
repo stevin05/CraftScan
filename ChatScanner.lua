@@ -1054,6 +1054,11 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
         return false
     end
 
+    local ignored = CraftScan.DB.settings.ignored and CraftScan.DB.settings.ignored[customer];
+    if ignored then
+        return false
+    end
+
     local customerInfo = CraftScan.DB.customers[customer]
 
     if event == "CHAT_MSG_WHISPER_INFORM" then

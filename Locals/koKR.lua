@@ -303,7 +303,7 @@ function CraftScan.LOCAL_KO:GetData()
         ["Save"]                                  = "저장",
         ["Reset"]                                 = "재설정",
         [LID.MANUAL_MATCHING_TITLE]               = "수동 일치",
-        [LID.MANUAL_MATCH]                        = "%s - %s",     -- 제작자, 직업
+        [LID.MANUAL_MATCH]                        = "%s - %s", -- 제작자, 직업
         [LID.MANUAL_MATCHING_DESC]                =
         "주요 키워드를 무시하고 이 메시지에 대한 일치를 강제합니다. CraftScan은 메시지에 따라 올바른 제작자를 찾으려고 하지만, 일치하는 항목이 없으면 지정된 제작자에 대한 기본 인사가 사용됩니다. 일치는 일반적인 방법으로 보고되며, 배너 또는 테이블 행을 클릭하여 인사를 보낼 수 있습니다.",
 
@@ -366,5 +366,13 @@ function CraftScan.LOCAL_KO:GetData()
         ["Permissive keyword matching"]           = "허용된 키워드 매칭",
         [LID.PERMISSIVE_MATCH_SETTING]            =
         "체크된 경우, CraftScan은 키워드 일치를 확인할 때 공백 및 기타 구분 기호를 무시합니다. 기본적으로 CraftScan은 짧은 키워드가 다른 단어에 포함되는 잘못된 매칭을 피하기 위해 키워드가 주변 텍스트와 명확하게 구분될 때만 일치시킵니다. 키워드를 구분하기 위해 공백을 사용하지 않는 언어의 경우, 이 옵션을 활성화하십시오.",
+        ["Show chat orders tab"]                  = "채팅 주문 탭 표시",
+        [LID.SHOW_CHAT_ORDER_TAB]                 = "전문 기술 창에서 '채팅 주문' 탭을 표시하거나 숨깁니다. 숨겨진 경우 CraftScan 버튼을 클릭하여 경고가 표시되는 페이지를 열 수 있습니다.",
+        [LID.IGNORE]                              = "무시",
+        [LID.IGNORE_TOOLTIP]                      =
+        "이 플레이어를 CraftScan 무시 목록에 추가합니다. CraftScan은 이 플레이어가 보낸 모든 메시지를 무시합니다. 이 메뉴를 사용하여 플레이어를 목록에서 제거할 수 있습니다.",
+        [LID.UNIGNORE]                            = "무시 해제",
+        [LID.UNIGNORE_TOOLTIP]                    = "이 플레이어는 CraftScan 무시 목록에 있습니다. 이 옵션을 통해 목록에서 제거할 수 있습니다.",
+
     }
 end

@@ -156,11 +156,36 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
 
     -- Inject our buttons on the right click of a name in chat.
     Menu.ModifyMenu("MENU_UNIT_FRIEND", function(owner, rootDescription, contextData)
-        rootDescription:CreateDivider();
-        local title = rootDescription:CreateTitle(L("CraftScan") .. " - " .. L(LID.MANUAL_MATCHING_TITLE));
-        title:SetTooltip(function(tooltip, elementDescription)
-            GameTooltip_AddNormalLine(tooltip, MakeTextWhite(L(LID.MANUAL_MATCHING_DESC)));
-        end);
+        local subMenu = rootDescription:CreateButton(L("CraftScan"))
+
+        local title = subMenu:CreateTitle(L("CraftScan"))
+        subMenu:CreateDivider()
+
+        do
+            local target = contextData.chatTarget;
+            local ignored = CraftScan.DB.settings.ignored and CraftScan.DB.settings.ignored[target];
+            local title = subMenu:CreateButton(L(ignored and LID.UNIGNORE or LID.IGNORE),
+                function()
+                    if ignored then
+                        CraftScan.DB.settings.ignored[target] = nil
+                    else
+                        CraftScan.Utils.saved(CraftScan.DB.settings, 'ignored', {})[target] = 1
+                    end
+                end);
+            title:SetTooltip(function(tooltip, elementDescription)
+                GameTooltip_AddNormalLine(tooltip,
+                    MakeTextWhite(L(ignored and LID.UNIGNORE_TOOLTIP or LID.IGNORE_TOOLTIP)));
+            end);
+        end
+
+
+        do
+            subMenu:CreateDivider();
+            local title = subMenu:CreateTitle(L(LID.MANUAL_MATCHING_TITLE));
+            title:SetTooltip(function(tooltip, elementDescription)
+                GameTooltip_AddNormalLine(tooltip, MakeTextWhite(L(LID.MANUAL_MATCHING_DESC)));
+            end);
+        end
 
         local crafterRows = CraftScan.GetSortedCrafters();
         for _, crafterInfo in ipairs(crafterRows) do
@@ -171,7 +196,7 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
 
             if ppConfig.scanning_enabled and not ppConfig.character_disabled then
                 local profName = CraftScan.Utils.ProfessionNameByID(ppID);
-                rootDescription:CreateButton(
+                subMenu:CreateButton(
                     string.format(L(LID.MANUAL_MATCH), CraftScan.ColorizeCrafterName(char),
                         CraftScan.Utils.ColorizeProfessionName(ppID, profName)),
                     function()
@@ -190,13 +215,13 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
         end
 
         if next(CraftScan.DB.settings.explanations) then
-            rootDescription:CreateDivider();
-            rootDescription:CreateTitle(L("CraftScan") .. " - " .. L("Custom Explanations"));
+            subMenu:CreateDivider();
+            subMenu:CreateTitle(L("Custom Explanations"));
             local explanations = CreateUIExplanations();
             for _, entry in ipairs(explanations) do
                 local label = entry.label;
                 local text = entry.text;
-                local button = rootDescription:CreateButton(label, function()
+                local button = subMenu:CreateButton(label, function()
                     local message = CraftScan.Utils.SplitResponse(text);
                     CraftScan.Utils.SendResponses(message, contextData.chatTarget)
                 end);
