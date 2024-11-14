@@ -256,9 +256,19 @@ CraftScan.Utils.onLoad(function()
         local initializer = Settings.CreateCheckbox(category, setting, L(LID.SHOW_CHAT_ORDER_TAB));
         initializer:AddSearchTags(L(LID.CRAFT_SCAN));
     end
+    do
+        local GetValue = function()
+            return CraftScan.DB.settings.collapse_chat_context;
+        end
+        local SetValue = function(value)
+            CraftScan.DB.settings.collapse_chat_context = value;
+        end
 
-
-
+        local setting = Settings.RegisterProxySetting(category, "CRAFTSCAN_COLLAPSE_CHAT_CONTEXT",
+            Settings.VarType.Boolean, L("Collapse chat context menu"), Settings.Default.False, GetValue, SetValue);
+        local initializer = Settings.CreateCheckbox(category, setting, L(LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP));
+        initializer:AddSearchTags(L(LID.CRAFT_SCAN));
+    end
 
     Settings.RegisterAddOnCategory(category);
 end)

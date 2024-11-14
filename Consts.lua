@@ -134,6 +134,7 @@ CraftScan.CONST.TEXT = {
     UNIGNORE                            = 130,
     IGNORE_TOOLTIP                      = 131,
     UNIGNORE_TOOLTIP                    = 132,
+    COLLAPSE_CHAT_CONTEXT_TOOLTIP       = 133,
 
 
 

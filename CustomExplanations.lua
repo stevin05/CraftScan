@@ -156,32 +156,17 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
 
     -- Inject our buttons on the right click of a name in chat.
     Menu.ModifyMenu("MENU_UNIT_FRIEND", function(owner, rootDescription, contextData)
-        local subMenu = rootDescription:CreateButton(L("CraftScan"))
+        local collapsed = CraftScan.DB.settings.collapse_chat_context
+        local prefix = collapsed and "" or L("CraftScan") .. " - "
+        local subMenu = collapsed and rootDescription:CreateButton(L("CraftScan")) or rootDescription
 
-        local title = subMenu:CreateTitle(L("CraftScan"))
-        subMenu:CreateDivider()
-
-        do
-            local target = contextData.chatTarget;
-            local ignored = CraftScan.DB.settings.ignored and CraftScan.DB.settings.ignored[target];
-            local title = subMenu:CreateButton(L(ignored and LID.UNIGNORE or LID.IGNORE),
-                function()
-                    if ignored then
-                        CraftScan.DB.settings.ignored[target] = nil
-                    else
-                        CraftScan.Utils.saved(CraftScan.DB.settings, 'ignored', {})[target] = 1
-                    end
-                end);
-            title:SetTooltip(function(tooltip, elementDescription)
-                GameTooltip_AddNormalLine(tooltip,
-                    MakeTextWhite(L(ignored and LID.UNIGNORE_TOOLTIP or LID.IGNORE_TOOLTIP)));
-            end);
+        if collapsed then
+            subMenu:CreateTitle(L("CraftScan"))
         end
-
 
         do
             subMenu:CreateDivider();
-            local title = subMenu:CreateTitle(L(LID.MANUAL_MATCHING_TITLE));
+            local title = subMenu:CreateTitle(prefix .. L(LID.MANUAL_MATCHING_TITLE));
             title:SetTooltip(function(tooltip, elementDescription)
                 GameTooltip_AddNormalLine(tooltip, MakeTextWhite(L(LID.MANUAL_MATCHING_DESC)));
             end);
@@ -216,7 +201,7 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
 
         if next(CraftScan.DB.settings.explanations) then
             subMenu:CreateDivider();
-            subMenu:CreateTitle(L("Custom Explanations"));
+            subMenu:CreateTitle(prefix .. L("Custom Explanations"));
             local explanations = CreateUIExplanations();
             for _, entry in ipairs(explanations) do
                 local label = entry.label;
@@ -230,6 +215,24 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
                     GameTooltip_AddNormalLine(tooltip, MakeTextWhite(text));
                 end);
             end
+        end
+
+        do
+            subMenu:CreateDivider()
+            local target = contextData.chatTarget;
+            local ignored = CraftScan.DB.settings.ignored and CraftScan.DB.settings.ignored[target];
+            local title = subMenu:CreateButton(prefix .. L(ignored and LID.UNIGNORE or LID.IGNORE),
+                function()
+                    if ignored then
+                        CraftScan.DB.settings.ignored[target] = nil
+                    else
+                        CraftScan.Utils.saved(CraftScan.DB.settings, 'ignored', {})[target] = 1
+                    end
+                end);
+            title:SetTooltip(function(tooltip, elementDescription)
+                GameTooltip_AddNormalLine(tooltip,
+                    MakeTextWhite(L(ignored and LID.UNIGNORE_TOOLTIP or LID.IGNORE_TOOLTIP)));
+            end);
         end
     end);
 end

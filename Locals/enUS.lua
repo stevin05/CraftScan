@@ -15,11 +15,11 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.RENABLE_ADDONS]                  = "Re-enable Addons",
                 [LID.DISABLE_ADDONS_TOOLTIP]          =
                 "Save your list of addons, and then disable them, allowing for a quick swap to an alt. This button can be clicked again to re-enable the addons at any time.",
-                [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft {item}.",           -- ItemLink
+                [LID.GREETING_I_CAN_CRAFT_ITEM]       = "I can craft {item}.",                  -- ItemLink
                 [LID.GREETING_ALT_CAN_CRAFT_ITEM]     = "My alt, {crafter}, can craft {item}.", -- Crafter Name, ItemLink
                 [LID.GREETING_LINK_BACKUP]            = "that",
-                [LID.GREETING_I_HAVE_PROF]            = "I have {profession}.",                -- Profession Name
-                [LID.GREETING_ALT_HAS_PROF]           = "My alt, {crafter}, has {profession}.",       -- Crafter Name, Profession Name
+                [LID.GREETING_I_HAVE_PROF]            = "I have {profession}.",                 -- Profession Name
+                [LID.GREETING_ALT_HAS_PROF]           = "My alt, {crafter}, has {profession}.", -- Crafter Name, Profession Name
                 [LID.GREETING_ALT_SUFFIX]             = "Let me know if you send an order so I can log over.",
                 [LID.MAIN_BUTTON_BINDING_NAME]        = "Toggle Order Page",
                 [LID.GREET_BUTTON_BINDING_NAME]       = "Greet Banner Customer",
@@ -207,209 +207,216 @@ function CraftScan.LOCAL_EN:GetData()
                 ["New name"]                          = "New name:",
 
 
-                [LID.RN_LINKED_ACCOUNTS]                      = "Linked Accounts",
-                [LID.RN_LINKED_ACCOUNTS + 1]                  =
+                [LID.RN_LINKED_ACCOUNTS]                  = "Linked Accounts",
+                [LID.RN_LINKED_ACCOUNTS + 1]              =
                 "Link multiple WoW accounts together to share crafting information and scan for any account from any account.",
-                [LID.RN_LINKED_ACCOUNTS + 2]                  =
+                [LID.RN_LINKED_ACCOUNTS + 2]              =
                 "Optionally, proxy customer orders from one account to the others so you can park a trial account in town while your main is out and about.",
-                [LID.RN_LINKED_ACCOUNTS + 3]                  =
+                [LID.RN_LINKED_ACCOUNTS + 3]              =
                 "To get started, click the 'Link Account' button in the bottom left corner of the CraftScan window and follow the instruction.",
-                [LID.RN_LINKED_ACCOUNTS + 4]                  =
+                [LID.RN_LINKED_ACCOUNTS + 4]              =
                 "Demo: https://www.youtube.com/watch?v=x1JLEph6t_c",
 
-                ["Open Settings"]                             = "Open Settings",
-                ["Customize Greeting"]                        = "Customize Greeting",
-                [LID.CUSTOM_GREETING_INFO]                    =
+                ["Open Settings"]                         = "Open Settings",
+                ["Customize Greeting"]                    = "Customize Greeting",
+                [LID.CUSTOM_GREETING_INFO]                =
                 "CraftScan uses these sentences to create the initial greeting sent to customers depending on the situation. Override some or all of them below to create your own greeting.",
-                ["Default"]                                   = "Default",
-                [LID.MISSING_PLACEHOLDERS]            =
+                ["Default"]                               = "Default",
+                [LID.MISSING_PLACEHOLDERS]                =
                 "You have not included %s. CraftScan will work with fewer placeholders, but you likely want to include them for context.",
-                [LID.EXTRA_PLACEHOLDERS]              = "Error: %s are not valid placeholders.",
-                [LID.LEGACY_PLACEHOLDERS]              = "Warning: The use of %s is now deprecated. Please use named placeholders, like so: {placeholder}",
+                [LID.EXTRA_PLACEHOLDERS]                  = "Error: %s are not valid placeholders.",
+                [LID.LEGACY_PLACEHOLDERS]                 =
+                "Warning: The use of %s is now deprecated. Please use named placeholders, like so: {placeholder}",
 
-                ["Pixels"]                                    = "Pixels",
-                ["Show button height"]                        = "Show button height",
-                ["Alert icon scale"]                          = "Alert icon scale",
-                ["Total"]                                     = "Total",
-                ["Repeat"]                                    = "Repeat",
-                ["Avg Per Day"]                               = "Avg/Day",
-                ["Peak Per Hour"]                             = "Peak/Hour",
-                ["Median Per Customer"]                       = "Mdn/Cust",
-                ["Median Per Customer Filtered"]              = "Mdn/Cust Repeat",
-                ["No analytics data"]                         = "No analytics data",
-                ["Reset Analytics"]                           = "Reset Analytics",
-                ["Analytics Options"]                         = "Analytics Options",
+                ["Pixels"]                                = "Pixels",
+                ["Show button height"]                    = "Show button height",
+                ["Alert icon scale"]                      = "Alert icon scale",
+                ["Total"]                                 = "Total",
+                ["Repeat"]                                = "Repeat",
+                ["Avg Per Day"]                           = "Avg/Day",
+                ["Peak Per Hour"]                         = "Peak/Hour",
+                ["Median Per Customer"]                   = "Mdn/Cust",
+                ["Median Per Customer Filtered"]          = "Mdn/Cust Repeat",
+                ["No analytics data"]                     = "No analytics data",
+                ["Reset Analytics"]                       = "Reset Analytics",
+                ["Analytics Options"]                     = "Analytics Options",
 
-                ["1 minute"]                                  = "1 minute",
-                ["15 minutes "]                               = "15 minutes ",
-                ["1 hour"]                                    = "1 hour",
-                ["1 day"]                                     = "1 day",
-                ["1 week "]                                   = "1 week ",
-                ["30 days"]                                   = "30 days",
-                ["180 days"]                                  = "180 days",
-                ["1 year"]                                    = "1 year",
-                ["Clear recent data"]                         = "Clear recent data",
-                ["Newer than"]                                = "Newer than",
-                ["Clear old data"]                            = "Clear old data",
-                ["Older than"]                                = "Older than",
-                ["1 Minute Bins"]                             = "1 Minute Bins",
-                ["5 Minute Bins"]                             = "5 Minute Bins",
-                ["10 Minute Bins"]                            = "10 Minute Bins",
-                ["30 Minute Bins"]                            = "30 Minute Bins",
-                ["1 Hour Bins"]                               = "1 Hour Bins",
-                ["6 Hour Bins"]                               = "6 Hour Bins",
-                ["12 Hour Bins"]                              = "12 Hour Bins",
-                ["24 Hour Bins"]                              = "24 Hour Bins",
-                ["1 Week Bins"]                               = "1 Week Bins",
+                ["1 minute"]                              = "1 minute",
+                ["15 minutes "]                           = "15 minutes ",
+                ["1 hour"]                                = "1 hour",
+                ["1 day"]                                 = "1 day",
+                ["1 week "]                               = "1 week ",
+                ["30 days"]                               = "30 days",
+                ["180 days"]                              = "180 days",
+                ["1 year"]                                = "1 year",
+                ["Clear recent data"]                     = "Clear recent data",
+                ["Newer than"]                            = "Newer than",
+                ["Clear old data"]                        = "Clear old data",
+                ["Older than"]                            = "Older than",
+                ["1 Minute Bins"]                         = "1 Minute Bins",
+                ["5 Minute Bins"]                         = "5 Minute Bins",
+                ["10 Minute Bins"]                        = "10 Minute Bins",
+                ["30 Minute Bins"]                        = "30 Minute Bins",
+                ["1 Hour Bins"]                           = "1 Hour Bins",
+                ["6 Hour Bins"]                           = "6 Hour Bins",
+                ["12 Hour Bins"]                          = "12 Hour Bins",
+                ["24 Hour Bins"]                          = "24 Hour Bins",
+                ["1 Week Bins"]                           = "1 Week Bins",
 
-                [LID.ANALYTICS_ITEM_TOOLTIP]                  =
+                [LID.ANALYTICS_ITEM_TOOLTIP]              =
                 "Items are matched by ensuring a message matches the global inclusion and exclusion keywords, and then looking for the quality icon in an item link. There is no global list of crafted items or way to determine if an itemID is crafted, so this is the best we can do.",
-                [LID.ANALYTICS_PROFESSION_TOOLTIP]            =
+                [LID.ANALYTICS_PROFESSION_TOOLTIP]        =
                 "There is no reverse look up from item to profession that crafts it. If one of your characters can craft the item, the profession is automatically assigned. When a profession is opened, any unknown items belonging to that profession are assigned. You can also manually assign the profession.",
-                [LID.ANALYTICS_TOTAL_TOOLTIP]                 =
+                [LID.ANALYTICS_TOTAL_TOOLTIP]             =
                 "The total number of times this item has been requested. Duplicate requests from the same customer within the same hour are not included.",
-                [LID.ANALYTICS_REPEAT_TOOLTIP]                =
+                [LID.ANALYTICS_REPEAT_TOOLTIP]            =
                 "The total number of times this item has been requested by the same customer multiple times within the same hour.\n\nIf this value is close to the Total, then supply for this item is likely lacking.\n\nDuplicate requests within 15 seconds of the initial request are ignored.",
-                [LID.ANALYTICS_AVERAGE_TOOLTIP]               = "The average number of total requests for this item per day.",
-                [LID.ANALYTICS_PEAK_TOOLTIP]                  = "The peak number of requests for this item per hour.",
-                [LID.ANALYTICS_MEDIAN_TOOLTIP]                =
+                [LID.ANALYTICS_AVERAGE_TOOLTIP]           = "The average number of total requests for this item per day.",
+                [LID.ANALYTICS_PEAK_TOOLTIP]              = "The peak number of requests for this item per hour.",
+                [LID.ANALYTICS_MEDIAN_TOOLTIP]            =
                 "The median number of times the same customer has requested the same item within the same hour.\n\nA value of 1 indicates that at least half of all requests are being fulfilled by someone and the demand for this item is likely satisfied.\n\nIf this value is high, this is likely a good item to pursue being able to craft.",
-                [LID.ANALYTICS_MEDIAN_TOOLTIP_FILTERED]       =
+                [LID.ANALYTICS_MEDIAN_TOOLTIP_FILTERED]   =
                 "The median number of times the same customer has requested the same item within the same hour, filtered to only those requests where the requestor asked multiple times.\n\nIf this value is not 1 but the unfiltered median is 1, that indicates that there are times when demand is not being met.",
-                ["Request Count"]                             = "Request Count",
-                [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]            =
+                ["Request Count"]                         = "Request Count",
+                [LID.ACCOUNT_LINK_ACCEPT_DST_INFO]        =
                 "'%s' has sent a request to link accounts.\n\nThe following permissions were requested:\n\n%s\n\nDo not accept full permission unless you sent the request.\n\nEnter a nickname for the other account:",
-                [LID.LINKED_ACCOUNT_REJECTED]                 = "CraftScan: Linked account request failed. Reason: %s",
-                [LID.LINKED_ACCOUNT_USER_REJECTED]            = "Target account rejected the request.",
+                [LID.LINKED_ACCOUNT_REJECTED]             = "CraftScan: Linked account request failed. Reason: %s",
+                [LID.LINKED_ACCOUNT_USER_REJECTED]        = "Target account rejected the request.",
 
-                [LID.LINKED_ACCOUNT_PERMISSION_FULL]          = "Full Control",
-                [LID.LINKED_ACCOUNT_PERMISSION_ANALYTICS]     = "Analytics Sync",
-                [LID.ACCOUNT_LINK_PERMISSIONS_DESC]           = "Request the following permissions with the linked account.",
-                [LID.ACCOUNT_LINK_FULL_CONTROL_DESC]          =
+                [LID.LINKED_ACCOUNT_PERMISSION_FULL]      = "Full Control",
+                [LID.LINKED_ACCOUNT_PERMISSION_ANALYTICS] = "Analytics Sync",
+                [LID.ACCOUNT_LINK_PERMISSIONS_DESC]       = "Request the following permissions with the linked account.",
+                [LID.ACCOUNT_LINK_FULL_CONTROL_DESC]      =
                 "Syncs all character data and supports all other permissions as well.",
-                [LID.ACCOUNT_LINK_ANALYTICS_DESC]             =
+                [LID.ACCOUNT_LINK_ANALYTICS_DESC]         =
                 "Synchronize only analytics data between the two account manually via the account's menu. Either account can trigger a two-way sync at any time. It is never done automatically. Since no characters are imported, you will only sync with the character specified here. You can manually add more alts of the linked account from the account menu.",
-                ["Sync Analytics"]                            = "Sync Analytics",
-                ["Sync Recent Analytics"]                     = "Sync Recent Analytics",
-                [LID.ANALYTICS_PROF_MISMATCH]                 =
+                ["Sync Analytics"]                        = "Sync Analytics",
+                ["Sync Recent Analytics"]                 = "Sync Recent Analytics",
+                [LID.ANALYTICS_PROF_MISMATCH]             =
                 "|cFFFF0000CraftScan: Warning: Analytics sync profession mismatch. Item: %s. Local profession: %s. Linked profession: %s.|r",
-                [LID.RN_ANALYTICS]                            = "Analytics",
-                [LID.RN_ANALYTICS + 1]                        =
+                [LID.RN_ANALYTICS]                        = "Analytics",
+                [LID.RN_ANALYTICS + 1]                    =
                 "CraftScan now scans chat for any crafted item combined with your global keywords (e.g. LF, recraft, etc...), even if you cannot craft the item. The time is recorded and detected items are displayed below the usual orders found in chat.",
-                [LID.RN_ANALYTICS + 2]                        =
+                [LID.RN_ANALYTICS + 2]                    =
                 "The concept of 'repeats' is used to determine if an item is lacking supply. CraftScan remembers who requested what for the last hour, and if they request the same thing again, it is recorded as a repeat. The column headers of the new grid have tooltips explaining their intent.",
-                [LID.RN_ANALYTICS + 3]                        =
+                [LID.RN_ANALYTICS + 3]                    =
                 "With a character parked in trade chat long enough, this should build up a good view of what branches of the profession tree are worth investment.",
-                [LID.RN_ANALYTICS + 4]                        =
+                [LID.RN_ANALYTICS + 4]                    =
                 "Analytics can be synchronized across multiple accounts. You can park a trial account in trade all day to collect data, then sync it over to your main account. You can also now create an analytics-only account link with a friend, supporting a two way sync that merges your analytics together. Once the collection gets large, there is an option to only sync data since the last time the accounts were synced.",
-                [LID.RN_ALERT_ICON_ANCHOR]                    = "Alert Icon Anchoring Updates",
-                [LID.RN_ALERT_ICON_ANCHOR + 1]                =
+                [LID.RN_ALERT_ICON_ANCHOR]                = "Alert Icon Anchoring Updates",
+                [LID.RN_ALERT_ICON_ANCHOR + 1]            =
                 "The alert icon's will now be hidden correctly when the UI is hidden. The change moved and scaled it on my screen slightly. If the button has moved off your screen because of this, there is a reset option if you right click the 'Open Settings' button at the top right of the chat orders page.",
-                [LID.BUSY_RIGHT_NOW]                          = "Busy Mode",
-                [LID.GREETING_BUSY]                           = "I am busy now, but can craft that later if you send it.",
-                [LID.BUSY_HELP]                               =
+                [LID.BUSY_RIGHT_NOW]                      = "Busy Mode",
+                [LID.GREETING_BUSY]                       = "I am busy now, but can craft that later if you send it.",
+                [LID.BUSY_HELP]                           =
                 "|cFFFFFFFFWhen checked, append the busy greeting in your response. Edit your busy greeting with the button below.\n\nThis is intended for use with a second account proxying orders so you can catch orders while out and about on your main.\n\nCurrent busy greeting: |cFF00FF00%s|r|r",
-                ["Custom Explanations"]                       = "Custom Explanations",
-                ["Create"]                                    = "Create",
-                ["Modify"]                                    = "Modify",
-                ["Delete"]                                    = "Delete",
-                [LID.EXPLANATION_LABEL_DESC]                  =
+                ["Custom Explanations"]                   = "Custom Explanations",
+                ["Create"]                                = "Create",
+                ["Modify"]                                = "Modify",
+                ["Delete"]                                = "Delete",
+                [LID.EXPLANATION_LABEL_DESC]              =
                 "Enter a label that you will see when right clicking the customer name in chat.",
-                [LID.EXPLANATION_DUPLICATE_LABEL]             = "This label is already in use.",
-                [LID.EXPLANATION_TEXT_DESC]                   =
+                [LID.EXPLANATION_DUPLICATE_LABEL]         = "This label is already in use.",
+                [LID.EXPLANATION_TEXT_DESC]               =
                 "Enter a message to send to the customer when the label is clicked. New lines are sent as separate messages. Long lines are split to fit within the max message length.",
-                ["Create an Explanation"]                     = "Create an Explanation",
-                ["Save"]                                      = "Save",
-                ["Reset"]                                     = "Reset",
-                [LID.MANUAL_MATCHING_TITLE]                   = "Manual Matching",
-                [LID.MANUAL_MATCH]                            = "%s - %s", -- crafter, profession
-                [LID.MANUAL_MATCHING_DESC]                    =
+                ["Create an Explanation"]                 = "Create an Explanation",
+                ["Save"]                                  = "Save",
+                ["Reset"]                                 = "Reset",
+                [LID.MANUAL_MATCHING_TITLE]               = "Manual Matching",
+                [LID.MANUAL_MATCH]                        = "%s - %s", -- crafter, profession
+                [LID.MANUAL_MATCHING_DESC]                =
                 "Ignore primary keywords and force a match for this message. CraftScan will attempt to find the correct crafter based on the message, but if no matches are found, the default greeting for the specified crafter will be used. The match is reported via the usual means, allowing you to click the banner or table row to send the greeting.",
 
-                [LID.RN_MANUAL_MATCH]                         = "Manual Matching",
-                [LID.RN_MANUAL_MATCH + 1]                     =
+                [LID.RN_MANUAL_MATCH]                     = "Manual Matching",
+                [LID.RN_MANUAL_MATCH + 1]                 =
                 "The context menu when right clicking a player name in chat now includes CraftScan options.",
-                [LID.RN_MANUAL_MATCH + 2]                     =
+                [LID.RN_MANUAL_MATCH + 2]                 =
                 "This menu includes all of your crafters and professions. Clicking one of these will force another pass on the message to look for a match without considering the 'Primary Keywords' (e.g. LF, WTB, recraft, etc...), in case the customer is using non-standard terminology.",
-                [LID.RN_MANUAL_MATCH + 3]                     =
+                [LID.RN_MANUAL_MATCH + 3]                 =
                 "If the message still does not match, a match is forced with the default greeting for the crafter and profession you clicked.",
-                [LID.RN_MANUAL_MATCH + 4]                     =
+                [LID.RN_MANUAL_MATCH + 4]                 =
                 "This click will not automatically message the customer. It generates the match in the usual way, and then you can inspect the generated response and choose to send it or not.",
-                [LID.RN_MANUAL_MATCH + 5]                     = "(Sorry, no machine learning.)",
-                [LID.RN_CUSTOM_EXPLANATIONS]                  = "Custom Explanations",
-                [LID.RN_CUSTOM_EXPLANATIONS + 1]              =
+                [LID.RN_MANUAL_MATCH + 5]                 = "(Sorry, no machine learning.)",
+                [LID.RN_CUSTOM_EXPLANATIONS]              = "Custom Explanations",
+                [LID.RN_CUSTOM_EXPLANATIONS + 1]          =
                 "The 'Chat Orders' page now includes a 'Custom Explanations' button. Explanations configured here also appear in the chat context menu, and clicking them will immediately send the explanation.",
-                [LID.RN_CUSTOM_EXPLANATIONS + 2]              =
+                [LID.RN_CUSTOM_EXPLANATIONS + 2]          =
                 "Explanations are sorted alphabetically, so you can number them to force a desired order.",
-                [LID.RN_BUSY_MODE]                            = "Busy Mode",
-                [LID.RN_BUSY_MODE + 1]                        =
+                [LID.RN_BUSY_MODE]                        = "Busy Mode",
+                [LID.RN_BUSY_MODE + 1]                    =
                 "This has been in for a few releases, but was never explained. There is a new 'Busy Mode' check box on the 'Chat Orders' page. When checked, append the busy greeting in your response. Edit your busy greeting with the 'Customize Greeting' button.",
-                [LID.RN_BUSY_MODE + 2]                        =
+                [LID.RN_BUSY_MODE + 2]                    =
                 "This is intended for use with a second account proxying orders so you can catch orders while out and about on your main, and the customer will know you can't craft it immediately.",
-                ["Release Notes"]                             = "Release Notes",
+                ["Release Notes"]                         = "Release Notes",
 
-                ["Secondary Keywords"]                        = "Secondary Keywords",
-                [LID.SECONDARY_KEYWORD_INSTRUCTIONS]          =
+                ["Secondary Keywords"]                    = "Secondary Keywords",
+                [LID.SECONDARY_KEYWORD_INSTRUCTIONS]      =
                 "For example: 'pvp, 610, algari' or '606, 610, 636' or '590', to differentiate the same keyword on multiple items.",
-                [LID.HELP_ITEM_SECONDARY_KEYWORDS]            =
+                [LID.HELP_ITEM_SECONDARY_KEYWORDS]        =
                 "After matching a keyword above, check for any secondary keywords to refine the match, allowing the various crafts for the same item slot to be differentiated.",
-                [LID.RN_SECONDARY_KEYWORDS]                   = "Secondary Keywords",
-                [LID.RN_SECONDARY_KEYWORDS + 1]               =
+                [LID.RN_SECONDARY_KEYWORDS]               = "Secondary Keywords",
+                [LID.RN_SECONDARY_KEYWORDS + 1]           =
                 "Items now support secondary keywords to refine a match. Each item slot usually has a Spark, PVP, and Blue version. Secondary keywords can be setup to differentiate them.",
-                [LID.RN_SECONDARY_KEYWORDS + 2]               = "Example secondary keywords:",
-                [LID.RN_SECONDARY_KEYWORDS + 3]               = "606, 619, 636",
-                [LID.RN_SECONDARY_KEYWORDS + 4]               = "610, pvp, algari",
-                [LID.RN_SECONDARY_KEYWORDS + 5]               = "590",
+                [LID.RN_SECONDARY_KEYWORDS + 2]           = "Example secondary keywords:",
+                [LID.RN_SECONDARY_KEYWORDS + 3]           = "606, 619, 636",
+                [LID.RN_SECONDARY_KEYWORDS + 4]           = "610, pvp, algari",
+                [LID.RN_SECONDARY_KEYWORDS + 5]           = "590",
 
-                ["Find Crafter"]                              = "Find Crafter",
-                ["No Crafters Found"]                         = "No Crafters Found",
-                [LID.FOUND_CRAFTER_NAME_ENTRY]                = "%s [%s]",
-                [LID.GREET_FOUND_CRAFTER]                     = "|cffffd100Left click: Request craft|r",
-                ["Crafter Greeting"]                          = "|cFFFFFFFFCrafter Greeting|r",
-                [LID.BUSY_ICON]                               =
+                ["Find Crafter"]                          = "Find Crafter",
+                ["No Crafters Found"]                     = "No Crafters Found",
+                [LID.FOUND_CRAFTER_NAME_ENTRY]            = "%s [%s]",
+                [LID.GREET_FOUND_CRAFTER]                 = "|cffffd100Left click: Request craft|r",
+                ["Crafter Greeting"]                      = "|cFFFFFFFFCrafter Greeting|r",
+                [LID.BUSY_ICON]                           =
                 "|cFFFFFFFFThe crafter has indicated they are currently busy, but can craft the item later.\n\nCheck their greeting for details.|r",
-                ["Potential Crafters"]                        = "Potential Crafters",
-                [LID.FOUND_VIA_CRAFT_SCAN]                    =
+                ["Potential Crafters"]                    = "Potential Crafters",
+                [LID.FOUND_VIA_CRAFT_SCAN]                =
                 "I found you via CraftScan and have seen your greeting. Can you craft %s for me now?",
-                [LID.COMMISSION_INSTRUCTIONS]                 =
+                [LID.COMMISSION_INSTRUCTIONS]             =
                 "e.g. '10000g', Default: 'Any'\nThis text appears in the customer's 'Find Crafter' table.",
-                ["Commission"]                                = "Commission",
-                ["Crafter [Currently Playing]"]               = "Crafter [Currently Playing]",
-                ["Profession commission"]                     = "Profession commission",
-                [LID.DEFAULT_COMMISSION]                      = "Any",
-                [LID.HELP_ITEM_COMMISSION]                    =
+                ["Commission"]                            = "Commission",
+                ["Crafter [Currently Playing]"]           = "Crafter [Currently Playing]",
+                ["Profession commission"]                 = "Profession commission",
+                [LID.DEFAULT_COMMISSION]                  = "Any",
+                [LID.HELP_ITEM_COMMISSION]                =
                 "CraftScan provides customers with a 'Find Crafter' button on personal orders. You name, greeting, and this commission will appear in the table along with other crafters. The length is limited to 12 characters to fit nicely in the customer's table.",
-                ["Discoverable"]                              = "Discoverable to customers",
-                [LID.DISCOVERABLE_SETTING]                    =
+                ["Discoverable"]                          = "Discoverable to customers",
+                [LID.DISCOVERABLE_SETTING]                =
                 "When enabled, when a customer hits 'Find Crafter', your name will appear in the generated table if you can craft the item.",
-                [LID.RN_CUSTOMER_SEARCH]                      = "Find a Crafter",
-                [LID.RN_CUSTOMER_SEARCH + 1]                  =
+                [LID.RN_CUSTOMER_SEARCH]                  = "Find a Crafter",
+                [LID.RN_CUSTOMER_SEARCH + 1]              =
                 "The page to send a Personal Order now has a 'Find Crafter' button. This button sends a request to all CraftScan users to see who can craft the item and presents the results in a table with the crafter's configured commission.",
-                [LID.RN_CUSTOMER_SEARCH + 2]                  =
+                [LID.RN_CUSTOMER_SEARCH + 2]              =
                 "Each profession and item now has a 'Commission' box to configure what will show up in this table, and the text is limited to 12 characters to fit in the table.",
-                [LID.RN_CUSTOMER_SEARCH + 3]                  =
+                [LID.RN_CUSTOMER_SEARCH + 3]              =
                 "You have joined the 'CraftScan' channel, but you don't need to enable it or see any messages in the channel. It exists to allow CraftScan to privately broadcast requests like players usually do in Trade chat.",
-                [LID.RN_CUSTOMER_SEARCH + 4]                  =
+                [LID.RN_CUSTOMER_SEARCH + 4]              =
                 "As a crafter, you might now receive unprompted whispers from customers that already know what you can craft.",
-                [LID.RN_CUSTOMER_SEARCH + 5]                  =
+                [LID.RN_CUSTOMER_SEARCH + 5]              =
                 "This one is a bit difficult to test since trial accounts aren't allowed access to the crafting table. If you run into any issues, you can disable the feature until I can fix it.",
-                [LID.RN_CUSTOMER_SEARCH + 6]                  =
+                [LID.RN_CUSTOMER_SEARCH + 6]              =
                 "You can opt out of being included in this table via the new 'Discoverable' setting in main Blizzard Settings menu.",
-                [LID.RN_CUSTOMER_SEARCH + 7]                  =
+                [LID.RN_CUSTOMER_SEARCH + 7]              =
                 "Since customers might start using the addon, the Analytics feature can be completely disabled, and defaults to being disabled now. If you already collected data, it will remain enabled.",
-                ["Permissive keyword matching"] = "Permissive keyword matching",
-                [LID.PERMISSIVE_MATCH_SETTING]                    =
+                ["Permissive keyword matching"]           = "Permissive keyword matching",
+                [LID.PERMISSIVE_MATCH_SETTING]            =
                 "When checked, CraftScan will stop caring about spaces and other delimiters when checking for keyword matches. By default, CraftScan will only match a keyword if it is clearly delimited from the surrounding text to avoid incorrectly matching short keywords embedded in other words. For languages that don't use spaces to delimit keywords, enable this option.",
+                ["Show chat orders tab"]                  = "Show chat orders tab",
+                [LID.SHOW_CHAT_ORDER_TAB]                 =
+                "Show or hide the 'Chat Orders' tab on the profession window. If hidden, you can open the chat orders page by clicking the CraftScan button where alerts appear.",
+                [LID.IGNORE]                              = "Ignore",
+                [LID.IGNORE_TOOLTIP]                      =
+                "Add this player to your CraftScan ignore list. CraftScan will ignore all messages sent by this player. This menu can be used to remove the player from the list.",
+                [LID.UNIGNORE]                            = "Remove Ignore",
+                [LID.UNIGNORE_TOOLTIP]                    =
+                "This player is on your CraftScan ignore list. This option will remove them from the list.",
 
                 -- Translations complete above this line
 
                 -- ChatGPT prompt:
                 -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.
-                ["Show chat orders tab"] = "Show chat orders tab",
-                [LID.SHOW_CHAT_ORDER_TAB] = "Show or hide the 'Chat Orders' tab on the profession window. If hidden, you can open the chat orders page by clicking the CraftScan button where alerts appear.",
-                [LID.IGNORE] = "Ignore",
-                [LID.IGNORE_TOOLTIP] = "Add this player to your CraftScan ignore list. CraftScan will ignore all messages sent by this player. This menu can be used to remove the player from the list.",
-                [LID.UNIGNORE] = "Remove Ignore",
-                [LID.UNIGNORE_TOOLTIP] = "This player is on your CraftScan ignore list. This option will remove them from the list.",
+                ["Collapse chat context menu"]            = "Collapse chat context menu",
+                [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
+                "When right clicking a player name in chat, collapse all context menu items into a single CraftScan sub-menu.",
         }
 end

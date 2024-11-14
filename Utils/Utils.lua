@@ -627,6 +627,11 @@ local function UpgradePersistentConfig()
         CraftScan.DB.settings.show_chat_orders_tab = true;
     end
 
+    if CraftScan.DB.settings.collapse_chat_context == nil then
+        CraftScan.DB.settings.collapse_chat_context = false;
+    end
+
+
     -- After changing placeholders in customer greetings from %s to {placeholder},
     -- existing configs must be updated to replace %s placeholders with the new ones.
     local greeting = CraftScan.DB.settings.greeting;
