@@ -206,12 +206,21 @@ function CraftScanCraftingOrderPageMixin:GetDesiredPageWidth()
     return 1105;
 end
 
+local function UpdateAnalyticsEnabled()
+    local enabled = CraftScan.DB.analytics.enabled;
+    if enabled then
+        CraftScanCraftingOrderPage:EnableAnalytics()
+    else
+        CraftScanCraftingOrderPage:DisableAnalytics()
+    end
+end
+
 function CraftScanCraftingOrderPageMixin:OnLoad()
     CraftScan.Utils.onLoad(function()
         self:ResetSortOrder() -- self.InitButtons()
         self:InitOrderListTable()
         self:SetupOrderListTable()
-        self.BrowseFrame.AnalyticsTable:Init()
+        UpdateAnalyticsEnabled();
     end);
 end
 
@@ -332,6 +341,7 @@ function CraftScanCraftingOrderPageMixin:DisableAnalytics()
 end
 
 function CraftScanCraftingOrderPageMixin:EnableAnalytics()
+    self.BrowseFrame.AnalyticsTable:Init();
     self.BrowseFrame.AnalyticsTable:Show();
     self.BrowseFrame.ResizeButton:Show();
 
@@ -748,8 +758,9 @@ end
 
 CraftScanAnalyticsTableMixin = {}
 
+local analyticsInitialized = false
 function CraftScanAnalyticsTableMixin:Init()
-    if not CraftScan.DB.analytics.enabled then return; end
+    if not CraftScan.DB.analytics.enabled or analyticsInitialized then return; end
 
     self:ResetSortOrder();
 
@@ -819,6 +830,8 @@ function CraftScanAnalyticsTableMixin:Init()
         "CraftScanAnalyticsTableCellMedianPerCustomerFilteredTemplate");
 
     self.tableBuilder:Arrange();
+
+    analyticsInitialized = true
 end
 
 function CraftScanAnalyticsTableMixin:SortOrderIsValid(sortOrder)
@@ -980,9 +993,6 @@ function CraftScanAnalyticsTableMixin:Refresh()
 
     self.ScrollBox:Show();
 
-    local dataProvider = CreateDataProvider();
-    self.ScrollBox:SetDataProvider(dataProvider);
-
     local seenItems = CraftScan.DB.analytics.seen_items;
     if not seenItems or not next(seenItems) then
         self.ResultsText:SetText(L("No analytics data"));
@@ -1014,6 +1024,8 @@ function CraftScanAnalyticsTableMixin:Refresh()
         end)
     end
 
+    local dataProvider = CreateDataProvider();
+    self.ScrollBox:SetDataProvider(dataProvider);
     local function OnAllItemsLoaded()
         if #items ~= TableSize(seenItems) then
             -- Wait for all item links to be asynchronously loaded.
@@ -1043,15 +1055,6 @@ local function EscapeCSV(str)
         str = '"' .. str .. '"'
     end
     return str
-end
-
-local function UpdateAnalyticsEnabled()
-    local enabled = CraftScan.DB.analytics.enabled;
-    if enabled then
-        CraftScanCraftingOrderPage:EnableAnalytics()
-    else
-        CraftScanCraftingOrderPage:DisableAnalytics()
-    end
 end
 
 CraftScan_ResetAnalyticsButtonMixin = {}
