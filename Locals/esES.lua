@@ -5,155 +5,153 @@ CraftScan.LOCAL_ES = {}
 function CraftScan.LOCAL_ES:GetData()
     local LID = CraftScan.CONST.TEXT;
     return {
-        -- I eventually got tired of the whole LID enum tedium copy/pasted from
-        -- CraftSim, so newer short ones are just the raw English string as the
-        -- key, which is easier to read in the code anyway.
         ["CraftScan"]                             = "CraftScan",
         [LID.CRAFT_SCAN]                          = "CraftScan",
-        [LID.CHAT_ORDERS]                         = "Chat-Aufträge",
-        [LID.DISABLE_ADDONS]                      = "Addons deaktivieren",
-        [LID.RENABLE_ADDONS]                      = "Addons reaktivieren",
+        [LID.CHAT_ORDERS]                         = "Pedidos de Chat",
+        [LID.DISABLE_ADDONS]                      = "Desactivar Addons",
+        [LID.RENABLE_ADDONS]                      = "Reactivar Addons",
         [LID.DISABLE_ADDONS_TOOLTIP]              =
-        "Speichern Sie Ihre Addon-Liste und deaktivieren Sie sie dann, um schnell zu einem anderen Charakter zu wechseln. Dieser Button kann erneut geklickt werden, um die Addons jederzeit wieder zu aktivieren.",
-        [LID.GREETING_I_CAN_CRAFT_ITEM]           = "Ich kann {item} herstellen.",                    -- ItemLink
-        [LID.GREETING_ALT_CAN_CRAFT_ITEM]         = "Mein Twink, {crafter}, kann {item} herstellen.", -- Crafter Name, ItemLink
-        [LID.GREETING_LINK_BACKUP]                = "das",
-        [LID.GREETING_I_HAVE_PROF]                = "Ich habe {profession}.",                         -- Profession Name
-        [LID.GREETING_ALT_HAS_PROF]               = "Mein Twink, {crafter}, hat {profession}.",       -- Crafter Name, Profession Name
-        [LID.GREETING_ALT_SUFFIX]                 = "Lassen Sie es mich wissen, wenn Sie einen Auftrag senden, damit ich umloggen kann.",
-        [LID.MAIN_BUTTON_BINDING_NAME]            = "Auftragsseite umschalten",
-        [LID.GREET_BUTTON_BINDING_NAME]           = "Kunden begrüßen",
-        [LID.DISMISS_BUTTON_BINDING_NAME]         = "Kunden ablehnen",
-        [LID.TOGGLE_CHAT_TOOLTIP]                 = "Chat-Aufträge umschalten%s", -- Keybind
-        [LID.SCANNER_CONFIG_SHOW]                 = "CraftScan anzeigen",
-        [LID.SCANNER_CONFIG_HIDE]                 = "CraftScan ausblenden",
-        [LID.CRAFT_SCAN_OPTIONS]                  = "CraftScan-Optionen",
-        [LID.ITEM_SCAN_CHECK]                     = "Chat nach diesem Gegenstand durchsuchen",
+        "Guarda tu lista de addons y luego los desactiva, permitiendo un cambio rápido a un alter. Este botón se puede pulsar de nuevo para reactivar los addons en cualquier momento.",
+        [LID.GREETING_I_CAN_CRAFT_ITEM]           = "Puedo fabricar {item}.",                      -- ItemLink
+        [LID.GREETING_ALT_CAN_CRAFT_ITEM]         = "Mi alter, {crafter}, puede fabricar {item}.", -- Crafter Name, ItemLink
+        [LID.GREETING_LINK_BACKUP]                = "eso",
+        [LID.GREETING_I_HAVE_PROF]                = "Tengo {profession}.",                         -- Profession Name
+        [LID.GREETING_ALT_HAS_PROF]               = "Mi alter, {crafter}, tiene {profession}.",    -- Crafter Name, Profession Name
+        [LID.GREETING_ALT_SUFFIX]                 = "Avísame si envías un pedido para que pueda conectarme.",
+        [LID.MAIN_BUTTON_BINDING_NAME]            = "Alternar Página de Pedidos",
+        [LID.GREET_BUTTON_BINDING_NAME]           = "Saludar Cliente del Banner",
+        [LID.DISMISS_BUTTON_BINDING_NAME]         = "Despedir Cliente del Banner",
+        [LID.TOGGLE_CHAT_TOOLTIP]                 = "Alternar pedidos de chat%s", -- Keybind
+        [LID.SCANNER_CONFIG_SHOW]                 = "Mostrar CraftScan",
+        [LID.SCANNER_CONFIG_HIDE]                 = "Ocultar CraftScan",
+        [LID.CRAFT_SCAN_OPTIONS]                  = "Opciones de CraftScan",
+        [LID.ITEM_SCAN_CHECK]                     = "Escanear chat para este objeto",
         [LID.HELP_PROFESSION_KEYWORDS]            =
-        "Eine Nachricht muss einen dieser Begriffe enthalten. Um eine Nachricht wie 'LF Lariat' zu erkennen, sollte 'lariet' hier aufgelistet sein. Um einen Gegenstandslink für den Elementar-Lariat in der Antwort zu erzeugen, sollte 'lariat' auch in den Gegenstandskonfigurations-Keywords für den Elementar-Lariat enthalten sein.",
+        "Un mensaje debe contener uno de estos términos. Para coincidir con un mensaje como 'LF Lariat', 'lariet' debería aparecer aquí. Para generar un enlace del objeto Elemental Lariat en la respuesta, 'lariat' también debe incluirse en las palabras clave de configuración del objeto.",
         [LID.HELP_PROFESSION_EXCLUSIONS]          =
-        "Eine Nachricht wird ignoriert, wenn sie einen dieser Begriffe enthält, auch wenn sie ansonsten übereinstimmt. Um zu vermeiden, auf 'LF JC Lariat' mit 'Ich habe Juwelenschleifen' zu antworten, wenn Sie das Lariat-Rezept nicht haben, sollte 'lariat' hier aufgeführt sein.",
-        [LID.HELP_SCAN_ALL]                       = "Scannen aller Rezepte derselben Erweiterung wie das ausgewählte Rezept aktivieren.",
+        "Un mensaje se ignorará si contiene uno de estos términos, incluso si sería una coincidencia. Para evitar responder a 'LF JC Lariat' con 'Tengo Joyería' cuando no tienes la receta de Lariat, 'lariat' debería aparecer aquí.",
+        [LID.HELP_SCAN_ALL]                       =
+        "Habilitar escaneo para todas las recetas de la misma expansión que la receta seleccionada.",
         [LID.HELP_PRIMARY_EXPANSION]              =
-        "Verwenden Sie diese Begrüßung, wenn Sie auf eine allgemeine Anfrage wie 'LF Schmied' antworten. Wenn eine neue Erweiterung erscheint, möchten Sie wahrscheinlich eine Begrüßung, die beschreibt, welche Gegenstände Sie herstellen können, anstatt zu sagen, dass Sie das maximale Wissen aus der vorherigen Erweiterung haben.",
+        "Usa este saludo al responder a una solicitud genérica como 'LF Herrero'. Cuando se lance una nueva expansión, probablemente querrás un saludo describiendo qué objetos puedes fabricar en lugar de afirmar que tienes el máximo conocimiento de la expansión anterior.",
         [LID.HELP_EXPANSION_GREETING]             =
-        "Ein anfängliches Intro wird immer generiert, das besagt, dass Sie den Gegenstand herstellen können. Dieser Text wird daran angehängt. Neue Zeilen sind erlaubt und werden als separate Antwort gesendet. Wenn der Text zu lang ist, wird er in mehrere Antworten aufgeteilt.",
+        "Se genera siempre una introducción inicial indicando que puedes fabricar el objeto. Este texto se añadirá después. Se permiten saltos de línea y se enviarán como respuestas separadas. Si el texto es demasiado largo, se dividirá en múltiples respuestas.",
         [LID.HELP_CATEGORY_KEYWORDS]              =
-        "Wenn ein Beruf erkannt wurde, überprüfen Sie diese kategoriespezifischen Keywords, um die Begrüßung zu verfeinern. Zum Beispiel könnten Sie 'giftig' oder 'schleimig' hier eintragen, um Lederverarbeitungsmuster zu erkennen, die den Altar der Verwesung erfordern.",
+        "Si se ha detectado una profesión, verifica estas palabras clave específicas de la categoría para refinar el saludo. Por ejemplo, podrías poner 'tóxico' o 'viscoso' aquí para detectar patrones de Peletería que requieren el Altar de la Decadencia.",
         [LID.HELP_CATEGORY_GREETING]              =
-        "Wenn diese Kategorie in einer Nachricht erkannt wird, sei es durch ein Keyword oder einen Gegenstandslink, wird diese zusätzliche Begrüßung nach der Berufsbegrüßung angehängt.",
-        [LID.HELP_CATEGORY_OVERRIDE]              =
-        "Lassen Sie die Berufsbegrüßung weg und beginnen Sie mit der Kategoriespezifischen Begrüßung.",
+        "Cuando esta categoría se detecte en un mensaje, ya sea mediante una palabra clave o un enlace del objeto, este saludo adicional se añadirá después del saludo de la profesión.",
+        [LID.HELP_CATEGORY_OVERRIDE]              = "Omitir el saludo de la profesión y comenzar con el saludo de la categoría.",
         [LID.HELP_ITEM_KEYWORDS]                  =
-        "Wenn ein Beruf erkannt wurde, überprüfen Sie diese gegenstandsspezifischen Keywords, um die Begrüßung zu verfeinern. Wenn sie übereinstimmen, enthält die Antwort den Gegenstandslink anstelle der allgemeinen Berufsbegrüßung. Wenn 'lariat' ein Berufsschlüsselwort, aber kein Gegenstandsschlüsselwort ist, sagt die Antwort 'Ich habe Juwelenschleifen.' Wenn 'lariat' nur ein Gegenstandsschlüsselwort ist, wird 'LF Lariat' nicht als Beruf erkannt und nicht als Treffer gewertet. Wenn 'lariat' sowohl ein Berufs- als auch ein Gegenstandsschlüsselwort ist, lautet die Antwort auf 'LF Lariat' 'Ich kann [Elementar-Lariat] herstellen.'",
+        "Si se ha detectado una profesión, verifica estas palabras clave específicas del objeto para refinar el saludo. Al coincidir, la respuesta incluirá el enlace del objeto en lugar del saludo genérico de la profesión. Si 'lariat' es una palabra clave de profesión, pero no de objeto, la respuesta será 'Tengo Joyería.' Si 'lariat' es solo una palabra clave de objeto, 'LF Lariat' no coincidirá. Si 'lariat' es ambas, la respuesta será 'Puedo fabricar [Lariat elemental].'",
         [LID.HELP_ITEM_GREETING]                  =
-        "Wenn dieser Gegenstand in einer Nachricht erkannt wird, sei es durch ein Keyword oder den Gegenstandslink, wird diese zusätzliche Begrüßung nach der Berufs- und Kategoriespezifischen Begrüßung angehängt.",
-        [LID.HELP_ITEM_OVERRIDE]                  =
-        "Lassen Sie die Berufs- und Kategoriespezifische Begrüßung weg und beginnen Sie mit der Gegenstandsspezifischen Begrüßung.",
-        [LID.HELP_GLOBAL_KEYWORDS]                = "Eine Nachricht muss einen dieser Begriffe enthalten.",
-        [LID.HELP_GLOBAL_EXCLUSIONS]              = "Eine Nachricht wird ignoriert, wenn sie einen dieser Begriffe enthält.",
-        [LID.SCAN_ALL_RECIPES]                    = 'Alle Rezepte scannen',
-        [LID.SCANNING_ENABLED]                    = "Das Scannen ist aktiviert, weil '%s' ausgewählt ist.", -- SCAN_ALL_RECIPES or ITEM_SCAN_CHECK
-        [LID.SCANNING_DISABLED]                   = "Das Scannen ist deaktiviert.",
-        [LID.PRIMARY_KEYWORDS]                    = "Primäre Schlüsselwörter",
+        "Cuando este objeto se detecte en un mensaje, ya sea mediante una palabra clave o un enlace del objeto, este saludo adicional se añadirá después de los saludos de profesión y categoría.",
+        [LID.HELP_ITEM_OVERRIDE]                  = "Omitir los saludos de la profesión y categoría y comenzar con el saludo del objeto.",
+        [LID.HELP_GLOBAL_KEYWORDS]                = "Un mensaje debe incluir uno de estos términos.",
+        [LID.HELP_GLOBAL_EXCLUSIONS]              = "Un mensaje se ignorará si contiene uno de estos términos.",
+        [LID.SCAN_ALL_RECIPES]                    = "Escanear todas las recetas",
+        [LID.SCANNING_ENABLED]                    = "El escaneo está habilitado porque '%s' está marcado.", -- SCAN_ALL_RECIPES or ITEM_SCAN_CHECK
+        [LID.SCANNING_DISABLED]                   = "El escaneo está deshabilitado.",
+        [LID.PRIMARY_KEYWORDS]                    = "Palabras clave principales",
         [LID.HELP_PRIMARY_KEYWORDS]               =
-        "Alle Nachrichten werden durch diese Begriffe gefiltert, die für alle Berufe gemeinsam sind. Eine übereinstimmende Nachricht wird weiterverarbeitet, um berufsbezogene Inhalte zu suchen.",
+        "Todos los mensajes se filtran por estos términos, comunes a todas las profesiones. Un mensaje coincidente se procesa más para buscar contenido relacionado con profesiones.",
         [LID.HELP_CATEGORY_SECTION]               =
-        "Die Kategorie ist der zusammenklappbare Abschnitt, der das Rezept in der Liste links enthält. 'Favoriten' ist keine Kategorie. Dies ist hauptsächlich für Dinge wie die giftigen Lederverarbeitungsrezepte gedacht, die schwieriger herzustellen sind. Es könnte auch nützlich sein zu Beginn von Erweiterungen, wenn Sie sich nur auf eine Kategorie spezialisieren können.",
+        "La categoría es la sección desplegable que contiene la receta en la lista a la izquierda. 'Favoritos' no es una categoría. Esto se usa principalmente para cosas como las recetas tóxicas de Peletería que son más difíciles de fabricar.",
         [LID.HELP_EXPANSION_SECTION]              =
-        "Wissensbäume unterscheiden sich je nach Erweiterung, daher kann auch die Begrüßung unterschiedlich sein.",
+        "Los árboles de conocimiento difieren según la expansión, por lo que el saludo también puede diferir.",
         [LID.HELP_PROFESSION_SECTION]             =
-        "Aus Kundensicht gibt es keinen Unterschied zwischen Erweiterungen. Diese Begriffe kombinieren sich mit der Auswahl der 'Primären Erweiterung', um eine allgemeine Begrüßung zu bieten (z.B. 'Ich habe <Beruf>.'), wenn wir nichts Spezifischeres erkennen können.",
-        [LID.RECIPE_NOT_LEARNED]                  = "Sie haben dieses Rezept nicht gelernt. Das Scannen ist deaktiviert.",
-        [LID.PING_SOUND_LABEL]                    = "Alarmton",
-        [LID.PING_SOUND_TOOLTIP]                  = "Der Ton, der abgespielt wird, wenn ein Kunde erkannt wird.",
-        [LID.BANNER_SIDE_LABEL]                   = "Banner-Richtung",
-        [LID.BANNER_SIDE_TOOLTIP]                 = "Das Banner wird von der Schaltfläche in diese Richtung wachsen.",
-        Left                                      = "Links",
-        Right                                     = "Rechts",
-        Minute                                    = "Minute",
-        Minutes                                   = "Minuten",
-        Second                                    = "Sekunde",
-        Seconds                                   = "Sekunden",
-        Millisecond                               = "Millisekunde",
-        Milliseconds                              = "Millisekunden",
-        Version                                   = "Neu in",
-        ["CraftScan Release Notes"]               = "CraftScan Release Notes",
-        [LID.CUSTOMER_TIMEOUT_LABEL]              = "Kunden-Timeout",
-        [LID.CUSTOMER_TIMEOUT_TOOLTIP]            = "Kunden automatisch nach dieser Anzahl von Minuten abweisen.",
-        [LID.BANNER_TIMEOUT_LABEL]                = "Banner-Timeout",
+        "Desde el punto de vista del cliente, no hay diferencia entre expansiones. Estos términos se combinan con la selección de 'Expansión principal' para proporcionar un saludo genérico (p. ej. 'Tengo {profesión}.') cuando no se puede coincidir con algo más específico.",
+        [LID.RECIPE_NOT_LEARNED]                  = "No has aprendido esta receta. El escaneo está deshabilitado.",
+        [LID.PING_SOUND_LABEL]                    = "Sonido de alerta",
+        [LID.PING_SOUND_TOOLTIP]                  = "El sonido que se reproduce cuando se detecta un cliente.",
+        [LID.BANNER_SIDE_LABEL]                   = "Dirección del banner",
+        [LID.BANNER_SIDE_TOOLTIP]                 = "El banner crecerá desde el botón en esta dirección.",
+        Left                                      = "Izquierda",
+        Right                                     = "Derecha",
+        Minute                                    = "Minuto",
+        Minutes                                   = "Minutos",
+        Second                                    = "Segundo",
+        Seconds                                   = "Segundos",
+        Millisecond                               = "Milisegundo",
+        Milliseconds                              = "Milisegundos",
+        Version                                   = "Nuevo en",
+        ["CraftScan Release Notes"]               = "Notas de CraftScan",
+        [LID.CUSTOMER_TIMEOUT_LABEL]              = "Tiempo de espera del cliente",
+        [LID.CUSTOMER_TIMEOUT_TOOLTIP]            = "Descartar automáticamente clientes después de estos minutos.",
+        [LID.BANNER_TIMEOUT_LABEL]                = "Tiempo de espera del banner",
         [LID.BANNER_TIMEOUT_TOOLTIP]              =
-        "Das Kundenbenachrichtigungsbanner bleibt für diese Dauer nach Erkennung eines Treffers angezeigt.",
-        ["All crafters"]                          = "Alle Handwerker",
-        ["Crafter Name"]                          = "Handwerkername",
-        ["Profession"]                            = "Beruf",
-        ["Customer Name"]                         = "Kundenname",
-        ["Replies"]                               = "Antworten",
-        ["Keywords"]                              = "Schlüsselwörter",
-        ["Profession greeting"]                   = "Berufsbegrüßung",
-        ["Category greeting"]                     = "Kategoriebegrüßung",
-        ["Item greeting"]                         = "Gegenstandsbegrüßung",
-        ["Primary expansion"]                     = "Primäre Erweiterung",
-        ["Override greeting"]                     = "Begrüßung überschreiben",
-        ["Excluded keywords"]                     = "Ausgeschlossene Schlüsselwörter",
-        [LID.EXCLUSION_INSTRUCTIONS]              =
-        "Nachrichten, die diese durch Kommas getrennten Tokens enthalten, nicht übereinstimmen.",
+        "El banner de notificación permanecerá visible durante esta duración tras detectar una coincidencia.",
+        ["All crafters"]                          = "Todos los artesanos",
+        ["Crafter Name"]                          = "Nombre del artesano",
+        ["Profession"]                            = "Profesión",
+        ["Customer Name"]                         = "Nombre del cliente",
+        ["Replies"]                               = "Respuestas",
+        ["Keywords"]                              = "Palabras clave",
+        ["Profession greeting"]                   = "Saludo de profesión",
+        ["Category greeting"]                     = "Saludo de categoría",
+        ["Item greeting"]                         = "Saludo de artículo",
+        ["Primary expansion"]                     = "Expansión principal",
+        ["Override greeting"]                     = "Anular saludo",
+        ["Excluded keywords"]                     = "Palabras clave excluidas",
+        [LID.EXCLUSION_INSTRUCTIONS]              = "No coincidir con mensajes que contengan estos términos separados por comas.",
         [LID.KEYWORD_INSTRUCTIONS]                =
-        "Nachrichten, die eines dieser durch Kommas getrennten Schlüsselwörter enthalten, übereinstimmen.",
-        [LID.GREETING_INSTRUCTIONS]               = "Eine Begrüßung, die an Kunden gesendet wird, die eine Herstellung suchen.",
-        [LID.GLOBAL_INCLUSION_DEFAULT]            = "LF, LFC, WTB, neuherstellen",
-        [LID.GLOBAL_EXCLUSION_DEFAULT]            = "LFW, WTS, LF Arbeit",
-        [LID.DEFAULT_KEYWORDS_BLACKSMITHING]      = "BS, Schmied, Waffenschmied, Rüstungsschmied",
-        [LID.DEFAULT_KEYWORDS_LEATHERWORKING]     = "LW, Lederverarbeitung, Lederarbeiter",
-        [LID.DEFAULT_KEYWORDS_ALCHEMY]            = "Alch, Alchemist, Stein",
-        [LID.DEFAULT_KEYWORDS_TAILORING]          = "Schneider",
-        [LID.DEFAULT_KEYWORDS_ENGINEERING]        = "Ingenieur, Ing",
-        [LID.DEFAULT_KEYWORDS_ENCHANTING]         = "Verzauberer, Wappen",
-        [LID.DEFAULT_KEYWORDS_JEWELCRAFTING]      = "JC, Juwelenschleifer",
-        [LID.DEFAULT_KEYWORDS_INSCRIPTION]        = "Inschriftenkunde, Schreiber",
+        "Coincidir con mensajes que contengan una de estas palabras clave separadas por comas.",
+        [LID.GREETING_INSTRUCTIONS]               = "Un saludo para enviar a los clientes que buscan un encargo.",
+        [LID.GLOBAL_INCLUSION_DEFAULT]            = "LF, LFC, WTB, recraft",
+        [LID.GLOBAL_EXCLUSION_DEFAULT]            = "LFW, WTS, LF work",
+        [LID.DEFAULT_KEYWORDS_BLACKSMITHING]      = "BS, Herrero, Forjador de armaduras, Forjador de armas",
+        [LID.DEFAULT_KEYWORDS_LEATHERWORKING]     = "LW, Peletería, Peletero",
+        [LID.DEFAULT_KEYWORDS_ALCHEMY]            = "Alq, Alquimista, Piedra",
+        [LID.DEFAULT_KEYWORDS_TAILORING]          = "Sastre",
+        [LID.DEFAULT_KEYWORDS_ENGINEERING]        = "Ingeniero, Ing",
+        [LID.DEFAULT_KEYWORDS_ENCHANTING]         = "Encantador, Cresta",
+        [LID.DEFAULT_KEYWORDS_JEWELCRAFTING]      = "JC, Joyero",
+        [LID.DEFAULT_KEYWORDS_INSCRIPTION]        = "Inscripción, Escriba, Inscripcionista",
 
-        -- Release notes
-        [LID.RN_WELCOME]                          = "Willkommen bei CraftScan!",
+        -- Notas de la versión
+        [LID.RN_WELCOME]                          = "¡Bienvenido a CraftScan!",
         [LID.RN_WELCOME + 1]                      =
-        "Dieses Addon scannt den Chat nach Nachrichten, die wie Anfragen für das Herstellen aussehen. Wenn die Konfiguration anzeigt, dass Sie den gewünschten Gegenstand herstellen können, wird eine Benachrichtigung ausgelöst und die Kundeninformation gespeichert, um die Kommunikation zu erleichtern.",
+        "Este addon escanea el chat en busca de mensajes que parezcan solicitudes de artesanía. Si la configuración indica que puedes fabricar el objeto solicitado, se activará una notificación y la información del cliente se almacenará para facilitar la comunicación.",
 
-        [LID.RN_INITIAL_SETUP]                    = "Erste Einrichtung",
+        [LID.RN_INITIAL_SETUP]                    = "Configuración Inicial",
         [LID.RN_INITIAL_SETUP + 1]                =
-        "Um zu beginnen, öffnen Sie einen Beruf und klicken Sie auf die neue Schaltfläche 'CraftScan anzeigen' unten.",
+        "Para comenzar, abre una profesión y haz clic en el nuevo botón 'Mostrar CraftScan' en la parte inferior.",
         [LID.RN_INITIAL_SETUP + 2]                =
-        "Scrollen Sie bis zum unteren Rand dieses neuen Fensters und arbeiten Sie sich nach oben. Die Dinge, die Sie selten ändern müssen, befinden sich unten, aber diese Einstellungen sind zuerst wichtig.",
+        "Desplázate hasta la parte inferior de esta nueva ventana y avanza hacia arriba. Las configuraciones que rara vez necesitas cambiar están al final, pero son las que debes configurar primero.",
         [LID.RN_INITIAL_SETUP + 3]                =
-        "Klicken Sie auf das Hilfe-Symbol in der oberen linken Ecke des Fensters, wenn Sie eine Erklärung zu einem Eingabefeld benötigen.",
+        "Haz clic en el icono de ayuda en la esquina superior izquierda de la ventana si necesitas una explicación de alguna entrada.",
 
-        [LID.RN_INITIAL_TESTING]                  = "Erste Tests",
+        [LID.RN_INITIAL_TESTING]                  = "Pruebas Iniciales",
         [LID.RN_INITIAL_TESTING + 1]              =
-        "Sobald Sie konfiguriert sind, geben Sie eine Nachricht im /say-Chat ein, wie 'LF BS' für Schmiedekunst, vorausgesetzt, Sie haben die 'LF' und 'BS' Schlüsselwörter beibehalten. Eine Benachrichtigung sollte erscheinen.",
+        "Una vez configurado, escribe un mensaje en el chat /say, como 'LF BS' para Herrería, suponiendo que hayas dejado las palabras clave 'LF' y 'BS'. Debería aparecer una notificación.",
         [LID.RN_INITIAL_TESTING + 2]              =
-        "Klicken Sie auf die Benachrichtigung, um sofort eine Antwort zu senden, klicken Sie mit der rechten Maustaste, um den Kunden abzulehnen, oder klicken Sie auf die runde Berufsschaltfläche selbst, um das Auftragsfenster zu öffnen.",
+        "Haz clic en la notificación para enviar una respuesta de inmediato, haz clic derecho para descartar al cliente o haz clic en el botón circular de la profesión para abrir la ventana de pedidos.",
         [LID.RN_INITIAL_TESTING + 3]              =
-        "Doppelte Benachrichtigungen werden unterdrückt, es sei denn, sie wurden bereits abgelehnt, daher klicken Sie mit der rechten Maustaste auf Ihre Testbenachrichtigung, um sie abzulehnen, wenn Sie es erneut versuchen möchten.",
+        "Las notificaciones duplicadas se suprimen a menos que ya hayan sido descartadas, así que haz clic derecho en tu notificación de prueba para descartar si quieres intentarlo de nuevo.",
 
-        [LID.RN_MANAGING_CRAFTERS]                = "Verwalten Ihrer Handwerker",
+        [LID.RN_MANAGING_CRAFTERS]                = "Gestión de Artesanos",
         [LID.RN_MANAGING_CRAFTERS + 1]            =
-        "Die linke Seite des Auftragsfensters listet Ihre Handwerker auf. Diese Liste wird gefüllt, während Sie sich bei Ihren verschiedenen Charakteren einloggen und deren Berufe konfigurieren. Sie können jederzeit auswählen, welche Charaktere aktiv gescannt werden sollen und ob die visuellen und akustischen Benachrichtigungen für jeden Ihrer Handwerker aktiviert sind.",
+        "El lado izquierdo de la ventana de pedidos enumera a tus artesanos. Esta lista se llenará a medida que inicies sesión con tus diferentes personajes y configures sus profesiones. Puedes seleccionar qué personajes deben ser escaneados activamente en cualquier momento, así como si las notificaciones visuales y auditivas están habilitadas para cada uno de ellos.",
 
-        [LID.RN_MANAGING_CUSTOMERS]               = "Verwalten der Kunden",
+        [LID.RN_MANAGING_CUSTOMERS]               = "Gestión de Clientes",
         [LID.RN_MANAGING_CUSTOMERS + 1]           =
-        "Die rechte Seite des Auftragsfensters wird mit im Chat erkannten Herstellungsaufträgen gefüllt. Klicken Sie auf eine Zeile, um die Begrüßung zu senden, wenn Sie dies nicht bereits über das Pop-up-Banner getan haben. Klicken Sie erneut, um ein Flüstern an den Kunden zu öffnen. Klicken Sie mit der rechten Maustaste, um die Zeile abzulehnen.",
+        "El lado derecho de la ventana de pedidos se llenará con encargos detectados en el chat. Haz clic izquierdo en una fila para enviar el saludo si aún no lo hiciste desde la notificación emergente. Haz clic izquierdo de nuevo para abrir un susurro al cliente. Haz clic derecho para descartar la fila.",
         [LID.RN_MANAGING_CUSTOMERS + 2]           =
-        "Zeilen in dieser Tabelle bleiben über alle Charaktere hinweg erhalten, sodass Sie zu einem Twink umloggen und dann erneut auf den Kunden klicken können, um die Kommunikation wiederherzustellen. Zeilen laufen standardmäßig nach 10 Minuten ab. Diese Dauer kann auf der Hauptseite der Einstellungen konfiguriert werden (Esc -> Optionen -> AddOns -> CraftScan).",
+        "Las filas en esta tabla persistirán entre todos los personajes, por lo que puedes cambiar a un alter y luego hacer clic en el cliente nuevamente para reanudar la comunicación. Las filas expiran después de 10 minutos por defecto. Esta duración se puede configurar en la página de configuración principal (Esc -> Opciones -> AddOns -> CraftScan).",
         [LID.RN_MANAGING_CUSTOMERS + 3]           =
-        "Hoffentlich ist die Tabelle weitgehend selbsterklärend. Die 'Antworten'-Spalte hat 3 Symbole. Das linke X oder Häkchen zeigt an, ob Sie dem Kunden eine Nachricht gesendet haben. Das rechte X oder Häkchen zeigt an, ob der Kunde geantwortet hat. Die Sprechblase ist eine Schaltfläche, die ein temporäres Flüsterfenster mit dem Kunden öffnet und es mit Ihrem Chatverlauf füllt.",
+        "Esperemos que la mayor parte de la tabla sea autoexplicativa. La columna 'Respuestas' tiene 3 iconos. La X o marca de verificación izquierda indica si has enviado un mensaje al cliente. La X o marca de verificación derecha indica si el cliente ha respondido. El globo de chat es un botón que abrirá una ventana de susurro temporal con el cliente y la llenará con tu historial de chat.",
 
-        [LID.RN_KEYBINDS]                         = "Tastenkombinationen",
+        [LID.RN_KEYBINDS]                         = "Atajos de Teclado",
         [LID.RN_KEYBINDS + 1]                     =
-        "Tastenkombinationen sind verfügbar, um die Auftragsseite zu öffnen, auf den neuesten Kunden zu antworten und den neuesten Kunden abzulehnen. Suchen Sie nach 'CraftScan', um alle verfügbaren Einstellungen zu finden.",
+        "Los atajos de teclado están disponibles para abrir la página de pedidos, responder al último cliente y descartar al último cliente. Busca 'CraftScan' para encontrar todas las configuraciones disponibles.",
+
         [LID.RN_CLEANUP]                          = "Limpieza de Configuración",
         [LID.RN_CLEANUP + 1]                      =
-        "Tus artesanos en el lado izquierdo de la página 'Órdenes de Chat' ahora tienen un menú contextual al hacer clic derecho. Usa este menú para mantener la lista limpia y eliminar personajes/profesiones obsoletos.",
+        "Los artesanos en el lado izquierdo de la página 'Pedidos de Chat' ahora tienen un menú contextual al hacer clic derecho. Utiliza este menú para mantener la lista limpia y eliminar personajes/profesiones obsoletos.",
+
         ["Disable"]                               = "Desactivar",
         [LID.DELETE_CONFIG_TOOLTIP_TEXT]          =
-        "Elimina permanentemente cualquier dato %s guardado para %s.\n\nUn botón 'Habilitar CraftScan' estará presente en la página de la profesión para habilitarlo nuevamente con la configuración predeterminada.\n\nUsa esto si deseas continuar usando la profesión, pero sin la interacción de CraftScan (por ejemplo, cuando tienes Alquimia en todos los personajes secundarios para frascos largos).", -- profession-name, character-name
+        "Eliminar permanentemente los datos guardados de %s para %s.\n\nUn botón 'Habilitar CraftScan' estará presente en la página de profesión para habilitarlo de nuevo con la configuración predeterminada.\n\nUtiliza esto si deseas continuar usando la profesión, pero sin interacción de CraftScan (por ejemplo, cuando tienes Alquimia en todos tus alters para frascos largos).", -- nombre de la profesión, nombre del personaje
+
         [LID.DELETE_CONFIG_CONFIRM]               = "Escribe 'DELETE' para continuar:",
         [LID.SCANNER_CONFIG_DISABLED]             = "Habilitar CraftScan",
 

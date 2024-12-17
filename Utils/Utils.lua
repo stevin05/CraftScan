@@ -661,12 +661,16 @@ local function UpgradePersistentConfig()
 
             -- Wipe out any parent prof configs that don't have any corresponding
             -- child prof configs.
-            for ppID, _ in pairs(charConfig.parent_professions) do
+            for ppID, ppConfig in pairs(charConfig.parent_professions) do
                 local found = false
-                for _, profConfig in pairs(charConfig.professions) do
-                    if profConfig.parentProfID == ppID then
-                        found = true
-                        break
+                if ppConfig.character_disabled == true then
+                    found = true
+                else
+                    for _, profConfig in pairs(charConfig.professions) do
+                        if profConfig.parentProfID == ppID then
+                            found = true
+                            break
+                        end
                     end
                 end
                 if not found then
