@@ -371,6 +371,12 @@ function CraftScan.LOCAL_TW:GetData()
         [LID.IGNORE_TOOLTIP]                      = "將此玩家加入 CraftScan 忽略列表。CraftScan 會忽略該玩家發送的所有訊息。此選單可用於將玩家從列表中移除。",
         [LID.UNIGNORE]                            = "移除忽略",
         [LID.UNIGNORE_TOOLTIP]                    = "此玩家在您的 CraftScan 忽略列表中。此選項將其從列表中移除。",
+        ["Collapse chat context menu"]            = "折疊聊天上下文選單",
+        [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
+        "當右鍵點擊聊天中的玩家名字時，將所有上下文選單項目折疊成一個CraftScan子選單。",
+
+        [LID.PROXY_ORDERS_TOOLTIP]                = "將此帳號偵測到的訂單發送到擁有「完全控制」權限的關聯帳號。接收的帳號將顯示正常通知，就如同它偵測到訂單一樣。",
+        [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        = "接收由「完全控制」關聯帳號偵測並代理的訂單。當收到來自關聯帳號的訂單時，本帳號將顯示正常通知。",
 
     }
 end

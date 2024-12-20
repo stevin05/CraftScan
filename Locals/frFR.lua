@@ -408,5 +408,14 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.UNIGNORE]                            = "Retirer l'ignorance",
         [LID.UNIGNORE_TOOLTIP]                    =
         "Ce joueur est dans votre liste d'ignorés CraftScan. Cette option le retire de la liste.",
+        ["Collapse chat context menu"]            = "Réduire le menu contextuel du chat",
+        [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
+        "Lors d’un clic droit sur un nom de joueur dans le chat, réduisez tous les éléments du menu contextuel en un sous-menu unique CraftScan.",
+
+        [LID.PROXY_ORDERS_TOOLTIP]                =
+        "Envoyez les commandes détectées par ce compte vers les comptes liés ayant des permissions 'Contrôle total'. Le compte recevant affichera la notification habituelle comme s'il avait détecté la commande.",
+        [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
+        "Recevez les commandes détectées et transmises par un compte lié en 'Contrôle total'. Lorsqu'une commande est reçue du compte lié, la notification habituelle apparaîtra sur ce compte.",
+
     }
 end

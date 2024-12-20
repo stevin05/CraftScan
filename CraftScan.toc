@@ -1,6 +1,6 @@
-## Interface: 110000, 110002
+## Interface: 110007
 ## Title: CraftScan
-## Version: 1.0.4
+## Version: 1.3.16
 ## Notes: Scans chat for potential work orders
 ## Author: Stevin
 ## X-Curse-Project-ID: 1028358

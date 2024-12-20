@@ -412,6 +412,14 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.UNIGNORE]                            = "Ignorieren entfernen",
         [LID.UNIGNORE_TOOLTIP]                    =
         "Dieser Spieler ist auf deiner CraftScan-Ignoreliste. Diese Option entfernt ihn aus der Liste.",
+        ["Collapse chat context menu"]            = "Chat-Kontextmenü reduzieren",
+        [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
+        "Beim Rechtsklick auf einen Spielernamen im Chat alle Kontextmenüeinträge in ein einzelnes CraftScan-Untermenü reduzieren.",
+
+        [LID.PROXY_ORDERS_TOOLTIP]                =
+        "Sende Aufträge, die von diesem Konto erkannt wurden, an verknüpfte Konten mit 'Vollzugriff'-Berechtigungen. Das empfangende Konto zeigt die übliche Benachrichtigung an, als hätte es den Auftrag selbst erkannt.",
+        [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
+        "Empfange Aufträge, die von einem verknüpften 'Vollzugriff'-Konto erkannt und weitergeleitet wurden. Wenn ein Auftrag vom verknüpften Konto empfangen wird, erscheint die übliche Benachrichtigung auf diesem Konto.",
 
     }
 end

@@ -407,6 +407,14 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.UNIGNORE]                            = "Rimuovi Ignora",
         [LID.UNIGNORE_TOOLTIP]                    =
         "Questo giocatore è nella tua lista di ignorati di CraftScan. Questa opzione lo rimuoverà dalla lista.",
+        ["Collapse chat context menu"]            = "Comprimi menu contestuale della chat",
+        [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
+        "Facendo clic destro su un nome giocatore nella chat, comprime tutte le voci del menu contestuale in un unico sottomenu CraftScan.",
+
+        [LID.PROXY_ORDERS_TOOLTIP]                =
+        "Invia gli ordini rilevati da questo account agli account collegati con permessi di 'Controllo Completo'. L'account ricevente mostrerà la notifica come se avesse rilevato l'ordine.",
+        [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
+        "Ricevi ordini rilevati e inoltrati da un account collegato con 'Controllo Completo'. Quando un ordine viene ricevuto dall'account collegato, comparirà la notifica abituale su questo account.",
 
     }
 end

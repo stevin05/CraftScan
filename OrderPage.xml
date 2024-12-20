@@ -317,6 +317,7 @@
 									<CheckButton parentKey="ProxyReceiveEnabled" inherits="CraftScan_ProxyEnabledTemplate" hidden="true">
 										<KeyValues>
 											<KeyValue key="key" value="proxy_receive_enabled" type="string"/>
+											<KeyValue key="tooltip" value="RECEIVE_PROXY_ORDERS_TOOLTIP" type="string"/>
 										</KeyValues>
 										<Anchors>
 											<Anchor point="BOTTOMLEFT" relativeKey="$parent.LinkAccountButton" relativePoint="TOPLEFT" x="0" y="0"/>
@@ -326,6 +327,7 @@
 									<CheckButton parentKey="ProxySendEnabled" inherits="CraftScan_ProxyEnabledTemplate" hidden="true">
 										<KeyValues>
 											<KeyValue key="key" value="proxy_send_enabled" type="string"/>
+											<KeyValue key="tooltip" value="PROXY_ORDERS_TOOLTIP" type="string"/>
 										</KeyValues>
 										<Anchors>
 											<Anchor point="BOTTOMLEFT" relativeKey="$parent.ProxyReceiveEnabled" relativePoint="TOPLEFT" x="0" y="0"/>

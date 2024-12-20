@@ -373,6 +373,12 @@ function CraftScan.LOCAL_KO:GetData()
         "이 플레이어를 CraftScan 무시 목록에 추가합니다. CraftScan은 이 플레이어가 보낸 모든 메시지를 무시합니다. 이 메뉴를 사용하여 플레이어를 목록에서 제거할 수 있습니다.",
         [LID.UNIGNORE]                            = "무시 해제",
         [LID.UNIGNORE_TOOLTIP]                    = "이 플레이어는 CraftScan 무시 목록에 있습니다. 이 옵션을 통해 목록에서 제거할 수 있습니다.",
+        ["Collapse chat context menu"]            = "채팅 컨텍스트 메뉴 축소",
+        [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
+        "채팅에서 플레이어 이름을 오른쪽 클릭하면 모든 컨텍스트 메뉴 항목이 하나의 CraftScan 하위 메뉴로 축소됩니다.",
+
+        [LID.PROXY_ORDERS_TOOLTIP]                = "이 계정에서 감지된 주문을 '전체 제어' 권한이 있는 연결된 계정으로 보냅니다. 수신 계정은 마치 주문을 직접 감지한 것처럼 알림을 표시합니다.",
+        [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        = "‘전체 제어’ 계정에서 감지하고 전달한 주문을 수신합니다. 연결된 계정으로부터 주문을 받으면 이 계정에서도 일반 알림이 표시됩니다.",
 
     }
 end

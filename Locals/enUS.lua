@@ -418,5 +418,9 @@ function CraftScan.LOCAL_EN:GetData()
                 ["Collapse chat context menu"]            = "Collapse chat context menu",
                 [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
                 "When right clicking a player name in chat, collapse all context menu items into a single CraftScan sub-menu.",
+
+                [LID.PROXY_ORDERS_TOOLTIP] = "Send orders detected by this account to linked accounts with 'Full Control' permissions. The receiving account will show the usual notification as if it detected the order.",
+                [LID.RECEIVE_PROXY_ORDERS_TOOLTIP] = "Receive orders that were detected and proxied by a linked 'Full Control' account. When an order is received from the linked account, the usual notification will appear on this account.",
+
         }
 end

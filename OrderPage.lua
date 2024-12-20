@@ -1416,9 +1416,13 @@ function CraftScan_ProxyEnabledMixin:OnClick()
 end
 
 function CraftScan_ProxyEnabledMixin:OnEnter()
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+    GameTooltip:SetText(L(LID[self.tooltip]), 1, 1, 1, 1, true)
+    GameTooltip:Show()
 end
 
 function CraftScan_ProxyEnabledMixin:OnLeave()
+    GameTooltip:Hide()
 end
 
 CraftScan_LinkAccountButtonMixin = {}
