@@ -222,8 +222,7 @@ function CraftScan.LOCAL_ES:GetData()
         [LID.CUSTOM_GREETING_INFO]                =
         "CraftScan utiliza estas frases para crear el saludo inicial enviado a los clientes dependiendo de la situación. Sobrescriba algunas o todas a continuación para crear su propio saludo.",
         ["Default"]                               = "Predeterminado",
-        [LID.MISSING_PLACEHOLDERS]                =
-        "No has incluido %s. CraftScan funcionará con menos marcadores de posición, pero probablemente quieras incluirlos para contexto.",
+        [LID.MISSING_PLACEHOLDERS]                = "Los siguientes marcadores de posición también son compatibles: %s.",
         [LID.EXTRA_PLACEHOLDERS]                  = "Error: %s no son marcadores de posición válidos.",
         [LID.LEGACY_PLACEHOLDERS]                 =
         "Advertencia: El uso de %s ya no está recomendado. Utilice marcadores de posición con nombre, como por ejemplo: {placeholder}",

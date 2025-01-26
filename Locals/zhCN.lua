@@ -204,8 +204,7 @@ function CraftScan.LOCAL_CN:GetData()
         ["Customize Greeting"]                    = "自定义问候语",
         [LID.CUSTOM_GREETING_INFO]                = "CraftScan 使用这些句子根据情况向客户发送初始问候语。覆盖下方的部分或全部内容以创建自己的问候语。",
         ["Default"]                               = "默认",
-        [LID.MISSING_PLACEHOLDERS]                =
-        "您尚未包含 %s。 CraftScan 可以在更少的占位符下工作，但你可能希望为上下文包含它们。",
+        [LID.MISSING_PLACEHOLDERS]                = "还支持以下占位符：%s。",
         [LID.EXTRA_PLACEHOLDERS]                  = "错误： %s 不是有效的占位符。",
         [LID.LEGACY_PLACEHOLDERS]                 = "警告：现在已弃用 %s。请使用命名占位符，例如：{placeholder}",
 

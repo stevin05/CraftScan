@@ -909,11 +909,11 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         if itemID then
             local item = itemLink or L(LID.GREETING_LINK_BACKUP);
             greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'),
-                { ['crafter'] = crafter, ['item'] = item });
+                { crafter = crafter, item = item });
         else
             local profession = profInfo.parentProfessionName;
             greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_HAS_PROF'),
-                { ['crafter'] = crafter, ['profession'] = profession });
+                { crafter = crafter, profession = profession });
         end
         if CraftScan.State.isBusy then
             greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
@@ -924,10 +924,12 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     else
         if itemID then
             local item = itemLink or L(LID.GREETING_LINK_BACKUP);
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'), { ['item'] = item });
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'),
+                { crafter = crafter, item = item });
         else
             local profession = profInfo.parentProfessionName;
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_HAVE_PROF'), { ['profession'] = profession });
+            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_HAVE_PROF'),
+                { crafter = crafter, profession = profession });
         end
         if CraftScan.State.isBusy then
             greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');

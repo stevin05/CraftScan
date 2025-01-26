@@ -224,8 +224,7 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.CUSTOM_GREETING_INFO]                =
         "CraftScan verwendet diese Sätze, um die anfängliche Begrüßung je nach Situation an Kunden zu senden. Überschreiben Sie unten einige oder alle, um Ihre eigene Begrüßung zu erstellen.",
         ["Default"]                               = "Standard",
-        [LID.MISSING_PLACEHOLDERS]                =
-        "Sie haben %s nicht eingeschlossen. CraftScan funktioniert mit weniger Platzhaltern, aber Sie möchten sie wahrscheinlich für den Kontext einfügen.",
+        [LID.MISSING_PLACEHOLDERS]                = "Die folgenden Platzhalter werden ebenfalls unterstützt: %s.",
         [LID.EXTRA_PLACEHOLDERS]                  = "Fehler: %s sind keine gültigen Platzhalter.",
         [LID.LEGACY_PLACEHOLDERS]                 =
         "Achtung: Die Verwendung von %s ist mittlerweile veraltet. Bitte verwenden Sie benannte Platzhalter, wie folgt: {placeholder}",

@@ -222,8 +222,7 @@ function CraftScan.LOCAL_FR:GetData()
         [LID.CUSTOM_GREETING_INFO]                =
         "CraftScan utilise ces phrases pour créer le message initial envoyé aux clients en fonction de la situation. Remplacez certaines ou toutes ci-dessous pour créer votre propre message.",
         ["Default"]                               = "Par défaut",
-        [LID.MISSING_PLACEHOLDERS]                =
-        "Vous n'avez pas inclus %s. CraftScan fonctionnera avec moins d'espaces réservés, mais vous souhaiterez probablement les inclure pour le contexte.",
+        [LID.MISSING_PLACEHOLDERS]                = "Les espaces réservés suivants sont également pris en charge : %s.",
         [LID.EXTRA_PLACEHOLDERS]                  = "Erreur : %s ne sont pas des espaces réservés valides.",
         [LID.LEGACY_PLACEHOLDERS]                 =
         "Attention : l'utilisation de %s est désormais obsolète. Veuillez utiliser des espaces réservés nommés, comme ceci : {placeholder}",

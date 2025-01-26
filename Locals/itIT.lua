@@ -221,8 +221,7 @@ function CraftScan.LOCAL_IT:GetData()
         [LID.CUSTOM_GREETING_INFO]                =
         "CraftScan utilizza queste frasi per creare il saluto iniziale inviato ai clienti a seconda della situazione. Sovrascrivi alcune o tutte qui sotto per creare il tuo saluto.",
         ["Default"]                               = "Predefinito",
-        [LID.MISSING_PLACEHOLDERS]                =
-        "Non hai incluso %s. CraftScan funzionerà con meno segnaposto, ma probabilmente vorrai includerli per il contesto.",
+        [LID.MISSING_PLACEHOLDERS]                = "I segnaposto seguenti sono anche supportati: %s.",
         [LID.EXTRA_PLACEHOLDERS]                  = "Errore: %s non sono segnaposto validi.",
         [LID.LEGACY_PLACEHOLDERS]                 =
         "Attenzione: l'uso di %s è ora deprecato. Si prega di utilizzare segnaposto denominati, come segue: {placeholder}",

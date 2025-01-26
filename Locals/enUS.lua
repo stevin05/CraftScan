@@ -222,8 +222,7 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.CUSTOM_GREETING_INFO]                =
                 "CraftScan uses these sentences to create the initial greeting sent to customers depending on the situation. Override some or all of them below to create your own greeting.",
                 ["Default"]                               = "Default",
-                [LID.MISSING_PLACEHOLDERS]                =
-                "You have not included %s. CraftScan will work with fewer placeholders, but you likely want to include them for context.",
+                [LID.MISSING_PLACEHOLDERS]                = "The following placeholders are also supported: %s.",
                 [LID.EXTRA_PLACEHOLDERS]                  = "Error: %s are not valid placeholders.",
                 [LID.LEGACY_PLACEHOLDERS]                 =
                 "Warning: The use of %s is now deprecated. Please use named placeholders, like so: {placeholder}",

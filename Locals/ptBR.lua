@@ -218,8 +218,7 @@ function CraftScan.LOCAL_PT:GetData()
         [LID.CUSTOM_GREETING_INFO]                =
         "CraftScan usa estas frases para criar a saudação inicial enviada aos clientes dependendo da situação. Substitua algumas ou todas abaixo para criar sua própria saudação.",
         ["Default"]                               = "Padrão",
-        [LID.MISSING_PLACEHOLDERS]                =
-        "Você não incluiu %s. CraftScan funcionará com menos marcadores, mas você provavelmente vai querer incluí-los para contexto.",
+        [LID.MISSING_PLACEHOLDERS]                = "Os seguintes espaços reservados também são suportados: %s.",
         [LID.EXTRA_PLACEHOLDERS]                  = "Erro: %s não são marcadores de posição válidos.",
         [LID.LEGACY_PLACEHOLDERS]                 =
         "Aviso: O uso de %s agora está obsoleto. Use placeholders nomeados, como: {placeholder}",

@@ -209,8 +209,7 @@ function CraftScan.LOCAL_KO:GetData()
         [LID.CUSTOM_GREETING_INFO]                =
         "CraftScan은 상황에 따라 고객에게 전송되는 초기 인사를 만들기 위해 이 문장을 사용합니다. 일부 또는 전부를 아래에서 덮어쓰고 자신만의 인사를 만드세요.",
         ["Default"]                               = "기본값",
-        [LID.MISSING_PLACEHOLDERS]                =
-        "%s을 포함하지 않았습니다. CraftScan은 더 적은 자리 표시자로도 작동하지만, 컨텍스트를 위해 포함하는 것이 좋습니다.",
+        [LID.MISSING_PLACEHOLDERS]                = "다음 플레이스홀더도 지원됩니다: %s.",
         [LID.EXTRA_PLACEHOLDERS]                  = "오류: %s는 올바른 자리 표시자가 아닙니다.",
         [LID.LEGACY_PLACEHOLDERS]                 = "경고: %s의 사용은 더 이상 사용되지 않습니다. 다음과 같이 명명된 플레이스홀더를 사용하세요: {placeholder}",
 
