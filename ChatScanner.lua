@@ -869,6 +869,76 @@ local function GetGreeting(tag)
     return greeting[tag] or L(LID[tag]);
 end
 
+local function UnshortRealmName(crafter)
+    -- Table mapping shortened realm names to original realm names
+    local realmNames = {
+        ["AeriePeak"] = "Aerie Peak",
+        ["AhnQiraj"] = "Ahn'Qiraj",
+        ["AlAkir"] = "Al'Akir",
+        ["Area52"] = "Area 52",
+        ["AzjolNerub"] = "Azjol-Nerub",
+        ["BlackDragonflight"] = "Black Dragonflight",
+        ["BlackwaterRaiders"] = "Blackwater Raiders",
+        ["BladesEdge"] = "Blade's Edge",
+        ["BleedingHollow"] = "Bleeding Hollow",
+        ["BurningBlade"] = "Burning Blade",
+        ["BurningLegion"] = "Burning Legion",
+        ["CenarionCircle"] = "Cenarion Circle",
+        ["ChamberofAspects"] = "Chamber of Aspects",
+        ["Chogall"] = "Cho'gall",
+        ["DarkIron"] = "Dark Iron",
+        ["DarkSpear"] = "Dark Spear",
+        ["DarkmoonFaire"] = "Darkmoon Faire",
+        ["DefiasBrotherhood"] = "Defias Brotherhood",
+        ["DemonSoul"] = "Demon Soul",
+        ["DieAldor"] = "Die Aldor",
+        ["DieTodeskrallen"] = "Die Todeskrallen",
+        ["DrakTharon"] = "Drak'Tharon",
+        ["Drakthul"] = "Drak'thul",
+        ["EchoIsles"] = "Echo Isles",
+        ["EldreThalas"] = "Eldre'Thalas",
+        ["EmeraldDream"] = "Emerald Dream",
+        ["GrizzlyHills"] = "Grizzly Hills",
+        ["Guldan"] = "Gul'dan",
+        ["HowlingFjord"] = "Howling Fjord",
+        ["Kaelthas"] = "Kael'thas",
+        ["KelThuzad"] = "Kel'Thuzad",
+        ["KhazModan"] = "Khaz Modan",
+        ["Khazgoroth"] = "Khaz'goroth",
+        ["Kiljaeden"] = "Kil'jaeden",
+        ["KulTiras"] = "Kul Tiras",
+        ["MalGanis"] = "Mal'Ganis",
+        ["MoonGuard"] = "Moon Guard",
+        ["Mugthol"] = "Mug'thol",
+        ["Nerzhul"] = "Ner'zhul",
+        ["PozzodellEternita"] = "Pozzo dell'Eternità",
+        ["ScarletCrusade"] = "Scarlet Crusade",
+        ["Senjin"] = "Sen'jin",
+        ["ShatteredHand"] = "Shattered Hand",
+        ["SilverHand"] = "Silver Hand",
+        ["TarrenMill"] = "Tarren Mill",
+        ["TheMaelstrom"] = "The Maelstrom",
+        ["TheShatar"] = "The Sha'tar",
+        ["TolBarad"] = "Tol Barad",
+        ["TwilightsHammer"] = "Twilight's Hammer",
+        ["TwistingNether"] = "Twisting Nether",
+        ["Veknilash"] = "Vek'nilash",
+        ["WyrmrestAccord"] = "Wyrmrest Accord",
+        ["Zuljin"] = "Zul'jin"
+    }
+    
+    -- Loop through all shortened realm names
+    for shortenedName, originalName in pairs(realmNames) do
+        -- Check if the shortened realm name exists in the name
+        if crafter:find(shortenedName) then
+            -- Replace the shortened realm name with the original realm name and return
+            return crafter:gsub(shortenedName, originalName)
+        end
+    end
+    
+    return crafter
+end
+
 CraftScan.Utils.GetGreeting = GetGreeting;
 
 local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, item, overrides)
@@ -903,6 +973,8 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
     local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter);
     local alt_craft = crafter ~= CraftScan.GetPlayerName();
+
+    crafter = UnshortRealmName(crafter);
 
     local greeting = '';
     if alt_craft then
