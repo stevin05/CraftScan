@@ -433,7 +433,7 @@ end
 
 function CraftScan.Utils.ShortenRealmName(realmName)
     -- Hopefully this is the correct shortening. Stolen from https://github.com/phanx-wow/LibRealmInfo/blob/master/LibRealmInfo.lua
-    local shortenedName = realmName:gsub("[%s%-']", "")
+    local shortenedName = realmName:gsub("[%s%-]", "")
     return shortenedName
 end
 
@@ -676,6 +676,35 @@ local function UpgradePersistentConfig()
                 if not found then
                     charConfig.parent_professions[ppID] = nil
                 end
+            end
+        end
+    end
+
+    do
+        -- See issue #48
+        -- The correct version of this gsub should not have ' in it. This
+        -- was a bug in the original ShortenRealmName, and its results were
+        -- stored in saved variables. If we find that the current player is
+        -- one of these broken shortened names, we replace it with the correct
+        -- one. We can only convert from good realm name to bad, so we can't fix
+        -- this problem until the user logs in to each character so we can
+        -- access the good name to convert it to the bad name and see if it
+        -- was saved. Until they do so, messages about that character
+        -- will still be missing the '.
+        function BrokenShortenRealmName(realmName)
+            local shortenedName = realmName:gsub("[%s%-']", "")
+            return shortenedName
+        end
+
+        local realm = BrokenShortenRealmName(GetRealmName());
+        local brokenPlayerName = UnitName("player") .. '-' .. realm;
+        local correctPlayerName = CraftScan.GetPlayerName(true);
+
+        if correctPlayerName ~= brokenPlayerName then
+            local config = CraftScan.DB.characters[brokenPlayerName]
+            if config then
+                CraftScan.DB.characters[correctPlayerName] = config;
+                CraftScan.DB.characters[brokenPlayerName] = nil;
             end
         end
     end

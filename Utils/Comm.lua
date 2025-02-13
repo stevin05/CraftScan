@@ -251,6 +251,22 @@ local function ReceiveShareCharacterData(sender, data, senderID)
         -- one last time here that we only import more recent data.
         for char, charConfig in pairs(characters) do
             local localCharConfig = CraftScan.DB.characters[char];
+
+            if not localCharConfig and string.find(char, "'") then
+                -- See issue #48.
+                -- We had incorrect realm shortening at one point that removed
+                -- single quotes when it should not have. If we have received a
+                -- correctly shortened realm, check if we have the
+                -- corresponding entry with the incorrectly shortened name and
+                -- swap them before continuing.
+                local brokenChar = char:gsub("[']", "")
+                localCharConfig = CraftScan.DB.characters[brokenChar];
+                if localCharConfig then
+                    CraftScan.DB.characters[char] = localCharConfig;
+                    CraftScan.DB.characters[brokenChar] = nil;
+                end
+            end
+
             if not localCharConfig then
                 CraftScan.DB.characters[char] = charConfig;
             else
@@ -298,6 +314,21 @@ local function ReceiveShareCharacterData(sender, data, senderID)
         -- either newer than or not included in the revisions, filtered by what
         -- the peer told us they are allowed to see.
         local revisions = data.revisions;
+
+        local brokenRevisions = {};
+        for char, _ in pairs(revisions) do
+            -- See issue #48.
+            -- We might receive revisions where a shortened realm name has
+            -- already been corrected on the this side. If we simply roll with
+            -- that, we'll send them the bad version back. Convert all correct
+            -- realm names to bad realm names so we can see if we have any
+            -- locally and delete them. (We can only convert from good to bad,
+            -- not from bad to good)
+            if string.find(char, "'") then
+                brokenRevisions[char:gsub("[']", "")] = true;
+            end
+        end
+
         local responseCharacters = {}
         local peers = data.peers;
         for char, localCharConfig in pairs(CraftScan.DB.characters) do
@@ -305,8 +336,12 @@ local function ReceiveShareCharacterData(sender, data, senderID)
             if CharacterInPeers(localCharConfig, peers) or characterOwnedByPeer then
                 local remoteCharConfig = revisions[char];
                 if not remoteCharConfig then
-                    if next(localCharConfig.parent_professions) then
-                        responseCharacters[char] = localCharConfig;
+                    if brokenRevisions[char] then
+                        CraftScan.DB.characters[char] = nil;
+                    else
+                        if next(localCharConfig.parent_professions) then
+                            responseCharacters[char] = localCharConfig;
+                        end
                     end
                 else
                     -- Both sides have the character, walk the professions and
