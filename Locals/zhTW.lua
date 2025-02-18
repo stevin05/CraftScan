@@ -376,6 +376,9 @@ function CraftScan.LOCAL_TW:GetData()
 
         [LID.PROXY_ORDERS_TOOLTIP]                = "將此帳號偵測到的訂單發送到擁有「完全控制」權限的關聯帳號。接收的帳號將顯示正常通知，就如同它偵測到訂單一樣。",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        = "接收由「完全控制」關聯帳號偵測並代理的訂單。當收到來自關聯帳號的訂單時，本帳號將顯示正常通知。",
+        [LID.LOCAL_ALERTS_TOOLTIP]                =
+        "只有在當前遊玩該角色時，才會顯示該工匠和專業的視覺和聽覺通知。這只是篩選器，不會啟用或禁用通知。通知仍可透過工匠列表右側的任務和耳機圖示進行管理。",
+        ["Local Notifications Only"]              = "僅限本地通知",
 
     }
 end

@@ -414,6 +414,9 @@ function CraftScan.LOCAL_IT:GetData()
         "Invia gli ordini rilevati da questo account agli account collegati con permessi di 'Controllo Completo'. L'account ricevente mostrerà la notifica come se avesse rilevato l'ordine.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Ricevi ordini rilevati e inoltrati da un account collegato con 'Controllo Completo'. Quando un ordine viene ricevuto dall'account collegato, comparirà la notifica abituale su questo account.",
+        [LID.LOCAL_ALERTS_TOOLTIP]                =
+        "Le notifiche visive e sonore per questo artigiano e questa professione verranno mostrate solo quando stai giocando con questo personaggio. Questo è solo un filtro e non attiva né disattiva le notifiche in generale. Le notifiche vengono comunque gestite tramite le icone della missione e delle cuffie sul lato destro della lista degli artigiani.",
+["Local Notifications Only"] = "Solo notifiche locali",
 
     }
 end

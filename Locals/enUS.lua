@@ -322,7 +322,7 @@ function CraftScan.LOCAL_EN:GetData()
                 ["Save"]                                  = "Save",
                 ["Reset"]                                 = "Reset",
                 [LID.MANUAL_MATCHING_TITLE]               = "Manual Matching",
-                [LID.MANUAL_MATCH]                        = "%s - %s", -- crafter, profession
+                [LID.MANUAL_MATCH]                        = "%s - %s",  -- crafter, profession
                 [LID.MANUAL_MATCHING_DESC]                =
                 "Ignore primary keywords and force a match for this message. CraftScan will attempt to find the correct crafter based on the message, but if no matches are found, the default greeting for the specified crafter will be used. The match is reported via the usual means, allowing you to click the banner or table row to send the greeting.",
 
@@ -409,17 +409,22 @@ function CraftScan.LOCAL_EN:GetData()
                 [LID.UNIGNORE]                            = "Remove Ignore",
                 [LID.UNIGNORE_TOOLTIP]                    =
                 "This player is on your CraftScan ignore list. This option will remove them from the list.",
+                ["Collapse chat context menu"]            = "Collapse chat context menu",
+                [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
+                "When right clicking a player name in chat, collapse all context menu items into a single CraftScan sub-menu.",
+
+                [LID.PROXY_ORDERS_TOOLTIP]                =
+                "Send orders detected by this account to linked accounts with 'Full Control' permissions. The receiving account will show the usual notification as if it detected the order.",
+                [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
+                "Receive orders that were detected and proxied by a linked 'Full Control' account. When an order is received from the linked account, the usual notification will appear on this account.",
+                ["Local Notifications Only"]              = "Local Notifications Only",
+                [LID.LOCAL_ALERTS_TOOLTIP]                =
+                "Visual and auditory notifications regarding this crafter and profession will only be made when you are currently playing this crafter. Note that this does not enable or disable notifications in general. It is only a filter. Notifications are still managed for the crafter via the quest and headset icons on the right side of the crafter list.",
 
                 -- Translations complete above this line
 
                 -- ChatGPT prompt:
                 -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.
-                ["Collapse chat context menu"]            = "Collapse chat context menu",
-                [LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP]       =
-                "When right clicking a player name in chat, collapse all context menu items into a single CraftScan sub-menu.",
-
-                [LID.PROXY_ORDERS_TOOLTIP] = "Send orders detected by this account to linked accounts with 'Full Control' permissions. The receiving account will show the usual notification as if it detected the order.",
-                [LID.RECEIVE_PROXY_ORDERS_TOOLTIP] = "Receive orders that were detected and proxied by a linked 'Full Control' account. When an order is received from the linked account, the usual notification will appear on this account.",
 
         }
 end

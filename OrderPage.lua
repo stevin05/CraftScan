@@ -1914,6 +1914,30 @@ function CraftScanCrafterListElementMixin:OnClick(button)
             local button = rootDescription:CreateCheckbox(L("Primary Crafter"), IsSelected, SetSelected, data)
             button:SetTooltip(SetTooltipWithTitle);
         end
+        do
+            -- Local notifications is the implementation of the suggestion in
+            -- issue #25. The goal is to only alert the user about crafts they
+            -- can perform on the character they are currently playing. The
+            -- checkbox lists are a bit nasty already, so I don't want to mess
+            -- with that and have them try to keep themselves lined up with the
+            -- current character. Instead, each character will have an option to
+            -- override their alert settings to only apply when playing that
+            -- character.
+            local IsSelected = function()
+                return ppConfig.local_alerts_only;
+            end
+            local SetSelected = function()
+                ppConfig.local_alerts_only = not ppConfig.local_alerts_only;
+                local ppChangeOnly = true;
+                CraftScanComm:ShareCharacterModification(self.crafterInfo.name, self.crafterInfo.parentProfessionID,
+                    ppChangeOnly);
+            end
+            local data = {
+                tooltipText = string.format(L(LID.LOCAL_ALERTS_TOOLTIP), crafter, profName),
+            };
+            local button = rootDescription:CreateCheckbox(L("Local Notifications Only"), IsSelected, SetSelected, data)
+            button:SetTooltip(SetTooltipWithTitle);
+        end
     end);
 end
 

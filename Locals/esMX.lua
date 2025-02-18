@@ -411,5 +411,9 @@ function CraftScan.LOCAL_MX:GetData()
         "Envía los pedidos detectados por esta cuenta a cuentas vinculadas con permisos de 'Control Total'. La cuenta receptora mostrará la notificación habitual como si hubiera detectado el pedido.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Recibe pedidos detectados y enviados por una cuenta vinculada con 'Control Total'. Cuando se recibe un pedido de la cuenta vinculada, aparecerá la notificación habitual en esta cuenta.",
+        [LID.LOCAL_ALERTS_TOOLTIP]                =
+        "Las notificaciones visuales y sonoras sobre este artesano y profesión solo se mostrarán cuando estés jugando con este personaje. Esto es solo un filtro y no activa ni desactiva las notificaciones en general. Las notificaciones siguen gestionándose mediante los iconos de misión y auriculares en el lado derecho de la lista de artesanos.",
+        ["Local Notifications Only"]              = "Solo notificaciones locales",
+
     }
 end

@@ -415,6 +415,9 @@ function CraftScan.LOCAL_FR:GetData()
         "Envoyez les commandes détectées par ce compte vers les comptes liés ayant des permissions 'Contrôle total'. Le compte recevant affichera la notification habituelle comme s'il avait détecté la commande.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Recevez les commandes détectées et transmises par un compte lié en 'Contrôle total'. Lorsqu'une commande est reçue du compte lié, la notification habituelle apparaîtra sur ce compte.",
+        [LID.LOCAL_ALERTS_TOOLTIP]                =
+        "Les notifications visuelles et sonores pour cet artisan et cette profession ne s'afficheront que lorsque vous jouez ce personnage. Il s'agit uniquement d'un filtre et cela n'active ni ne désactive les notifications en général. Elles restent gérées via les icônes de quête et de casque à droite de la liste des artisans.",
+        ["Local Notifications Only"]              = "Notifications locales uniquement",
 
     }
 end

@@ -375,6 +375,9 @@ function CraftScan.LOCAL_CN:GetData()
 
         [LID.PROXY_ORDERS_TOOLTIP]                = "将此账号检测到的订单发送给具有‘完全控制’权限的关联账号。接收账号将显示正常通知，就像它自己检测到订单一样。",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        = "接收由‘完全控制’关联账号检测并代理的订单。当从关联账号接收到订单时，本账号会显示正常的通知。",
+        [LID.LOCAL_ALERTS_TOOLTIP]                =
+        "只有在当前游玩该角色时，才会显示该工匠和专业的视觉和听觉通知。这只是一个筛选器，不会启用或禁用通知。通知仍可通过工匠列表右侧的任务和耳机图标进行管理。",
+        ["Local Notifications Only"]              = "仅限本地通知",
 
     }
 end

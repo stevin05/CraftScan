@@ -378,6 +378,9 @@ function CraftScan.LOCAL_KO:GetData()
 
         [LID.PROXY_ORDERS_TOOLTIP]                = "이 계정에서 감지된 주문을 '전체 제어' 권한이 있는 연결된 계정으로 보냅니다. 수신 계정은 마치 주문을 직접 감지한 것처럼 알림을 표시합니다.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        = "‘전체 제어’ 계정에서 감지하고 전달한 주문을 수신합니다. 연결된 계정으로부터 주문을 받으면 이 계정에서도 일반 알림이 표시됩니다.",
+        [LID.LOCAL_ALERTS_TOOLTIP]                =
+        "이 제작자와 전문 기술에 대한 시각 및 청각 알림은 해당 캐릭터를 플레이 중일 때만 표시됩니다. 이는 단순한 필터이며, 알림을 활성화하거나 비활성화하지 않습니다. 알림은 여전히 제작자 목록 오른쪽의 퀘스트 및 헤드셋 아이콘을 통해 관리됩니다.",
+        ["Local Notifications Only"]              = "로컬 알림만",
 
     }
 end

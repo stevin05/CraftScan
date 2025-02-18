@@ -1023,7 +1023,8 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
         local ppConfig = ParentProfessionConfig(crafterInfo);
 
-        if ppConfig.visual_alert_enabled then
+        local isAlertFiltered = (ppConfig.local_alerts_only and CraftScan.GetPlayerName(true) ~= crafterInfo.crafter)
+        if ppConfig.visual_alert_enabled and not isAlertFiltered then
             FlashClientIcon()
 
             if not greeting_queued and not customerStartedInteraction then
@@ -1041,7 +1042,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
             end
         end
 
-        if ppConfig.sound_alert_enabled then
+        if ppConfig.sound_alert_enabled and not isAlertFiltered then
             PlaySoundFile(CraftScan.Utils.GetSetting("ping_sound"), "Master");
         end
 

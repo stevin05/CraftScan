@@ -137,6 +137,7 @@ CraftScan.CONST.TEXT = {
     COLLAPSE_CHAT_CONTEXT_TOOLTIP       = 133,
     PROXY_ORDERS_TOOLTIP                = 134,
     RECEIVE_PROXY_ORDERS_TOOLTIP        = 135,
+    LOCAL_ALERTS_TOOLTIP                = 136,
 
 
 

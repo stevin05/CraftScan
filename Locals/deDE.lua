@@ -420,5 +420,9 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Empfange Aufträge, die von einem verknüpften 'Vollzugriff'-Konto erkannt und weitergeleitet wurden. Wenn ein Auftrag vom verknüpften Konto empfangen wird, erscheint die übliche Benachrichtigung auf diesem Konto.",
 
+        [LID.LOCAL_ALERTS_TOOLTIP]                =
+        "Visuelle und akustische Benachrichtigungen für diesen Handwerker und Beruf werden nur angezeigt, wenn du diesen Charakter spielst. Dies ist nur ein Filter und aktiviert oder deaktiviert Benachrichtigungen nicht generell. Die Benachrichtigungen werden weiterhin über die Quest- und Headset-Symbole rechts in der Handwerkerliste verwaltet.",
+        ["Local Notifications Only"]              = "Nur lokale Benachrichtigungen",
+
     }
 end
