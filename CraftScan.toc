@@ -3,6 +3,7 @@
 ## Version: 1.3.16
 ## Notes: Scans chat for potential work orders
 ## Author: Stevin
+## Category: Professions
 ## X-Curse-Project-ID: 1028358
 ## X-Wago-ID: rN4V3jKD
 ## X-WoWI-ID: 26847
