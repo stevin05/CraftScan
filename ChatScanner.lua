@@ -79,7 +79,7 @@ local function HasMatch(message, tokens, secondary_keywords)
     local len = nil;
     local numMatches = 0;
     for _, token in pairs(tokens) do
-        local b, e = string.find(message, token)
+        local b, e = string.find(message:lower(), token:lower())
         if HasMatchCheck(b, e, message) then
             if not len or len < #token then
                 len = #token;
