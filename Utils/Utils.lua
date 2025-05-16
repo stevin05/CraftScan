@@ -631,9 +631,13 @@ local function UpgradePersistentConfig()
         CraftScan.DB.settings.collapse_chat_context = false;
     end
 
-
     -- After changing placeholders in customer greetings from %s to {placeholder},
     -- existing configs must be updated to replace %s placeholders with the new ones.
+
+    -- This upgrade work has the downside that users putting %'s in their
+    -- messages causes the whole addon not to load. It's been months since this
+    -- was added, so just disabling it.
+    --[[
     local greeting = CraftScan.DB.settings.greeting;
     if greeting ~= nil then
         greeting['GREETING_ALT_CAN_CRAFT_ITEM'] = string.format(greeting['GREETING_ALT_CAN_CRAFT_ITEM'], "{crafter}",
@@ -642,6 +646,7 @@ local function UpgradePersistentConfig()
         greeting['GREETING_I_CAN_CRAFT_ITEM'] = string.format(greeting['GREETING_I_CAN_CRAFT_ITEM'], "{item}");
         greeting['GREETING_I_HAVE_PROF'] = string.format(greeting['GREETING_I_HAVE_PROF'], "{profession}");
     end
+    ]]--
 
     -- Account link users are hitting a case where they have a parent profession
     -- with no associated child professions. I think this has to do with
