@@ -968,7 +968,7 @@ function CraftScanComm:RejectPeerRequest()
 end
 
 function CraftScanComm:FindCrafters(itemID)
-    CraftScanComm:Transmit({ i = itemID }, CraftScanComm.Operations.FindCrafter, TARGET_BROADCAST);
+    CraftScanComm:Transmit({ i = itemID, cg = UnitGUID("player") }, CraftScanComm.Operations.FindCrafter, TARGET_BROADCAST);
 end
 
 local function ReceiveFindCrafter(sender, data)
@@ -977,7 +977,7 @@ local function ReceiveFindCrafter(sender, data)
             if not CraftScan.DB.settings.discoverable then
                 return;
             end
-            CraftScan.OnMessage("CHAT_MSG_CHANNEL", "", sender, nil,
+            CraftScan.OnMessage("CHAT_MSG_CHANNEL", "", sender, data.cg,
                 {
                     itemInfo = function()
                         return true, nil, data.i;
@@ -1017,6 +1017,10 @@ end
 local function ReceiveRequestCraft(sender, data)
     if data.i then
         local itemID = data.i;
+
+        -- Would be nice to be '.cg', since .g is also used for greeting in this
+        -- flow, but that would create a mixed version problem, so just living
+        -- with it.
         local customerGUID = data.g;
         CreateRequestCraftGreeting(itemID, function(message)
             CraftScan.OnMessage("CHAT_MSG_CHANNEL", message, sender, customerGUID, {
