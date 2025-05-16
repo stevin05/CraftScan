@@ -587,6 +587,11 @@ local seen_profs = {};
 local function OnRecipeSelected()
     if not C_TradeSkillUI.IsTradeSkillReady() then return end
 
+    -- Some other addons trigger this without actually showing the frame, then
+    -- our setup fails because it's trying to position elements on a hidden
+    -- frame.
+    if not ProfessionsFrame.CraftingPage.SchematicForm:IsShown() then return end
+
     cur.recipe = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
     if not cur.recipe then
         onSchematicChange()
