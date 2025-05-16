@@ -112,20 +112,6 @@ local professionLabel = nil;
 local expansionLabel = nil;
 
 function CraftScan_CraftScanFrameMixin:ShowTutorial()
-    -- We want out help content to be in the scroll window, so we replace its
-    -- parent while we show it, and set it up restore original values when
-    -- hidden.
-
-    -- XXX: The simple act of setting any parent except UIParent for any amount
-    -- of time causes the the collapse animation to no longer work on any other
-    -- help boxes. I doubt many people are scrolling around various places askin
-    -- for help, and it's just an animation, so oh well.
-    local helpPlateParent = HelpPlate:GetParent();
-    local helpPlateFrameLevel = HelpPlate:GetFrameLevel();
-
-    HelpPlate:SetParent(self.ScrollFrame.Content)
-    HelpPlate:SetFrameLevel(1000)
-
     local function UpdateHelp(index, frame, description, rightXPadding, leftXPadding)
         CraftScan_CraftScanFrame_HelpPlate[index] = HelpFrameAttributes(frame, description, rightXPadding, leftXPadding);
     end
@@ -134,32 +120,30 @@ function CraftScan_CraftScanFrameMixin:ShowTutorial()
     UpdateHelp(2, expansionLabel, LID.HELP_EXPANSION_SECTION, 20);
     UpdateHelp(3, professionLabel, LID.HELP_PROFESSION_SECTION, 20);
 
-    HelpPlate_Show(CraftScan_CraftScanFrame_HelpPlate, self.ScrollFrame.Content, self.TutorialButton);
-
-    HelpPlate:SetScript("OnHide", function(self)
-        HelpPlate:SetScript("OnHide", nil);
-
-        HelpPlate:SetParent(helpPlateParent);
-        helpPlateParent = nil;
-
-        HelpPlate:SetFrameLevel(helpPlateFrameLevel);
-        helpPlateFrameLevel = nil;
-    end);
+    -- The Show() call sets the parent of the help to
+    -- GetAppropriateTopLevelParent(). We set that to our  scroll frame content
+    -- so that the help information only shows up within the scroll frame.
+    -- Without this, the help extends past the scroll frame on top and bottom.
+    -- It still lines up correctly for what is shown, but shows help for
+    -- out-of-view elements.
+    SetAlternateTopLevelParent(self.ScrollFrame.Content)
+    HelpPlate.Show(CraftScan_CraftScanFrame_HelpPlate, self.ScrollFrame.Content, self.TutorialButton);
+    ClearAlternateTopLevelParent()
 end
 
 function CraftScan_CraftScanFrameMixin:IsTutorialShown()
-    return HelpPlate_IsShowing(CraftScan_CraftScanFrame_HelpPlate);
+    return HelpPlate.IsShowingHelpInfo(CraftScan_CraftScanFrame_HelpPlate);
 end
 
 function CraftScan_CraftScanFrameMixin:OnHide()
-    if HelpPlate_IsShowing(CraftScan_CraftScanFrame_HelpPlate) then
-        HelpPlate_Hide(false);
+    if HelpPlate.IsShowingHelpInfo(CraftScan_CraftScanFrame_HelpPlate) then
+        HelpPlate.Hide(false);
     end
 end
 
 function CraftScan_CraftScanFrameMixin:ToggleTutorial()
     if self:IsTutorialShown() then
-        HelpPlate_Hide(true);
+        HelpPlate.Hide(true);
     else
         self:ShowTutorial();
     end
@@ -544,8 +528,34 @@ local function ShowSchematicOptions()
     end
 end
 
+local function PlayerKnowsProfession(profession)
+    CraftScan.Debug.Print(CraftScan.CONST.PROFESSIONS, "PROFESSIONS")
+    CraftScan.Debug.Print(profession, "profession")
+    for _, prof in ipairs(CraftScan.CONST.PROFESSIONS) do
+        if prof.professionID == profession.parentProfessionID then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function IsPlayerProfession(profession)
+    -- Ignore Cooking, Fishing, gathering professions (we don't have
+    -- default keywords for them), and weird 'professions' like Emerald
+    -- Dream rep boxes (no parentProfessionID).
+    return profession.isPrimaryProfession and
+        profession.parentProfessionID and
+        CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[profession.parentProfessionID] and
+        not C_TradeSkillUI.IsTradeSkillGuild() and
+        not C_TradeSkillUI.IsTradeSkillLinked() and
+        PlayerKnowsProfession(profession)
+end
+
 local seen_profs = {};
 local function OnRecipeSelected()
+    if not C_TradeSkillUI.IsTradeSkillReady() then return end
+
     cur.recipe = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
     if not cur.recipe then
         onSchematicChange()
@@ -554,10 +564,7 @@ local function OnRecipeSelected()
 
     cur.profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(cur.recipe.recipeID)
 
-    if not cur.profession.isPrimaryProfession or not cur.profession.parentProfessionID or not CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[cur.profession.parentProfessionID] then
-        -- Ignore Cooking, Fishing, gathering professions (we don't have
-        -- default keywords for them), and weird 'professions' like Emerald
-        -- Dream rep boxes (no parentProfessionID).
+    if not IsPlayerProfession(cur.profession) then
         HideSchematicOptions();
         return
     end
