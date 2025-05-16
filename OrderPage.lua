@@ -2367,6 +2367,8 @@ end
 
 CraftScan.Utils.onLoad(function()
     local frame = CraftScanCraftingOrderPage
+    frame:EnableMouse(true);
+
     CraftScan.Frames.OrdersPage = frame
     table.insert(UISpecialFrames, "CraftScanCraftingOrderPage"); -- Make 'esc' close the frame
     UIPanelWindows["CraftScanCraftingOrderPage"] = { area = "doublewide", pushable = 1, whileDead = 1 }
