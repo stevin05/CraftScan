@@ -412,9 +412,18 @@ function CraftScan.LOCAL_PT:GetData()
         "Envia os pedidos detectados por esta conta para contas vinculadas com permissões de 'Controle Total'. A conta receptora mostrará a notificação padrão como se tivesse detectado o pedido.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Recebe pedidos detectados e enviados por uma conta vinculada com 'Controle Total'. Quando um pedido é recebido da conta vinculada, a notificação padrão aparecerá nesta conta.",
-        [LID.LOCAL_ALERTS_TOOLTIP]                =
-        "As notificações visuais e sonoras para este artesão e profissão só serão exibidas quando você estiver jogando com este personagem. Isso é apenas um filtro e não ativa ou desativa notificações em geral. As notificações ainda são gerenciadas pelos ícones de missão e fone de ouvido no lado direito da lista de artesãos.",
-        ["Local Notifications Only"]              = "Apenas notificações locais",
+        ["Visual alerts are enabled."]            = "Alertas visuais ativados.",
+        ["Visual alerts are disabled."]           = "Alertas visuais desativados.",
+        ["Details: Visual alerts."]               =
+        "Alertas visuais exibem um banner que cresce do botão do CraftScan. A direção pode ser escolhida em 'Abrir configurações' no canto superior direito.",
+        ["Sound alerts are enabled."]             = "Alertas sonoros ativados.",
+        ["Sound alerts are muted."]               = "Alertas sonoros silenciados.",
+        ["Details: Sound alerts."]                =
+        "Alertas sonoros usam a biblioteca de áudio do WeakAuras. O som pode ser escolhido em 'Abrir configurações' no canto superior direito.",
+        ["Warband alerts are enabled."]           = "Alertas de grupo de guerra ativados.",
+        ["Warband alerts are disabled."]          = "Alertas de grupo de guerra desativados.",
+        ["Details: Warband alerts."]              =
+        "Alertas de grupo de guerra filtram os demais. Ativados, permitem alertas para artesãos em outros personagens. Desativados, apenas com o artesão ativo.\n\nPedidos de grupo de guerra sempre aparecem na página 'Pedidos no bate-papo'.",
 
     }
 end

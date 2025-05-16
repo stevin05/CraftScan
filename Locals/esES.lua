@@ -415,10 +415,18 @@ function CraftScan.LOCAL_ES:GetData()
         "Envía los pedidos detectados por esta cuenta a cuentas vinculadas con permisos de 'Control Total'. La cuenta receptora mostrará la notificación habitual como si hubiera detectado el pedido.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Recibe pedidos detectados y enviados por una cuenta vinculada con 'Control Total'. Cuando se recibe un pedido de la cuenta vinculada, aparecerá la notificación habitual en esta cuenta.",
-
-        [LID.LOCAL_ALERTS_TOOLTIP]                =
-        "Las notificaciones visuales y sonoras sobre este artesano y profesión solo se mostrarán cuando estés jugando con este personaje. Esto es solo un filtro y no activa ni desactiva las notificaciones en general. Las notificaciones siguen gestionándose mediante los iconos de misión y auriculares en el lado derecho de la lista de artesanos.",
-        ["Local Notifications Only"]              = "Solo notificaciones locales",
+        ["Visual alerts are enabled."]            = "Alertas visuales activadas.",
+        ["Visual alerts are disabled."]           = "Alertas visuales desactivadas.",
+        ["Details: Visual alerts."]               =
+        "Las alertas visuales muestran un banner que se expande desde el botón de CraftScan. Puedes cambiar su dirección en 'Abrir configuración' arriba a la derecha.",
+        ["Sound alerts are enabled."]             = "Alertas de sonido activadas.",
+        ["Sound alerts are muted."]               = "Alertas de sonido silenciadas.",
+        ["Details: Sound alerts."]                =
+        "Las alertas de sonido usan la biblioteca de audio de WeakAuras. Selecciona el sonido en 'Abrir configuración' arriba a la derecha.",
+        ["Warband alerts are enabled."]           = "Alertas de banda de guerra activadas.",
+        ["Warband alerts are disabled."]          = "Alertas de banda de guerra desactivadas.",
+        ["Details: Warband alerts."]              =
+        "Las alertas de banda de guerra filtran las demás. Activadas, se generan alertas al usar otros personajes. Desactivadas, solo con el artesano activo.\n\nLos encargos de banda de guerra siempre se muestran en la página 'Pedidos del chat'.",
 
     }
 end

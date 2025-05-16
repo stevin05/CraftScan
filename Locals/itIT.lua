@@ -414,9 +414,18 @@ function CraftScan.LOCAL_IT:GetData()
         "Invia gli ordini rilevati da questo account agli account collegati con permessi di 'Controllo Completo'. L'account ricevente mostrerà la notifica come se avesse rilevato l'ordine.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Ricevi ordini rilevati e inoltrati da un account collegato con 'Controllo Completo'. Quando un ordine viene ricevuto dall'account collegato, comparirà la notifica abituale su questo account.",
-        [LID.LOCAL_ALERTS_TOOLTIP]                =
-        "Le notifiche visive e sonore per questo artigiano e questa professione verranno mostrate solo quando stai giocando con questo personaggio. Questo è solo un filtro e non attiva né disattiva le notifiche in generale. Le notifiche vengono comunque gestite tramite le icone della missione e delle cuffie sul lato destro della lista degli artigiani.",
-["Local Notifications Only"] = "Solo notifiche locali",
+        ["Visual alerts are enabled."]            = "Avvisi visivi attivati.",
+        ["Visual alerts are disabled."]           = "Avvisi visivi disattivati.",
+        ["Details: Visual alerts."]               =
+        "Gli avvisi visivi mostrano un banner dal pulsante di CraftScan. La direzione si imposta su 'Apri impostazioni' in alto a destra.",
+        ["Sound alerts are enabled."]             = "Avvisi sonori attivati.",
+        ["Sound alerts are muted."]               = "Avvisi sonori disattivati.",
+        ["Details: Sound alerts."]                =
+        "Gli avvisi sonori usano la libreria audio di WeakAuras. Puoi cambiare il suono in 'Apri impostazioni' in alto a destra.",
+        ["Warband alerts are enabled."]           = "Avvisi squadra di guerra attivati.",
+        ["Warband alerts are disabled."]          = "Avvisi squadra di guerra disattivati.",
+        ["Details: Warband alerts."]              =
+        "Gli avvisi squadra di guerra filtrano gli altri. Attivi, generano avvisi anche con altri personaggi. Disattivi, solo con l'artigiano attivo.\n\nGli ordini squadra di guerra sono sempre visibili nella pagina 'Ordini chat'.",
 
     }
 end

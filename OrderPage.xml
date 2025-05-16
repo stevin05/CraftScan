@@ -36,7 +36,7 @@
 
 	<CheckButton name="CraftScan_CrafterToggleTemplate" mixin="CraftScan_CrafterToggleMixin" virtual="true">
 		<KeyValues>
-			<KeyValue key="ppconfig_key" value="scanning_enabled|visual_alert_enabled|sound_alert_enabled" type="string"/>
+			<KeyValue key="ppconfig_key" value="scanning_enabled|visual_alert_enabled|sound_alert_enabled|local_alerts_only" type="string"/>
 		</KeyValues>
 		<Size x="18" y="18"/>
 		<Scripts>
@@ -151,10 +151,11 @@
 					<KeyValue key="ppconfig_key" value="visual_alert_enabled" type="string"/>
 					<KeyValue key="enabled_tooltip" value="Visual alerts are enabled." type="string"/>
 					<KeyValue key="disabled_tooltip" value="Visual alerts are disabled." type="string"/>
+					<KeyValue key="tooltip_details" value="Details: Visual alerts." type="string"/>
 					<KeyValue key="indeterminate_atlas" value="UI-HUD-MicroMenu-Questlog-Down" type="string"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="RIGHT" relativePoint="RIGHT" x="-18"/>
+					<Anchor point="RIGHT" relativePoint="RIGHT" x="-36"/>
 				</Anchors>
 				<Size x="20" y="20" />
 				<NormalTexture atlas="UI-HUD-MicroMenu-Questlog-Disabled" useAtlasSize="true"/>
@@ -163,15 +164,34 @@
 			<CheckButton name="SoundAlertCheckBox" parentKey="SoundAlertCheckBox" inherits="CraftScan_CrafterToggleTemplate">
 				<KeyValues>
 					<KeyValue key="ppconfig_key" value="sound_alert_enabled" type="string"/>
-					<KeyValue key="enabled_tooltip" value="Sound alerts are enabled (the WeakAuras sound library is required)." type="string"/>
+					<KeyValue key="enabled_tooltip" value="Sound alerts are enabled." type="string"/>
 					<KeyValue key="disabled_tooltip" value="Sound alerts are muted." type="string"/>
+					<KeyValue key="tooltip_details" value="Details: Sound alerts." type="string"/>
+					<KeyValue key="indeterminate_atlas" value="glues-characterSelect-icon-minus-hover" type="string"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="RIGHT" x="-18"/>
+				</Anchors>
+				<NormalTexture atlas="voicechat-icon-headphone-off" useAtlasSize="true"/>
+				<CheckedTexture atlas="voicechat-icon-headphone-on" useAtlasSize="true"/>
+			</CheckButton>
+			<!-- Warband notifications were originally implemented as "Local
+			     Notifications Only", so the meaning of enabled/disabled is logically
+			     flipped. Warband notifications being enabled means
+			     'local_alerts_only' is false. -->
+			<CheckButton name="LocalAlertCheckBox" parentKey="LocalAlertCheckBox" inherits="CraftScan_CrafterToggleTemplate">
+				<KeyValues>
+					<KeyValue key="ppconfig_key" value="local_alerts_only" type="string"/>
+					<KeyValue key="enabled_tooltip" value="Warband alerts are disabled." type="string"/>
+					<KeyValue key="disabled_tooltip" value="Warband alerts are enabled." type="string"/>
+					<KeyValue key="tooltip_details" value="Details: Warband alerts." type="string"/>
 					<KeyValue key="indeterminate_atlas" value="glues-characterSelect-icon-minus-hover" type="string"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="RIGHT" x="0"/>
 				</Anchors>
-				<NormalTexture atlas="voicechat-icon-headphone-off" useAtlasSize="true"/>
-				<CheckedTexture atlas="voicechat-icon-headphone-on" useAtlasSize="true"/>
+				<NormalTexture atlas="warbands-icon" useAtlasSize="true"/>
+				<CheckedTexture atlas="warband-bank-slot" useAtlasSize="true"/>
 			</CheckButton>
 		</Frames>
 		<Layers>
@@ -210,13 +230,13 @@
 				</Texture>
 				<FontString parentKey="ProfessionName" inherits="Number14FontWhite" justifyH="RIGHT" setAllPoints="true">
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="RIGHT" x="-60"/>
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="-80"/>
 					</Anchors>
 				</FontString>
 				<Texture parentKey="ProfessionIcon">
 					<Size x="16" y="16"/>
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="RIGHT" x="-40"/>
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="-60"/>
 					</Anchors>
 				</Texture>
 			</Layer>

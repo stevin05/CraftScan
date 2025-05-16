@@ -375,9 +375,15 @@ function CraftScan.LOCAL_CN:GetData()
 
         [LID.PROXY_ORDERS_TOOLTIP]                = "将此账号检测到的订单发送给具有‘完全控制’权限的关联账号。接收账号将显示正常通知，就像它自己检测到订单一样。",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        = "接收由‘完全控制’关联账号检测并代理的订单。当从关联账号接收到订单时，本账号会显示正常的通知。",
-        [LID.LOCAL_ALERTS_TOOLTIP]                =
-        "只有在当前游玩该角色时，才会显示该工匠和专业的视觉和听觉通知。这只是一个筛选器，不会启用或禁用通知。通知仍可通过工匠列表右侧的任务和耳机图标进行管理。",
-        ["Local Notifications Only"]              = "仅限本地通知",
+        ["Visual alerts are enabled."]            = "视觉警报已启用。",
+        ["Visual alerts are disabled."]           = "视觉警报已禁用。",
+        ["Details: Visual alerts."]               = "视觉警报会从CraftScan按钮处弹出横幅。横幅方向可通过右上角的“打开设置”更改。",
+        ["Sound alerts are enabled."]             = "声音警报已启用。",
+        ["Sound alerts are muted."]               = "声音警报已静音。",
+        ["Details: Sound alerts."]                = "声音警报依赖WeakAuras音频库。可在右上角“打开设置”中选择声音。",
+        ["Warband alerts are enabled."]           = "战团警报已启用。",
+        ["Warband alerts are disabled."]          = "战团警报已禁用。",
+        ["Details: Warband alerts."]              = "战团警报会筛选其他警报。启用时，其他角色也能收到该工匠的警报；禁用时，仅在操控该工匠时触发。\n\n战团订单始终显示在“聊天订单”页面。",
 
     }
 end

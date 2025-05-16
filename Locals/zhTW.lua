@@ -376,9 +376,15 @@ function CraftScan.LOCAL_TW:GetData()
 
         [LID.PROXY_ORDERS_TOOLTIP]                = "將此帳號偵測到的訂單發送到擁有「完全控制」權限的關聯帳號。接收的帳號將顯示正常通知，就如同它偵測到訂單一樣。",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        = "接收由「完全控制」關聯帳號偵測並代理的訂單。當收到來自關聯帳號的訂單時，本帳號將顯示正常通知。",
-        [LID.LOCAL_ALERTS_TOOLTIP]                =
-        "只有在當前遊玩該角色時，才會顯示該工匠和專業的視覺和聽覺通知。這只是篩選器，不會啟用或禁用通知。通知仍可透過工匠列表右側的任務和耳機圖示進行管理。",
-        ["Local Notifications Only"]              = "僅限本地通知",
+        ["Visual alerts are enabled."]            = "視覺警示已啟用。",
+        ["Visual alerts are disabled."]           = "視覺警示已停用。",
+        ["Details: Visual alerts."]               = "視覺警示會從CraftScan按鈕延伸出橫幅。方向可於右上角「開啟設定」中調整。",
+        ["Sound alerts are enabled."]             = "聲音警示已啟用。",
+        ["Sound alerts are muted."]               = "聲音警示已靜音。",
+        ["Details: Sound alerts."]                = "聲音警示使用WeakAuras音效庫。可於右上角「開啟設定」中選擇音效。",
+        ["Warband alerts are enabled."]           = "戰團警示已啟用。",
+        ["Warband alerts are disabled."]          = "戰團警示已停用。",
+        ["Details: Warband alerts."]              = "戰團警示會過濾其他警示。啟用時，使用其他角色也能接收製作角色的警示；停用時，僅在使用該角色時收到。\n\n戰團訂單會固定顯示在「聊天訂單」頁面中。",
 
     }
 end

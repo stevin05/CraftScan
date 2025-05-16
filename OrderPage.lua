@@ -10,6 +10,11 @@ local function L(id)
     return CraftScan.LOCAL:GetText(id);
 end
 
+local function SetTooltipWithTitle(tooltip, title, text)
+    GameTooltip_SetTitle(tooltip, title);
+    GameTooltip_AddNormalLine(tooltip, text);
+end;
+
 local function GetSortedProfessions()
     local result = {}
     for parentProfID, color in pairs(CraftScan.CONST.PROFESSION_COLORS) do
@@ -655,10 +660,11 @@ end
 function CraftScan_CrafterToggleMixin:SetTooltip()
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
     if self:GetChecked() then
-        GameTooltip:SetText(self.enabled_tooltip);
+        SetTooltipWithTitle(GameTooltip, L(self.enabled_tooltip), L(self.tooltip_details));
     else
-        GameTooltip:SetText(self.disabled_tooltip);
+        SetTooltipWithTitle(GameTooltip, L(self.disabled_tooltip), L(self.tooltip_details));
     end
+    GameTooltip:Show();
 end
 
 function CraftScan_CrafterToggleMixin:OnEnter()
@@ -1185,6 +1191,7 @@ function CraftScan_CrafterListMixin:SetupCrafterList()
     InitAllCheckBox(crafterListAll.EnabledCheckBox)
     InitAllCheckBox(crafterListAll.SoundAlertCheckBox)
     InitAllCheckBox(crafterListAll.VisualAlertCheckBox)
+    InitAllCheckBox(crafterListAll.LocalAlertCheckBox)
 
     -- TODO Make this big and find a better texture
     crafterListAll.CrafterName:SetText(L("All crafters"))
@@ -1203,6 +1210,7 @@ function CraftScan_CrafterListMixin:SetupCrafterList()
         frame.EnabledCheckBox:InitState()
         frame.SoundAlertCheckBox:InitState()
         frame.VisualAlertCheckBox:InitState()
+        frame.LocalAlertCheckBox:InitState()
         frame.ProfessionIcon:SetTexture(C_TradeSkillUI.GetTradeSkillTexture(crafterInfo.parentProfessionID))
         frame:RegisterForClicks("AnyUp");
 
@@ -1831,12 +1839,10 @@ local function ProcessPrimaryCrafterUpdate(crafterInfo, ppConfig)
     end
 end
 
-local function SetTooltipWithTitle(tooltip, elementDescription)
+local function SetTooltipWithTitleFromData(tooltip, elementDescription)
     local data = elementDescription:GetData();
-    GameTooltip_SetTitle(tooltip, data.tooltipTitle or MenuUtil.GetElementText(elementDescription));
-    GameTooltip_AddNormalLine(tooltip, data.tooltipText);
+    SetTooltipWithTitle(tooltip, data.tooltipTitle or MenuUtil.GetElementText(elementDescription), data.tooltipText);
 end;
-
 
 -- We only register for RightButton on the individual character rows, not the
 -- 'All Crafters' row, so we don't need to filter it out.
@@ -1882,7 +1888,7 @@ function CraftScanCrafterListElementMixin:OnClick(button)
             if isRemoteCrafter then
                 button:SetEnabled(false);
             else
-                button:SetTooltip(SetTooltipWithTitle);
+                button:SetTooltip(SetTooltipWithTitleFromData);
             end
         end
         do
@@ -1893,7 +1899,7 @@ function CraftScanCrafterListElementMixin:OnClick(button)
                 tooltipText = string.format(L(LID.CLEANUP_CONFIG_TOOLTIP_TEXT), profName, crafter),
             };
             local button = rootDescription:CreateButton(L("Cleanup"), onClick, data)
-            button:SetTooltip(SetTooltipWithTitle);
+            button:SetTooltip(SetTooltipWithTitleFromData);
         end
         do
             local IsSelected = function()
@@ -1912,31 +1918,7 @@ function CraftScanCrafterListElementMixin:OnClick(button)
                 tooltipText = string.format(L(LID.PRIMARY_CRAFTER_TOOLTIP), crafter, profName),
             };
             local button = rootDescription:CreateCheckbox(L("Primary Crafter"), IsSelected, SetSelected, data)
-            button:SetTooltip(SetTooltipWithTitle);
-        end
-        do
-            -- Local notifications is the implementation of the suggestion in
-            -- issue #25. The goal is to only alert the user about crafts they
-            -- can perform on the character they are currently playing. The
-            -- checkbox lists are a bit nasty already, so I don't want to mess
-            -- with that and have them try to keep themselves lined up with the
-            -- current character. Instead, each character will have an option to
-            -- override their alert settings to only apply when playing that
-            -- character.
-            local IsSelected = function()
-                return ppConfig.local_alerts_only;
-            end
-            local SetSelected = function()
-                ppConfig.local_alerts_only = not ppConfig.local_alerts_only;
-                local ppChangeOnly = true;
-                CraftScanComm:ShareCharacterModification(self.crafterInfo.name, self.crafterInfo.parentProfessionID,
-                    ppChangeOnly);
-            end
-            local data = {
-                tooltipText = string.format(L(LID.LOCAL_ALERTS_TOOLTIP), crafter, profName),
-            };
-            local button = rootDescription:CreateCheckbox(L("Local Notifications Only"), IsSelected, SetSelected, data)
-            button:SetTooltip(SetTooltipWithTitle);
+            button:SetTooltip(SetTooltipWithTitleFromData);
         end
     end);
 end

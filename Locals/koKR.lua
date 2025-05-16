@@ -378,9 +378,16 @@ function CraftScan.LOCAL_KO:GetData()
 
         [LID.PROXY_ORDERS_TOOLTIP]                = "이 계정에서 감지된 주문을 '전체 제어' 권한이 있는 연결된 계정으로 보냅니다. 수신 계정은 마치 주문을 직접 감지한 것처럼 알림을 표시합니다.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        = "‘전체 제어’ 계정에서 감지하고 전달한 주문을 수신합니다. 연결된 계정으로부터 주문을 받으면 이 계정에서도 일반 알림이 표시됩니다.",
-        [LID.LOCAL_ALERTS_TOOLTIP]                =
-        "이 제작자와 전문 기술에 대한 시각 및 청각 알림은 해당 캐릭터를 플레이 중일 때만 표시됩니다. 이는 단순한 필터이며, 알림을 활성화하거나 비활성화하지 않습니다. 알림은 여전히 제작자 목록 오른쪽의 퀘스트 및 헤드셋 아이콘을 통해 관리됩니다.",
-        ["Local Notifications Only"]              = "로컬 알림만",
+        ["Visual alerts are enabled."]            = "시각 알림이 활성화되었습니다.",
+        ["Visual alerts are disabled."]           = "시각 알림이 비활성화되었습니다.",
+        ["Details: Visual alerts."]               = "시각 알림은 CraftScan 버튼에서 배너가 확장되어 표시됩니다. 방향은 오른쪽 상단의 '설정 열기'에서 변경할 수 있습니다.",
+        ["Sound alerts are enabled."]             = "소리 알림이 활성화되었습니다.",
+        ["Sound alerts are muted."]               = "소리 알림이 음소거되었습니다.",
+        ["Details: Sound alerts."]                = "소리 알림은 WeakAuras 오디오 라이브러리를 사용합니다. 오른쪽 상단 '설정 열기'에서 사운드를 선택할 수 있습니다.",
+        ["Warband alerts are enabled."]           = "워밴드 알림이 활성화되었습니다.",
+        ["Warband alerts are disabled."]          = "워밴드 알림이 비활성화되었습니다.",
+        ["Details: Warband alerts."]              =
+        "워밴드 알림은 다른 알림에 필터를 적용합니다. 활성화 시 다른 캐릭터로도 제작자 경고가 표시됩니다. 비활성화 시 제작자로 플레이할 때만 표시됩니다.\n\n워밴드 주문은 알림 설정과 관계없이 항상 '채팅 주문' 페이지에 표시됩니다.",
 
     }
 end

@@ -415,9 +415,18 @@ function CraftScan.LOCAL_FR:GetData()
         "Envoyez les commandes détectées par ce compte vers les comptes liés ayant des permissions 'Contrôle total'. Le compte recevant affichera la notification habituelle comme s'il avait détecté la commande.",
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Recevez les commandes détectées et transmises par un compte lié en 'Contrôle total'. Lorsqu'une commande est reçue du compte lié, la notification habituelle apparaîtra sur ce compte.",
-        [LID.LOCAL_ALERTS_TOOLTIP]                =
-        "Les notifications visuelles et sonores pour cet artisan et cette profession ne s'afficheront que lorsque vous jouez ce personnage. Il s'agit uniquement d'un filtre et cela n'active ni ne désactive les notifications en général. Elles restent gérées via les icônes de quête et de casque à droite de la liste des artisans.",
-        ["Local Notifications Only"]              = "Notifications locales uniquement",
+        ["Visual alerts are enabled."]            = "Alertes visuelles activées.",
+        ["Visual alerts are disabled."]           = "Alertes visuelles désactivées.",
+        ["Details: Visual alerts."]               =
+        "Les alertes visuelles affichent une bannière depuis le bouton CraftScan. La direction se règle via 'Ouvrir les paramètres' en haut à droite.",
+        ["Sound alerts are enabled."]             = "Alertes sonores activées.",
+        ["Sound alerts are muted."]               = "Alertes sonores désactivées.",
+        ["Details: Sound alerts."]                =
+        "Les alertes sonores utilisent la bibliothèque audio de WeakAuras. Le son se règle via 'Ouvrir les paramètres' en haut à droite.",
+        ["Warband alerts are enabled."]           = "Alertes de bande activées.",
+        ["Warband alerts are disabled."]          = "Alertes de bande désactivées.",
+        ["Details: Warband alerts."]              =
+        "Les alertes de bande filtrent les autres. Activées, elles s’appliquent sur tous les personnages. Désactivées, seulement sur le personnage artisan.\n\nLes commandes de bande s'affichent toujours dans 'Commandes du chat'.",
 
     }
 end

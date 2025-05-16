@@ -420,9 +420,18 @@ function CraftScan.LOCAL_DE:GetData()
         [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
         "Empfange Aufträge, die von einem verknüpften 'Vollzugriff'-Konto erkannt und weitergeleitet wurden. Wenn ein Auftrag vom verknüpften Konto empfangen wird, erscheint die übliche Benachrichtigung auf diesem Konto.",
 
-        [LID.LOCAL_ALERTS_TOOLTIP]                =
-        "Visuelle und akustische Benachrichtigungen für diesen Handwerker und Beruf werden nur angezeigt, wenn du diesen Charakter spielst. Dies ist nur ein Filter und aktiviert oder deaktiviert Benachrichtigungen nicht generell. Die Benachrichtigungen werden weiterhin über die Quest- und Headset-Symbole rechts in der Handwerkerliste verwaltet.",
-        ["Local Notifications Only"]              = "Nur lokale Benachrichtigungen",
+        ["Visual alerts are enabled."]            = "Visuelle Warnungen sind aktiviert.",
+        ["Visual alerts are disabled."]           = "Visuelle Warnungen sind deaktiviert.",
+        ["Details: Visual alerts."]               =
+        "Visuelle Warnungen zeigen ein Banner, das sich vom CraftScan-Button aus entfaltet. Die Richtung kann über 'Einstellungen öffnen' oben rechts geändert werden.",
+        ["Sound alerts are enabled."]             = "Sound-Warnungen sind aktiviert.",
+        ["Sound alerts are muted."]               = "Sound-Warnungen sind stummgeschaltet.",
+        ["Details: Sound alerts."]                =
+        "Sound-Warnungen nutzen die WeakAuras-Audio-Bibliothek. Der Sound kann über 'Einstellungen öffnen' oben rechts gewählt werden.",
+        ["Warband alerts are enabled."]           = "Trupp-Warnungen sind aktiviert.",
+        ["Warband alerts are disabled."]          = "Trupp-Warnungen sind deaktiviert.",
+        ["Details: Warband alerts."]              =
+        "Trupp-Warnungen filtern andere Warnungen. Aktiviert erzeugen sie Warnungen für Handwerker auch auf anderen Charakteren. Deaktiviert nur beim Spielen des Handwerkers.\n\nTruppaufträge erscheinen immer auf der Seite 'Chataufträge'.",
 
     }
 end

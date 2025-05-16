@@ -322,7 +322,7 @@ function CraftScan.LOCAL_EN:GetData()
                 ["Save"]                                  = "Save",
                 ["Reset"]                                 = "Reset",
                 [LID.MANUAL_MATCHING_TITLE]               = "Manual Matching",
-                [LID.MANUAL_MATCH]                        = "%s - %s",  -- crafter, profession
+                [LID.MANUAL_MATCH]                        = "%s - %s", -- crafter, profession
                 [LID.MANUAL_MATCHING_DESC]                =
                 "Ignore primary keywords and force a match for this message. CraftScan will attempt to find the correct crafter based on the message, but if no matches are found, the default greeting for the specified crafter will be used. The match is reported via the usual means, allowing you to click the banner or table row to send the greeting.",
 
@@ -417,9 +417,15 @@ function CraftScan.LOCAL_EN:GetData()
                 "Send orders detected by this account to linked accounts with 'Full Control' permissions. The receiving account will show the usual notification as if it detected the order.",
                 [LID.RECEIVE_PROXY_ORDERS_TOOLTIP]        =
                 "Receive orders that were detected and proxied by a linked 'Full Control' account. When an order is received from the linked account, the usual notification will appear on this account.",
-                ["Local Notifications Only"]              = "Local Notifications Only",
-                [LID.LOCAL_ALERTS_TOOLTIP]                =
-                "Visual and auditory notifications regarding this crafter and profession will only be made when you are currently playing this crafter. Note that this does not enable or disable notifications in general. It is only a filter. Notifications are still managed for the crafter via the quest and headset icons on the right side of the crafter list.",
+                ["Visual alerts are enabled."]            = "Visual alerts are enabled.",
+                ["Visual alerts are disabled."]           = "Visual alerts are disabled.",
+                ["Details: Visual alerts."]               = "Visual alerts display a banner growing from the CraftScan button. The direction of the banner can be selected by clicking 'Open Settings' in the top right corner of this page.",
+                ["Sound alerts are enabled."]             = "Sound alerts are enabled.",
+                ["Sound alerts are muted."]               = "Sound alerts are muted.",
+                ["Details: Sound alerts."]                = "Sound alerts depend on the WeakAuras audio library. The sound can be selected by clicking 'Open Settings' in the top right corner of this page.",
+                ["Warband alerts are enabled."]          = "Warbands alerts are enabled.",
+                ["Warband alerts are disabled."]          = "Warband alerts are disabled.",
+                ["Details: Warband alerts."]              = "Warband alerts act as a filter on all other alerts. When enabled, alerts can be generated for the crafter while playing other characters. When disabled, alerts for a crafter can only be generated while playing that crafter.\n\nWarband crafts are always presented on the 'Chat Orders' page, regardless of alert settings.",
 
                 -- Translations complete above this line
 
