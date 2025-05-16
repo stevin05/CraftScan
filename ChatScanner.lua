@@ -189,12 +189,11 @@ function CraftScan.Scanner.LoadConfig()
     config.exclusions = ParseStringList(CraftScan.DB.settings.exclusions)
     config.inclusions = ParseStringList(CraftScan.DB.settings.inclusions)
 
-    -- Sort professions by 'primary_crafter' so that when we scan for generic
-    -- keyword matches, we find the primary crafter first. We also ignore
-    -- duplicate recipes from crafters that aren't the primary. These could be
-    -- considered a misconfig since the user has to enable scanning for the same
-    -- item on two characters, but that's bound to happen. If no primary crafter
-    -- is marked, the current character is treated as the primary.
+    -- Sort professions so that when we scan for generic keyword matches, we
+    -- find the local charcter first, then the primary crafter. We ignore
+    -- duplicate recipes, so this gives priority to the local character, then
+    -- the primary crafter, then other crafters in alphabetical order than can
+    -- make the item.
     local parentProfessions = {};
     for crafter, crafterConfig in pairs(CraftScan.DB.characters) do
         for parentProfID, parentProf in pairs(crafterConfig.parent_professions) do
@@ -220,18 +219,18 @@ function CraftScan.Scanner.LoadConfig()
 
     local playerNameWithRealm = CraftScan.GetPlayerName(true)
     table.sort(parentProfessions, function(lhs, rhs)
-        if lhs.parentProfession.primary_crafter then
-            if not rhs.parentProfession.primary_crafter then
-                return true;
-            end
-        elseif rhs.parentProfession.primary_crafter then
-            return false;
-        end
         if lhs.crafter == playerNameWithRealm then
             if rhs.crafter ~= playerNameWithRealm then
                 return true;
             end
         elseif rhs.crafter == playerNameWithRealm then
+            return false;
+        end
+        if lhs.parentProfession.primary_crafter then
+            if not rhs.parentProfession.primary_crafter then
+                return true;
+            end
+        elseif rhs.parentProfession.primary_crafter then
             return false;
         end
         return lhs.crafter < rhs.crafter;
