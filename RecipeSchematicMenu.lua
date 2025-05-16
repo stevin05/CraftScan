@@ -44,15 +44,41 @@ local function scanAllRecipes()
         local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
         local profInfo = C_TradeSkillUI.GetProfessionInfoByRecipeID(id)
         if profInfo.professionID == cur.profession.professionID and recipeInfo.learned then
-            saved(db_recipes, id, {})
+            saved(db_recipes, id, { categoryID = recipeInfo.categoryID })
         end
     end
+end
+
+local function IsRecipeConfigEmpty(recipeConfig)
+    for key, value in pairs(recipeConfig) do
+        if key == 'categoryID' then
+            -- Default config
+        elseif value == "" and
+            (key == 'keywords' or
+                key == 'secondary_keywords' or
+                key == 'commission' or
+                key == 'greeting') then
+            -- Default config
+        elseif value == false and
+            (key == 'override' or
+                key == 'enabled') then
+            -- Default config
+        else
+            -- Non-default config
+            return false
+        end
+    end
+    return true
+end
+
+local function CurrentRecipeConfig()
+    return saved(db_recipes, cur.recipe.recipeID, { categoryID = cur.recipe.categoryID })
 end
 
 local function clearEmptyRecipes()
     local toBeRemoved = {}
     for key, value in pairs(db_recipes) do
-        if not next(value) then
+        if IsRecipeConfigEmpty(value) then
             table.insert(toBeRemoved, key)
         end
     end
@@ -177,6 +203,11 @@ function CraftScan_CloseCraftScanFrameMixin:OnClick(button)
 end
 
 local function OnConfigChange()
+    local recipeConfig = saved(db_recipes, cur.recipe.recipeID)
+    if recipeConfig and not db_prof.all_enabled and IsRecipeConfigEmpty(recipeConfig) then
+        -- Clean up completely defaulted config items.
+        db_recipes[cur.recipe.recipeID] = nil
+    end
     CraftScanComm:ShareCharacterModification(playerNameWithRealm, cur.profession.parentProfessionID);
     CraftScan.Scanner.LoadConfig()
 end
@@ -192,7 +223,7 @@ local function initMenu()
     scanEnabledCheckBox = CraftScan.Frames.createCheckBox(L(LID.ITEM_SCAN_CHECK),
         ProfessionsFrame.CraftingPage.SchematicForm,
         function(self, button, down)
-            saved(db_recipes, cur.recipe.recipeID, {}).enabled = self:GetChecked()
+            CurrentRecipeConfig().enabled = self:GetChecked()
             onSchematicChange()
             OnConfigChange();
         end, function()
@@ -336,7 +367,7 @@ local function initMenu()
     local itemKeywords = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 30, L("Keywords"), "",
         "CraftScan_Keywords",
         function(self)
-            saved(db_recipes, cur.recipe.recipeID, {}).keywords = self:GetText()
+            CurrentRecipeConfig().keywords = self:GetText()
             OnConfigChange();
         end, function()
             local db_recipe = saved(db_recipes, cur.recipe.recipeID)
@@ -347,7 +378,7 @@ local function initMenu()
         "",
         "CraftScan_SecondaryKeywords",
         function(self)
-            saved(db_recipes, cur.recipe.recipeID, {}).secondary_keywords = self:GetText()
+            CurrentRecipeConfig().secondary_keywords = self:GetText()
             OnConfigChange();
         end, function()
             local db_recipe = saved(db_recipes, cur.recipe.recipeID)
@@ -358,7 +389,7 @@ local function initMenu()
     local itemGreeting = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 45, L("Item greeting"), "",
         "CraftScan_Greeting",
         function(self)
-            saved(db_recipes, cur.recipe.recipeID, {}).greeting = self:GetText()
+            CurrentRecipeConfig().greeting = self:GetText()
             OnConfigChange();
         end, function()
             local db_recipe = saved(db_recipes, cur.recipe.recipeID)
@@ -368,7 +399,7 @@ local function initMenu()
     local itemCommission = CraftScan.Frames.createTextInput(nil, contentFrame, 335, 22, L("Commission"), "",
         "CraftScan_CommissionInput",
         function(self)
-            saved(db_recipes, cur.recipe.recipeID, {}).commission = self:GetText()
+            CurrentRecipeConfig().commission = self:GetText()
         end, function()
             local db_recipe = saved(db_recipes, cur.recipe.recipeID)
             return db_recipe and db_recipe.commission or "";
@@ -377,7 +408,7 @@ local function initMenu()
 
     local itemOverride = CraftScan.Frames.createCheckBox(L("Override greeting"), contentFrame,
         function(self, button, down)
-            saved(db_recipes, cur.recipe.recipeID, {}).override = self:GetChecked()
+            CurrentRecipeConfig().override = self:GetChecked()
             OnConfigChange();
         end, function()
             local db_recipe = saved(db_recipes, cur.recipe.recipeID)
@@ -609,8 +640,19 @@ local function OnRecipeSelected()
 
     db_prof = saved(db_player.professions, cur.profession.professionID, {})
     db_prof.parentProfID = cur.profession.parentProfessionID
+    db_prof.categoryIDsUpgraded = db_prof.categoryIDsUpgraded or false
 
     db_recipes = saved(db_prof, "recipes", {})
+    if not db_prof.categoryIDsUpgraded then
+        for recipeID, recipeConfig in pairs(db_recipes) do
+            -- CategoryIDs are only available on characters with the profession,
+            -- so we need to save them correlated with the items in the
+            -- category.
+            local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
+            recipeConfig.categoryID = recipeInfo.categoryID;
+        end
+        db_prof.categoryIDsUpgraded = true
+    end
 
     cur.category = C_TradeSkillUI.GetCategoryInfo(cur.recipe.categoryID)
 

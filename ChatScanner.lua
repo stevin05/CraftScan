@@ -174,6 +174,15 @@ CraftScan.Utils.GetOutputItems = function(recipeInfo)
     return nil
 end
 
+local RecipeCreatesEpicItem = function(recipeID)
+    local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
+    local items = CraftScan.Utils.GetOutputItems(recipeInfo);
+    if items and #items == 1 then
+        return Enum.ItemQuality.Epic == C_Item.GetItemQualityByID(items[1])
+    end
+    return false
+end
+
 -- The usage of this method is *very* inefficient. On any profession
 -- configuration change, we reload the whole thing. AddonUsage shows that
 -- during config changes, we shoot up to #1 on memory usage of any addon.
@@ -293,7 +302,7 @@ local function IsScanningEnabled(crafterInfo)
     return ppConfig.scanning_enabled;
 end
 
-local function idForKeywords(message, profConfig, section)
+local function idForKeywords(message, profConfig, section, categoryID)
     local sectionConfig = profConfig[section]
     if not sectionConfig then
         return nil
@@ -305,8 +314,18 @@ local function idForKeywords(message, profConfig, section)
     for id, config in pairs(sectionConfig) do
         if (profConfig.all_enabled or section ~= 'recipes' or config.enabled) and config.keywords then
             local matchLen, numMatches = HasMatch(message, ParseStringList(config.keywords), config.secondary_keywords);
+            if categoryID and categoryID == config.categoryID then
+                -- Give category keywords some priority.
+
+                -- With a 'mail' category keyword, 'lf mail bracers' can now
+                -- prioritize the mail bracers instead of the leather ones.
+                numMatches = numMatches + 1
+            end
             if matchLen then
-                if not len or len < matchLen or len == matchLen and num < numMatches then
+                if not len or len < matchLen or
+                    (len == matchLen and num < numMatches) or
+                    -- All else being equal, prioritize the epic spark-level craft.
+                    (num == numMatches and section == 'recipes' and RecipeCreatesEpicItem(id)) then
                     len = matchLen;
                     num = numMatches;
                     result = id;
@@ -318,16 +337,33 @@ local function idForKeywords(message, profConfig, section)
 end
 
 local function getRequestIDs(message, crafterInfo, profConfig)
-    local recipeID = crafterInfo.recipeID or idForKeywords(message, profConfig, 'recipes')
-    if recipeID then
-        local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
-        if recipeInfo then
-            return recipeInfo, recipeInfo.categoryID
+
+    local recipeID = crafterInfo.recipeID;
+    if not recipeID then
+        -- If we're purely keyword matching, start with a category search so we
+        -- can use it to prioritize the item keyword search.
+        local categoryID = idForKeywords(message, profConfig, 'categories')
+        recipeID = idForKeywords(message, profConfig, 'recipes', categoryID)
+        if not recipeID then
+            return nil, categoryID
         end
     end
 
-    local categoryID = idForKeywords(message, profConfig, 'categories')
-    return nil, categoryID
+    local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
+    if recipeInfo then
+        -- recipeInfo only loads a non-0 categoryID on characters with the
+        -- profession. If it's 0, fall back on the categoryID stored in the
+        -- config, which depends on the user having opened that profession
+        -- to update it since this change started persisting it.
+        local categoryID = recipeInfo.categoryID
+        if categoryID == 0 then
+            categoryID = profConfig.recipes[recipeInfo.recipeID].categoryID
+        end
+
+        return recipeInfo, categoryID
+    end
+
+    return nil, idForKeywords(message, profConfig, 'categories')
 end
 
 -- There does not appear to be any reverse look up from itemID to whether the
