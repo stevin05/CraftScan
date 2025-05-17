@@ -1054,12 +1054,13 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         }
         CraftScan.DB.listed_orders[CraftScan.OrderToOrderID(order)] = order
 
-        CraftScan.State.activeOrder = order;
 
         local ppConfig = ParentProfessionConfig(crafterInfo);
 
         local isAlertFiltered = (ppConfig.local_alerts_only and CraftScan.GetPlayerName(true) ~= crafterInfo.crafter)
         if ppConfig.visual_alert_enabled and not isAlertFiltered then
+            CraftScan.State.activeOrder = order;
+
             FlashClientIcon()
 
             if not greeting_queued and not customerStartedInteraction then
