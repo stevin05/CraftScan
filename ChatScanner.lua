@@ -962,13 +962,14 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
             greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'),
                 { crafter = crafter, item = item });
         else
+            local profession = profInfo.parentProfessionName;
             local spellSkillIndex = C_SpellBook.GetSkillLineIndexByID(profInfo.parentProfessionID);
             local skillLineInfo = C_SpellBook.GetSpellBookSkillLineInfo(spellSkillIndex);
             local offset = skillLineInfo.itemIndexOffset;
             local skillSpellID = select(2, C_SpellBook.GetSpellBookItemType(offset + 1, Enum.SpellBookSpellBank.Player));
-            local profession = C_Spell.GetSpellTradeSkillLink(skillSpellID);
+            local profession_link = C_Spell.GetSpellTradeSkillLink(skillSpellID);
             greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_HAVE_PROF'),
-                { crafter = crafter, profession = profession });
+                { crafter = crafter, profession = profession, profession_link = profession_link });
         end
         if CraftScan.State.isBusy then
             greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
