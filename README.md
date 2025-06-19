@@ -64,7 +64,3 @@ Keybinds are available for opening the orders page, responding to the latest cus
 
 #### Available options:
 ![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/Options.JPG)
-
-### Donations
-
-If you make a bunch of gold with this, feel free to share with Ktevin-Sargeras. I have a feeling I'll be making less after releasing this...
