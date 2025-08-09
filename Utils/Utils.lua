@@ -59,7 +59,7 @@ end
 
 function CraftScan.Utils.SendResponses(responses, customer)
     for _, response in pairs(responses) do
-        SendChatMessage(response, "WHISPER", GetDefaultLanguage("player"), customer)
+        SendChatMessage(response, "WHISPER", select(2, GetDefaultLanguage("player")), customer)
     end
 end
 
