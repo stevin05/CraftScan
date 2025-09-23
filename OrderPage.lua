@@ -1307,7 +1307,7 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", {
     text = L(LID.DELETE_CONFIG_TOOLTIP_TEXT) .. '\n\n' .. L(LID.DELETE_CONFIG_CONFIRM),
     button1 = "Delete",
     OnAccept = function(self, crafterInfo)
-        local userInput = self.editBox:GetText()
+        local userInput = self.EditBox:GetText()
         if string.lower(userInput) == "delete" then
             local charConfig = CraftScan.DB.characters[crafterInfo.name];
 
@@ -1343,7 +1343,7 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", {
     text = L(LID.CLEANUP_CONFIG_TOOLTIP_TEXT) .. '\n\n' .. L(LID.CLEANUP_CONFIG_CONFIRM),
     button1 = "Cleanup",
     OnAccept = function(self, crafterInfo)
-        local userInput = self.editBox:GetText()
+        local userInput = self.EditBox:GetText()
         if string.lower(userInput) == "cleanup" then
             local charConfig = CraftScan.DB.characters[crafterInfo.name];
 
