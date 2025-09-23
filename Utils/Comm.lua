@@ -1006,7 +1006,7 @@ end
 function CraftScanComm:RequestCraft(target, itemID)
     -- Start by simply sending the message that we want something crafted.
     CreateRequestCraftGreeting(itemID, function(message)
-        SendChatMessage(message, "WHISPER", GetDefaultLanguage("player"), target)
+        SendChatMessage(message, "WHISPER", select(2, GetDefaultLanguage()), target)
 
         -- Also inject that message into the crafter's list since we aren't always
         -- setup to listen for whispers.
