@@ -1,29 +1,23 @@
 local CraftScan = select(2, ...)
 
-local LID = CraftScan.CONST.TEXT;
+local LID = CraftScan.CONST.TEXT
 local function L(id)
-    return CraftScan.LOCAL:GetText(id);
+    return CraftScan.LOCAL:GetText(id)
 end
 
 local saved = CraftScan.Utils.saved
 
-CraftScan.MessageType = EnumUtil.MakeEnum("General", "Whisper");
-
-local function NonEmptyStrSplit(delimiter, text)
-    local result = {}
-    for part in string.gmatch(text, "([^" .. delimiter .. "]+)") do
-        table.insert(result, part)
-    end
-    return result
-end
+CraftScan.MessageType = EnumUtil.MakeEnum('General', 'Whisper')
 
 -- Split and normalize a comma separated list of strings
 local function ParseStringList(list)
-    if not list then return {} end;
+    if not list then
+        return {}
+    end
 
-    local items = NonEmptyStrSplit(",", list)
-    for i, item in ipairs(items) do
-        items[i] = string.lower(item:gsub("^%s*(.-)%s*$", "%1"))
+    local items = {}
+    for token in string.gmatch(CraftScan.Config.SubstituteTags(list), '([^,]+)') do
+        items[string.lower(token:gsub('^%s*(.-)%s*$', '%1'))] = true
     end
     return items
 end
@@ -48,11 +42,13 @@ local function SplitResponse(raw_response)
     end
     return result
 end
-CraftScan.Utils.SplitResponse = SplitResponse;
+CraftScan.Utils.SplitResponse = SplitResponse
 
 local function DelimitedHasMatchCheck(b, e, message)
-    return b and e and (b == 1 or message:sub(b - 1, b - 1) == ' ' or (b > 2 and message:sub(b - 2, b - 1) == '|r')) and
-        (e == #message or message:sub(e + 1, e + 1) == ' ' or message:sub(e + 1, e + 1) == '|')
+    return b
+        and e
+        and (b == 1 or message:sub(b - 1, b - 1) == ' ' or (b > 2 and message:sub(b - 2, b - 1) == '|r'))
+        and (e == #message or message:sub(e + 1, e + 1) == ' ' or message:sub(e + 1, e + 1) == '|')
 end
 
 local function PermissiveHasMatchCheck(b, e, message)
@@ -64,10 +60,8 @@ end
 local HasMatchCheck = DelimitedHasMatchCheck
 function CraftScan.UpdateHasMatchStyle()
     if CraftScan.DB.settings.permissive_matching then
-        CraftScan.Debug.Print("Permissive matching enabled")
         HasMatchCheck = PermissiveHasMatchCheck
     else
-        CraftScan.Debug.Print("Delimited matching enabled")
         HasMatchCheck = DelimitedHasMatchCheck
     end
 end
@@ -76,40 +70,23 @@ end
 -- contains one of the tokens, delimited by spaces, start/end, or
 -- the [] of an item link.]
 local function HasMatch(message, tokens, secondary_keywords)
-    local len = nil;
-    local numMatches = 0;
-    for _, token in pairs(tokens) do
+    local len = nil
+    local numMatches = 0
+    for token, _ in pairs(tokens) do
         local b, e = string.find(message, token)
         if HasMatchCheck(b, e, message) then
             if not len or len < #token then
-                len = #token;
+                len = #token
             end
-            numMatches = numMatches + 1;
+            numMatches = numMatches + 1
             if secondary_keywords then
                 local secondary_tokens = ParseStringList(secondary_keywords)
-                local secLen, secNum = HasMatch(message, secondary_tokens);
-                numMatches = numMatches + secNum;
+                local secLen, secNum = HasMatch(message, secondary_tokens)
+                numMatches = numMatches + secNum
             end
         end
     end
-    return len, numMatches;
-end
-
-local function TableConcat(t1, t2)
-    for i = 1, #t2 do
-        t1[#t1 + 1] = t2[i]
-    end
-    return t1
-end
-
-
-local function FindByField(array, value, field)
-    for _, val in ipairs(array) do
-        if value == val[field] then
-            return val
-        end
-    end
-    return nil
+    return len, numMatches
 end
 
 local config = {}
@@ -130,25 +107,16 @@ end
             <id>: {
                 "recipes": {
                     "recipeID": {
-                        "enabled": <true|false>
+                        "scan_state": <CraftScan.CONST.RECIPE_STATES>
                         "keywords": "<keywords>",
                         "greeting": "<greeting>",
                         "override": <true|false>
                     }
                 },
-                "categories": {
-                    "categoryID": {
-                        "keywords": "<keywords>",
-                        "greeting": "<greeting>",
-                        "override": <true|false>
-                    }
-                }
                 "keywords": "<keywords>",
-                "greeting": "<greeting>",
-                "all_enabled": <true|false>
+                "greeting": "<greeting>"
             }
-        },
-        "primary_expansion": <profID>
+        }
     }
 
 }
@@ -176,11 +144,15 @@ end
 
 local RecipeCreatesEpicItem = function(recipeID)
     local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
-    local items = CraftScan.Utils.GetOutputItems(recipeInfo);
+    local items = CraftScan.Utils.GetOutputItems(recipeInfo)
     if items and #items == 1 then
         return Enum.ItemQuality.Epic == C_Item.GetItemQualityByID(items[1])
     end
     return false
+end
+
+function CraftScan.Scanner.RecipeScanningOn(recipeConfig)
+    return recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.SCANNING_ON
 end
 
 -- The usage of this method is *very* inefficient. On any profession
@@ -203,11 +175,11 @@ function CraftScan.Scanner.LoadConfig()
     -- duplicate recipes, so this gives priority to the local character, then
     -- the primary crafter, then other crafters in alphabetical order than can
     -- make the item.
-    local parentProfessions = {};
+    local parentProfessions = {}
     for crafter, crafterConfig in pairs(CraftScan.DB.characters) do
         for parentProfID, parentProf in pairs(crafterConfig.parent_professions) do
             if not parentProf.character_disabled then
-                local professions = {};
+                local professions = {}
                 for profID, prof in pairs(crafterConfig.professions) do
                     if prof.parentProfID == parentProfID then
                         table.insert(professions, {
@@ -230,19 +202,19 @@ function CraftScan.Scanner.LoadConfig()
     table.sort(parentProfessions, function(lhs, rhs)
         if lhs.crafter == playerNameWithRealm then
             if rhs.crafter ~= playerNameWithRealm then
-                return true;
+                return true
             end
         elseif rhs.crafter == playerNameWithRealm then
-            return false;
+            return false
         end
         if lhs.parentProfession.primary_crafter then
             if not rhs.parentProfession.primary_crafter then
-                return true;
+                return true
             end
         elseif rhs.parentProfession.primary_crafter then
-            return false;
+            return false
         end
-        return lhs.crafter < rhs.crafter;
+        return lhs.crafter < rhs.crafter
     end)
 
     -- Flatten the keywords, storing the path back to their source so we can
@@ -251,12 +223,13 @@ function CraftScan.Scanner.LoadConfig()
     -- Convert recipeIDs to itemIDs, which is what we will find in chat message
     -- links.
     for _, entry in ipairs(parentProfessions) do
-        local crafter = entry.crafter;
-        local parentProf = entry.parentProfession;
-        local parentProfID = entry.parentProfID;
-        local professions = entry.professions;
+        local crafter = entry.crafter
+        local parentProf = entry.parentProfession
+        local parentProfID = entry.parentProfID
+        local professions = entry.professions
 
-        local keywords = parentProf.keywords or L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[parentProfID])
+        local keywords = parentProf.keywords
+            or L(CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[parentProfID])
         table.insert(config.prof_keywords, {
             keywords = ParseStringList(keywords),
             exclusions = ParseStringList(parentProf.exclusions or ''),
@@ -265,11 +238,11 @@ function CraftScan.Scanner.LoadConfig()
         })
 
         for _, pEntry in ipairs(professions) do
-            local prof = pEntry.profession;
+            local prof = pEntry.profession
             if prof.recipes then
-                local profID = pEntry.profID;
+                local profID = pEntry.profID
                 for recipeID, recipe in pairs(prof.recipes) do
-                    if prof.all_enabled or recipe.enabled then
+                    if CraftScan.Scanner.RecipeScanningOn(recipe) then
                         -- Look up the itemIDs associated with the recipe
                         local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
                         local itemIDs = CraftScan.Utils.GetOutputItems(recipeInfo)
@@ -279,7 +252,7 @@ function CraftScan.Scanner.LoadConfig()
                                     config.items[itemID] = {
                                         crafter = crafter,
                                         profID = profID,
-                                        recipeID = recipeID
+                                        recipeID = recipeID,
                                     }
                                 end
                             end
@@ -292,78 +265,65 @@ function CraftScan.Scanner.LoadConfig()
 end
 
 local function ParentProfessionConfig(crafterInfo)
-    local crafterConfig = CraftScan.DB.characters[crafterInfo.crafter];
-    local profConfig = crafterConfig.professions[crafterInfo.profID];
-    return crafterConfig.parent_professions[profConfig.parentProfID];
+    local crafterConfig = CraftScan.DB.characters[crafterInfo.crafter]
+    local profConfig = crafterConfig.professions[crafterInfo.profID]
+    return crafterConfig.parent_professions[profConfig.parentProfID]
 end
 
 local function IsScanningEnabled(crafterInfo)
     local ppConfig = ParentProfessionConfig(crafterInfo)
-    return ppConfig.scanning_enabled;
+    return ppConfig.scanning_enabled
 end
 
-local function idForKeywords(message, profConfig, section, categoryID)
-    local sectionConfig = profConfig[section]
-    if not sectionConfig then
+local function RecipeIdForKeywords(message, profConfig)
+    local recipeConfigs = profConfig.recipes
+    if not recipeConfigs then
         return nil
     end
 
-    local len = nil;
-    local num = 0;
-    local result = nil;
-    for id, config in pairs(sectionConfig) do
-        if (profConfig.all_enabled or section ~= 'recipes' or config.enabled) and config.keywords then
-            local matchLen, numMatches = HasMatch(message, ParseStringList(config.keywords), config.secondary_keywords);
-            if categoryID and categoryID == config.categoryID then
-                -- Give category keywords some priority.
-
-                -- With a 'mail' category keyword, 'lf mail bracers' can now
-                -- prioritize the mail bracers instead of the leather ones.
-                numMatches = numMatches + 1
-            end
+    local len = nil
+    local num = 0
+    local result = nil
+    for id, recipeConfig in pairs(recipeConfigs) do
+        if CraftScan.Scanner.RecipeScanningOn(recipeConfig) and recipeConfig.keywords then
+            local matchLen, numMatches = HasMatch(
+                message,
+                ParseStringList(recipeConfig.keywords),
+                recipeConfig.secondary_keywords
+            )
             if matchLen then
-                if not len or len < matchLen or
-                    (len == matchLen and num < numMatches) or
+                if
+                    not len
+                    or len < matchLen
+                    or (len == matchLen and num < numMatches)
                     -- All else being equal, prioritize the epic spark-level craft.
-                    (num == numMatches and section == 'recipes' and RecipeCreatesEpicItem(id)) then
-                    len = matchLen;
-                    num = numMatches;
-                    result = id;
+                    or (num == numMatches and RecipeCreatesEpicItem(id))
+                then
+                    len = matchLen
+                    num = numMatches
+                    result = id
                 end
             end
         end
     end
-    return result;
+    return result
 end
 
-local function getRequestIDs(message, crafterInfo, profConfig)
-
-    local recipeID = crafterInfo.recipeID;
+local function GetRequestID(message, crafterInfo, profConfig)
+    local recipeID = crafterInfo.recipeID
     if not recipeID then
-        -- If we're purely keyword matching, start with a category search so we
-        -- can use it to prioritize the item keyword search.
-        local categoryID = idForKeywords(message, profConfig, 'categories')
-        recipeID = idForKeywords(message, profConfig, 'recipes', categoryID)
+        recipeID = RecipeIdForKeywords(message, profConfig)
         if not recipeID then
-            return nil, categoryID
+            return nil
         end
     end
 
     local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
     if recipeInfo then
-        -- recipeInfo only loads a non-0 categoryID on characters with the
-        -- profession. If it's 0, fall back on the categoryID stored in the
-        -- config, which depends on the user having opened that profession
-        -- to update it since this change started persisting it.
-        local categoryID = recipeInfo.categoryID
-        if categoryID == 0 then
-            categoryID = profConfig.recipes[recipeInfo.recipeID].categoryID
-        end
-
-        return recipeInfo, categoryID
+        return recipeInfo
     end
 
-    return nil, idForKeywords(message, profConfig, 'categories')
+    return nil
 end
 
 -- There does not appear to be any reverse look up from itemID to whether the
@@ -375,23 +335,26 @@ end
 -- without an addon all items clicked from a profession or the order page have a
 -- quality.)
 local function GetItemIDsFromQualityLinks(inputString)
-    local itemIDs = nil;
+    local itemIDs = nil
 
-    local pattern = "item:(%d+)"
-    local qualityPattern = "professions%-chaticon%-quality%-tier";
-    for itemLink in string.gmatch(inputString, "(item:[%d:]+%|h%b[])") do
+    local pattern = 'item:(%d+)'
+    local qualityPattern = 'professions%-chaticon%-quality%-tier'
+    for itemLink in string.gmatch(inputString, '(item:[%d:]+%|h%b[])') do
         local itemIDStr = itemLink:match(pattern)
         if itemIDStr then
-            local itemID = tonumber(itemIDStr);
-            local crafterInfo = config.items[itemID];
+            local itemID = tonumber(itemIDStr)
+            local crafterInfo = config.items[itemID]
             if crafterInfo or string.find(itemLink, qualityPattern) then
-                if not itemIDs then itemIDs = {}; end
+                if not itemIDs then
+                    itemIDs = {}
+                end
 
                 if crafterInfo then
-                    local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[crafterInfo.profID];
-                    table.insert(itemIDs, { itemID = itemID, ppID = profConfig.parentProfID });
+                    local profConfig =
+                        CraftScan.DB.characters[crafterInfo.crafter].professions[crafterInfo.profID]
+                    table.insert(itemIDs, { itemID = itemID, ppID = profConfig.parentProfID })
                 else
-                    table.insert(itemIDs, itemID);
+                    table.insert(itemIDs, itemID)
                 end
             end
         end
@@ -402,87 +365,91 @@ end
 
 -- Return array with the front n elements removed.
 local function RemoveFront(array, n)
-    local result = {};
+    local result = {}
     for i = n + 1, #array, 1 do
-        table.insert(result, array[i]);
+        table.insert(result, array[i])
     end
-    return result;
+    return result
 end
 
 local function RemoveBack(array, n)
     for _ = 1, n do
-        table.remove(array);
+        table.remove(array)
     end
 end
 
-CraftScan.Analytics = {};
+CraftScan.Analytics = {}
 
 function CraftScan.Analytics.GetTimeStamp(timeEntry)
-    if type(timeEntry) == "table" then return timeEntry.t end
-    return timeEntry;
+    if type(timeEntry) == 'table' then
+        return timeEntry.t
+    end
+    return timeEntry
 end
 
 local function ClearAnalyticsForItem_(itemID, range)
-    local timeout = range.seconds;
-    local recent = range.recent;
-    local items = CraftScan.DB.analytics.seen_items;
-    local itemInfo = items[itemID];
-    local now = time();
+    local timeout = range.seconds
+    local recent = range.recent
+    local items = CraftScan.DB.analytics.seen_items
+    local itemInfo = items[itemID]
+    local now = time()
     for i, timeInfo in ipairs(itemInfo.times) do
         if CraftScan.Analytics.GetTimeStamp(timeInfo) + timeout > now then
             if recent then
-                local count = #itemInfo.times - i + 1;
+                local count = #itemInfo.times - i + 1
                 if count == 0 then
                     -- Don't need to refresh the display
-                    return false;
+                    return false
                 end
 
-                RemoveBack(itemInfo.times, count);
+                RemoveBack(itemInfo.times, count)
             else
-                local count = i - 1;
+                local count = i - 1
                 if count == 0 then
                     -- Don't need to refresh the display
-                    return false;
+                    return false
                 end
 
-                itemInfo.times = RemoveFront(itemInfo.times, i - 1);
+                itemInfo.times = RemoveFront(itemInfo.times, i - 1)
             end
-            if #itemInfo.times == 0 then items[itemID] = nil; end;
-            return true;
+            if #itemInfo.times == 0 then
+                items[itemID] = nil
+            end
+            return true
         end
     end
     if not recent then
-        items[itemID] = nil;
-        return true;
+        items[itemID] = nil
+        return true
     end
 end
 
 -- Remove entries older than timeout for the given itemID. If itemID is nil,
 -- apply to all itemIDs.
 function CraftScan.Analytics:ClearAnalyticsForItem(itemID, range)
-    local timeout = range.seconds;
+    local timeout = range.seconds
 
-    local items = CraftScan.DB.analytics.seen_items;
+    local items = CraftScan.DB.analytics.seen_items
     if timeout == nil then
         if itemID == nil then
-            items = {};
+            items = {}
         else
-            items[itemID] = nil;
+            items[itemID] = nil
         end
-        return true;
+        return true
     end
 
     if itemID then
-        return ClearAnalyticsForItem_(itemID, range);
+        return ClearAnalyticsForItem_(itemID, range)
     end
 
-    local result = false;
+    local result = false
     for itemID, itemInfo in pairs(items) do
         if ClearAnalyticsForItem_(itemID, range) then
-            result = true;
+            result = true
         end
     end
-    return result;
+    return result
 end
 
 -- If the same customer requests the same item repeatedly, that indicates a
@@ -490,30 +457,32 @@ end
 -- requests within 15 seconds are ignored completely - they're just impatient.
 -- For an hour after their first request, if they keep requesting the same
 -- thing, we count them.
-local ANALYTICS_IGNORE_DUPLICATE_INTERVAL = 15;
-local ANALYTICS_RESET_DUPLICATE_INTERVAL = 3600;
+local ANALYTICS_IGNORE_DUPLICATE_INTERVAL = 15
+local ANALYTICS_RESET_DUPLICATE_INTERVAL = 3600
 
 local function CleanRecentAnalytics()
-    if not CraftScan.DB.analytics.seen_items then return end
+    if not CraftScan.DB.analytics.seen_items then
+        return
+    end
 
-    local timeout = ANALYTICS_RESET_DUPLICATE_INTERVAL;
-    local now = time();
+    local timeout = ANALYTICS_RESET_DUPLICATE_INTERVAL
+    local now = time()
     for _, itemInfo in pairs(CraftScan.DB.analytics.seen_items) do
         for i, timeInfo in ipairs(itemInfo.times) do
-            if type(timeInfo) == "table" and timeInfo.t + timeout < now then
+            if type(timeInfo) == 'table' and timeInfo.t + timeout < now then
                 if timeInfo.c ~= nil then
                     -- Save the count, but erase the customer to save some space.
-                    timeInfo['customer'] = nil;
+                    timeInfo['customer'] = nil
                 else
                     -- No duplicates from this customer, so replace the dictionary with the raw time.
-                    itemInfo.times[i] = timeInfo.t;
+                    itemInfo.times[i] = timeInfo.t
                 end
             end
         end
     end
 
     -- On login and every hour after that, clean up any recent records to save space.
-    C_Timer.After(timeout, CleanRecentAnalytics);
+    C_Timer.After(timeout, CleanRecentAnalytics)
 end
 
 local function AddTimeToAnalytics(customer, item)
@@ -521,31 +490,31 @@ local function AddTimeToAnalytics(customer, item)
     -- duplicate requests for the same item from the same person. This helps us
     -- find items that are difficult to get crafted, which might indicate a good
     -- item to invest in learning to craft.
-    local times = item.times;
+    local times = item.times
 
     --  Track repeat requests for up to an hour. This aligns with our 'peak per
     --  hour', so duplicate requests don't artificially inflate the peak requests.
-    local timeout = ANALYTICS_RESET_DUPLICATE_INTERVAL;
-    local now = time();
+    local timeout = ANALYTICS_RESET_DUPLICATE_INTERVAL
+    local now = time()
     for i = #times, 1, -1 do
         local entry = times[i]
-        if type(entry) == "table" then
+        if type(entry) == 'table' then
             if entry.t + ANALYTICS_IGNORE_DUPLICATE_INTERVAL > now then
                 -- Ignore it. Same customer spamming a request before they had a chance to get any replies.
-                CraftScan.Utils.printTable("Ignoring very recent request", true);
-                return;
+                CraftScan.Utils.printTable('Ignoring very recent request', true)
+                return
             end
 
             if entry.t + timeout < now then
-                CraftScan.Utils.printTable("Starting a new bucket", true);
-                break;
+                CraftScan.Utils.printTable('Starting a new bucket', true)
+                break
             end
 
             if entry.customer == customer then
-                entry.c = (entry.c or 1) + 1;
-                CraftScan.Utils.printTable("Incrementing bucket", entry);
+                entry.c = (entry.c or 1) + 1
+                CraftScan.Utils.printTable('Incrementing bucket', entry)
                 CraftScanCraftingOrderPage:UpdateAnalytics()
-                return;
+                return
             end
         else
             -- After an hour, a garbage collector converts entries from
@@ -555,33 +524,41 @@ local function AddTimeToAnalytics(customer, item)
             break
         end
     end
-    table.insert(item.times, { t = time(), customer = customer });
+    table.insert(item.times, { t = time(), customer = customer })
 
     CraftScanCraftingOrderPage:UpdateAnalytics()
 end
 
 local function AddItemToAnalytics(customer, itemID, parentProfID)
-    if not CraftScan.DB.analytics.enabled then return; end
+    if not CraftScan.DB.analytics.enabled then
+        return
+    end
 
-    local seen = saved(CraftScan.DB.analytics, "seen_items", {});
-    local item = saved(seen, itemID, { times = {}, ppID = parentProfID });
-    AddTimeToAnalytics(customer, item);
-    if not item.ppID then item.ppID = parentProfID end
+    local seen = saved(CraftScan.DB.analytics, 'seen_items', {})
+    local item = saved(seen, itemID, { times = {}, ppID = parentProfID })
+    AddTimeToAnalytics(customer, item)
+    if not item.ppID then
+        item.ppID = parentProfID
+    end
 end
 
 local function AddMessageToAnalytics(customer, message)
-    if not CraftScan.DB.analytics.enabled then return; end
+    if not CraftScan.DB.analytics.enabled then
+        return
+    end
 
-    local itemIDs = GetItemIDsFromQualityLinks(message);
-    if not itemIDs then return; end
+    local itemIDs = GetItemIDsFromQualityLinks(message)
+    if not itemIDs then
+        return
+    end
 
-    local seen = saved(CraftScan.DB.analytics, "seen_items", {});
+    local seen = saved(CraftScan.DB.analytics, 'seen_items', {})
     for _, itemID in ipairs(itemIDs) do
-        if type(itemID) == "table" then
-            AddItemToAnalytics(customer, itemID.itemID, itemID.ppID);
+        if type(itemID) == 'table' then
+            AddItemToAnalytics(customer, itemID.itemID, itemID.ppID)
         else
-            local item = saved(seen, itemID, { times = {} });
-            AddTimeToAnalytics(customer, item);
+            local item = saved(seen, itemID, { times = {} })
+            AddTimeToAnalytics(customer, item)
         end
     end
 end
@@ -590,38 +567,42 @@ end
 -- the translation when a profession is opened scan any saved items and see if
 -- they are related to this profession.
 function CraftScan.Scanner.UpdateAnalyticsProfIDs(parentProfID)
-    if not CraftScan.DB.analytics.enabled then return; end
+    if not CraftScan.DB.analytics.enabled then
+        return
+    end
 
-    if not CraftScan.DB.analytics.seen_items then return end
+    if not CraftScan.DB.analytics.seen_items then
+        return
+    end
 
-    local itemIDs = nil;
+    local itemIDs = nil
     for itemID, itemInfo in pairs(CraftScan.DB.analytics.seen_items) do
         if not itemInfo.ppID then
             if not itemIDs then
-                itemIDs = {};
+                itemIDs = {}
                 -- On the first analytics item without profession info, grab the
                 -- full list, convert it to all itemIDs created by the
                 -- profession, then check if we have a match.
-                local recipes = C_TradeSkillUI.GetAllRecipeIDs();
+                local recipes = C_TradeSkillUI.GetAllRecipeIDs()
                 for _, id in pairs(recipes) do
                     local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
                     local recipeItemIDs = CraftScan.Utils.GetOutputItems(recipeInfo)
                     if recipeItemIDs then
                         for _, itemID in ipairs(recipeItemIDs) do
-                            itemIDs[itemID] = true;
+                            itemIDs[itemID] = true
                         end
                     end
                 end
             end
 
             if itemIDs[itemID] then
-                itemInfo.ppID = parentProfID;
+                itemInfo.ppID = parentProfID
             end
         end
     end
 end
 
-local function getCrafterForMessage(customer, message, overrides)
+local function GetCrafterForMessage(customer, message, overrides)
     message = string.lower(message)
 
     if not overrides or (not overrides.forceCrafterInfo and not overrides.itemInfo) then
@@ -644,7 +625,7 @@ local function getCrafterForMessage(customer, message, overrides)
             -- We originally piggy backed on the matching below for analytics, but
             -- analytics supports multiple items in a request while the matching
             -- below does not.
-            AddMessageToAnalytics(customer, message);
+            AddMessageToAnalytics(customer, message)
         end
     end
 
@@ -654,80 +635,83 @@ local function getCrafterForMessage(customer, message, overrides)
         itemFound, _, itemID = overrides.itemInfo()
     else
         -- Determine the profession via the item link or keywords in the message
-        itemFound, _, itemID = string.find(message, "item:(%d+):")
+        itemFound, _, itemID = string.find(message, 'item:(%d+):')
     end
 
     if itemFound then
         itemID = tonumber(itemID)
-        local crafterInfo = config.items[itemID];
+        local crafterInfo = config.items[itemID]
         if crafterInfo then
-            local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[crafterInfo.profID];
+            local profConfig =
+                CraftScan.DB.characters[crafterInfo.crafter].professions[crafterInfo.profID]
             if IsScanningEnabled(crafterInfo) then
-                local recipeInfo, categoryID = getRequestIDs(message, crafterInfo, profConfig);
-                return crafterInfo, itemID, recipeInfo, categoryID;
+                local recipeInfo = GetRequestID(message, crafterInfo, profConfig)
+                return crafterInfo, itemID, recipeInfo
             end
         end
 
         if not overrides or not overrides.forceCrafterInfo then
-            return nil;
+            return nil
         end
     end
 
-    local bestMatch = nil;
+    local bestMatch = nil
 
     local function FindBestCrafter(crafterInfo)
         -- For profession keywords, we store the parent profession ID,
         -- and need to determine which expansion's profession we should
-        -- report. We check the sub-configurations for a category or recipe
-        -- match, and if not found, return the largest profession ID, which
-        -- presumable refers to the latest expansion.
-        local crafterConfig = CraftScan.DB.characters[crafterInfo.crafter];
-        local ppConfig = crafterConfig.parent_professions[crafterInfo.parentProfID];
+        -- report. We check the sub-configurations for a recipe match, and if
+        -- not found, return the largest profession ID, which presumable refers
+        -- to the latest expansion.
+        local crafterConfig = CraftScan.DB.characters[crafterInfo.crafter]
+        local ppConfig = crafterConfig.parent_professions[crafterInfo.parentProfID]
         if ppConfig.scanning_enabled then
-            local maxProfID = 0;
+            local maxProfID = 0
             for pID, pConfig in pairs(crafterConfig.professions) do
                 if pConfig.parentProfID == crafterInfo.parentProfID then
-                    local recipeInfo, categoryID = getRequestIDs(message, crafterInfo, pConfig)
-                    if recipeInfo or categoryID then
-                        return { crafter = crafterInfo.crafter, profID = pID }, nil, recipeInfo,
-                            categoryID;
+                    local recipeInfo = GetRequestID(message, crafterInfo, pConfig)
+                    if recipeInfo then
+                        return { crafter = crafterInfo.crafter, profID = pID }, nil, recipeInfo
                     end
 
                     if pID > maxProfID then
-                        maxProfID = pID;
+                        maxProfID = pID
                     end
                 end
             end
 
-            local profID = maxProfID;
-            if ppConfig.primary_expansion then
-                profID = ppConfig.primary_expansion;
-            end
-
+            local profID = maxProfID
             if profID ~= nil and not bestMatch then
-                bestMatch = { crafter = crafterInfo.crafter, profID = profID };
+                bestMatch = { crafter = crafterInfo.crafter, profID = profID }
             end -- Keep looking for other crafters with keywords that match something specific.
         end
     end
 
     for _, crafterInfo in ipairs(config.prof_keywords) do
-        if HasMatch(message, crafterInfo.keywords) and not HasMatch(message, crafterInfo.exclusions) then
-            local crafterInfo, itemID, recipeInfo, categoryID = FindBestCrafter(crafterInfo);
-            if crafterInfo then return crafterInfo, itemID, recipeInfo, categoryID; end
+        if
+            HasMatch(message, crafterInfo.keywords)
+            and not HasMatch(message, crafterInfo.exclusions)
+        then
+            local crafterInfo, itemID, recipeInfo = FindBestCrafter(crafterInfo)
+            if crafterInfo then
+                return crafterInfo, itemID, recipeInfo
+            end
         end
     end
 
     if not bestMatch and overrides and overrides.forceCrafterInfo then
-        local crafterInfo, itemID, recipeInfo, categoryID = FindBestCrafter(overrides.forceCrafterInfo);
-        if crafterInfo then return crafterInfo, itemID, recipeInfo, categoryID; end
+        local crafterInfo, itemID, recipeInfo = FindBestCrafter(overrides.forceCrafterInfo)
+        if crafterInfo then
+            return crafterInfo, itemID, recipeInfo
+        end
     end
 
-    return bestMatch;
+    return bestMatch
 end
 
-local function concatGreetings(lhs, rhs)
-    if lhs then
-        if rhs then
+local function ConcatGreetings(lhs, rhs)
+    if lhs and lhs ~= '' then
+        if rhs and rhs ~= '' then
             return lhs .. ' ' .. rhs
         end
         return lhs
@@ -735,26 +719,18 @@ local function concatGreetings(lhs, rhs)
     return rhs
 end
 
-local function sectionGreeting(profConfig, section, sectionID)
-    if sectionID and profConfig[section] then
-        local config = profConfig[section][sectionID]
-        return config and config.greeting, config and config.override
-    end
-    return nil, nil
-end
+local function MakeGreetingBuilder()
+    local result = ''
 
-local function profGreeting(recipeID, categoryID, profConfig)
-    local recipeGreeting, recipeOverride = sectionGreeting(profConfig, 'recipes', recipeID)
-    if recipeOverride then
-        return recipeGreeting
+    local function Greeting(text)
+        result = ConcatGreetings(result, text)
     end
 
-    local catGreeting, catOverride = sectionGreeting(profConfig, 'categories', categoryID)
-    local greeting = concatGreetings(catGreeting, recipeGreeting)
-    if catOverride then
-        return greeting
+    local function FinalGreeting()
+        return CraftScan.Config.SubstituteTags(result)
     end
-    return concatGreetings(profConfig.greeting, greeting)
+
+    return Greeting, FinalGreeting
 end
 
 CraftScan.OrderToCustomerInfo = function(order)
@@ -800,18 +776,18 @@ end
 
 CraftScan.GetUnitName = function(unit, forceRealm)
     if CraftScan.State.realmID or forceRealm then
-        local realm = CraftScan.Utils.ShortenRealmName(GetRealmName());
-        return unit .. '-' .. realm;
+        local realm = CraftScan.Utils.ShortenRealmName(GetRealmName())
+        return unit .. '-' .. realm
     end
-    return unit;
+    return unit
 end
 
 CraftScan.GetPlayerName = function(forceRealm)
-    return CraftScan.GetUnitName(UnitName("player"), forceRealm);
+    return CraftScan.GetUnitName(UnitName('player'), forceRealm)
 end
 
 local function ShortenedRealmForDisplay(name)
-    local dash = string.find(name, "-")
+    local dash = string.find(name, '-')
     if dash then
         return name:sub(1, dash + 3)
     end
@@ -821,31 +797,42 @@ end
 CraftScan.NameAndRealmToName = function(name, forDisplay)
     if CraftScan.State.realmID then
         if forDisplay then
-            return ShortenedRealmForDisplay(name);
+            return ShortenedRealmForDisplay(name)
         end
-        return name; -- On cross-realm servers, never remove realm names.
+        return name -- On cross-realm servers, never remove realm names.
     end
-    return name:match("^([^-]+)")
+    return name:match('^([^-]+)')
 end
 
 CraftScan.ColorizePlayerName = function(name, guid)
     name = CraftScan.NameAndRealmToName(name)
     local _, class = GetPlayerInfoByGUID(guid)
-    local cc = RAID_CLASS_COLORS[class];
+    local cc = RAID_CLASS_COLORS[class]
     if cc then
-        return string.format("|cff%02x%02x%02x%s|r", cc.r * 255, cc.g * 255, cc.b * 255, name);
+        return cc:WrapTextInColorCode(name)
     end
     return name
 end
 
+local GetCrafterNameColor = function(name)
+    if name ~= CraftScan.GetPlayerName() and name ~= CraftScan.GetPlayerName(true) then
+        return CreateColor(1, 1, 1, 1)
+    end
+    return CreateColor(0, 1, 0, 1)
+end
+
+CraftScan.GetCrafterNameColor = function(name)
+    return GetCrafterNameColor(name)
+end
+
 CraftScan.ColorizeCrafterName = function(name)
-    if name ~= CraftScan.GetPlayerName() then return CraftScan.NameAndRealmToName(name, true) end
-    return '|cff00ff00' .. CraftScan.NameAndRealmToName(name, true) .. '|r'
+    local color = GetCrafterNameColor(name)
+    return color:WrapTextInColorCode(CraftScan.NameAndRealmToName(name, true))
 end
 
 local lastChatFrameMessages = {}
-local lastChatFrameIndex = 0; -- Incremented to 1 before use
-local CHAT_FRAME_BUFFER_SIZE = 10;
+local lastChatFrameIndex = 0 -- Incremented to 1 before use
+local CHAT_FRAME_BUFFER_SIZE = 10
 
 local function MakeChatHistoryEntry(customer)
     -- We've hacked together the ChatFrame and the CHAT_MSG_ events, but they
@@ -859,14 +846,14 @@ local function MakeChatHistoryEntry(customer)
     -- You can test this out by leaving 'Say' chat, then saying an order for
     -- yourself.
     local function DoIt(index)
-        local lastChatFrameMessage = lastChatFrameMessages[index];
+        local lastChatFrameMessage = lastChatFrameMessages[index]
         if string.find(lastChatFrameMessage.message, CraftScan.NameAndRealmToName(customer)) then
             return {
                 message = lastChatFrameMessage.message,
                 args = lastChatFrameMessage.args,
             }
         end
-        return nil;
+        return nil
     end
 
     -- We add entries to the circular buffer in increasing order, so start at
@@ -874,22 +861,28 @@ local function MakeChatHistoryEntry(customer)
     -- message with formatting.
     if lastChatFrameIndex then
         for i = lastChatFrameIndex, 1, -1 do
-            local result = DoIt(i);
-            if result then return result; end
+            local result = DoIt(i)
+            if result then
+                return result
+            end
         end
 
         for i = 2, lastChatFrameIndex - 1, 1 do
-            local result = DoIt(i);
-            if result then return result; end
+            local result = DoIt(i)
+            if result then
+                return result
+            end
         end
     end
 
-    return nil;
+    return nil
 end
 
 local function MakeChatHistoryEntryDefault(customer, message)
-    local found = MakeChatHistoryEntry(customer);
-    if found then return found; end
+    local found = MakeChatHistoryEntry(customer)
+    if found then
+        return found
+    end
     return {
         message = message,
         args = nil,
@@ -899,14 +892,16 @@ end
 local function GetGreeting(tag)
     -- We support configured or internationalized greetings. They use the
     -- same naming pattern, so we can look them up by tag.
-    local greeting = CraftScan.DB.settings.greeting;
-    if not greeting then return L(LID[tag]); end
-    return greeting[tag] or L(LID[tag]);
+    local greeting = CraftScan.DB.settings.greeting
+    if not greeting then
+        return L(LID[tag])
+    end
+    return greeting[tag] or L(LID[tag])
 end
 
-CraftScan.Utils.GetGreeting = GetGreeting;
+CraftScan.Utils.GetGreeting = GetGreeting
 
-local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, item, overrides)
+local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo, item, overrides)
     -- At this point, we have everything we need to generate a response to the message.
     local itemLink = item and item:GetItemLink() or nil
 
@@ -922,11 +917,11 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     -- Be as specific as possible about what we're responding to.
     local profID = crafterInfo.profID
     local recipeID = recipeInfo and recipeInfo.recipeID
-    local responseID = recipeID or categoryID or profID
+    local responseID = recipeID or profID
 
-    local needsResultCallbackOnly = overrides and overrides.resultCallback;
+    local needsResultCallbackOnly = overrides and overrides.resultCallback
 
-    local responses = saved(customerInfo, "responses", {})
+    local responses = saved(customerInfo, 'responses', {})
     local response = saved(responses, responseID, {})
     local firstInteraction = not next(response)
     if response.greeting_sent and not needsResultCallbackOnly then
@@ -935,49 +930,76 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     end
 
     local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(profID)
+    local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[profID]
+    local recipeConfig = recipeID and profConfig.recipes[recipeID] or nil
 
-    local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter);
-    local alt_craft = crafter ~= CraftScan.GetPlayerName();
+    local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter)
+    local alt_craft = crafter ~= CraftScan.GetPlayerName()
 
-    local greeting = '';
-    if alt_craft then
-        if itemID then
-            local item = itemLink or L(LID.GREETING_LINK_BACKUP);
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'),
-                { crafter = crafter, item = item });
+    local Greeting, FinalGreeting = MakeGreetingBuilder()
+    local FString = CraftScan.Utils.FString
+    if not profConfig.omit_general and (not recipeConfig or not recipeConfig.omit_general) then
+        if alt_craft then
+            if itemID then
+                Greeting(
+                    FString(
+                        GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'),
+                        { crafter = crafter, item = itemLink or L(LID.GREETING_LINK_BACKUP) }
+                    )
+                )
+            else
+                Greeting(
+                    FString(
+                        GetGreeting('GREETING_ALT_HAS_PROF'),
+                        { crafter = crafter, profession = profInfo.parentProfessionName }
+                    )
+                )
+            end
         else
-            local profession = profInfo.parentProfessionName;
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_ALT_HAS_PROF'),
-                { crafter = crafter, profession = profession });
-        end
-        if CraftScan.State.isBusy then
-            greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
-        else
-            -- They know we are busy and can't do it now, so don't bother saying we need to log over.
-            greeting = greeting .. ' ' .. GetGreeting('GREETING_ALT_SUFFIX');
-        end
-    else
-        if itemID then
-            local item = itemLink or L(LID.GREETING_LINK_BACKUP);
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'),
-                { crafter = crafter, item = item });
-        else
-            local profession = profInfo.parentProfessionName;
-            local spellSkillIndex = C_SpellBook.GetSkillLineIndexByID(profInfo.parentProfessionID);
-            local skillLineInfo = C_SpellBook.GetSpellBookSkillLineInfo(spellSkillIndex);
-            local offset = skillLineInfo.itemIndexOffset;
-            local skillSpellID = select(2, C_SpellBook.GetSpellBookItemType(offset + 1, Enum.SpellBookSpellBank.Player));
-            local profession_link = C_Spell.GetSpellTradeSkillLink(skillSpellID);
-            greeting = CraftScan.Utils.FString(GetGreeting('GREETING_I_HAVE_PROF'),
-                { crafter = crafter, profession = profession, profession_link = profession_link });
-        end
-        if CraftScan.State.isBusy then
-            greeting = greeting .. ' ' .. GetGreeting('GREETING_BUSY');
+            if itemID then
+                Greeting(
+                    FString(
+                        GetGreeting('GREETING_I_CAN_CRAFT_ITEM'),
+                        { crafter = crafter, item = itemLink or L(LID.GREETING_LINK_BACKUP) }
+                    )
+                )
+            else
+                local profession = profInfo.parentProfessionName
+                local spellSkillIndex =
+                    C_SpellBook.GetSkillLineIndexByID(profInfo.parentProfessionID)
+                local skillLineInfo = C_SpellBook.GetSpellBookSkillLineInfo(spellSkillIndex)
+                local offset = skillLineInfo.itemIndexOffset
+                local skillSpellID = select(
+                    2,
+                    C_SpellBook.GetSpellBookItemType(offset + 1, Enum.SpellBookSpellBank.Player)
+                )
+                local profession_link = C_Spell.GetSpellTradeSkillLink(skillSpellID)
+                Greeting(FString(GetGreeting('GREETING_I_HAVE_PROF'), {
+                    crafter = crafter,
+                    profession = profession,
+                    profession_link = profession_link,
+                }))
+            end
         end
     end
 
-    local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[profID]
-    greeting = concatGreetings(greeting, profGreeting(recipeID, categoryID, profConfig))
+    if CraftScan.State.isBusy then
+        Greeting(GetGreeting('GREETING_BUSY'))
+    end
+
+    if not recipeConfig or not recipeConfig.omit_profession then
+        Greeting(profConfig.greeting)
+    end
+
+    if recipeConfig then
+        Greeting(recipeConfig.greeting)
+    end
+
+    if alt_craft then
+        Greeting(CraftScan.Utils.FString(GetGreeting('GREETING_ALT_SUFFIX'), { crafter = crafter }))
+    end
+
+    greeting = FinalGreeting()
 
     if needsResultCallbackOnly then
         -- Erase the persistent state associated with this since it's just a
@@ -985,49 +1007,40 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         -- chooses to interact.
         CraftScan.DismissOrder({
             customerName = customer,
-            responseID = responseID
-        });
+            responseID = responseID,
+        })
 
         local function GetCommission()
-            local itemComm = profConfig.recipes[recipeID].commission;
+            local itemComm = profConfig.recipes[recipeID].commission
             if itemComm and #itemComm ~= 0 then
-                return itemComm;
+                return CraftScan.Config.SubstituteTags(itemComm)
             end
-            local profComm = profConfig.commission;
+            local profComm = profConfig.commission
             if profComm and #profComm ~= 0 then
-                return profComm;
+                return CraftScan.Config.SubstituteTags(profComm)
             end
-            return nil;
+            return nil
         end
-        overrides.resultCallback(crafter, greeting, GetCommission());
-        return;
+        overrides.resultCallback(crafter, greeting, GetCommission())
+        return
     end
 
     response.message = SplitResponse(greeting)
     local chat_history = saved(customerInfo, 'chat_history', {})
-    table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
+    table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message))
 
-    if categoryID then
-        -- Save the request at higher granularities as well so that we don't
-        -- respond to someone a second time for something more generic. E.g. we
-        -- responded to 'lf bs <item>', they didn't take the offer, then they
-        -- requested 'lf bs'. We don't want to message that person again after
-        -- they rejected us offering the exact item they wanted.
-        if recipeID then
-            if not responses[categoryID] then
-                responses[categoryID] = response
-                local children = saved(response, "less_granular", {})
-                table.insert(children, categoryID)
-            end
-        end
-        if not responses[profID] then
-            responses[profID] = response
-            local children = saved(response, "less_granular", {})
-            table.insert(children, profID)
-        end
+    -- Save the request at higher granularities as well so that we don't
+    -- respond to someone a second time for something more generic. E.g. we
+    -- responded to 'lf bs <item>', they didn't take the offer, then they
+    -- requested 'lf bs'. We don't want to message that person again after
+    -- they rejected us offering the exact item they wanted.
+    if not responses[profID] then
+        responses[profID] = response
+        local children = saved(response, 'less_granular', {})
+        table.insert(children, profID)
     end
 
-    local greeting_queued = not alt_craft and CraftScan.auto_replies_enabled;
+    local greeting_queued = not alt_craft and CraftScan.auto_replies_enabled
     if greeting_queued then
         C_Timer.After(CraftScan.Utils.GetSetting('auto_reply_delay') / 1000, function()
             CraftScan.Utils.SendResponses(response.message, customer)
@@ -1037,60 +1050,72 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
 
     local now = time()
 
-    local customerStartedInteraction = overrides and overrides.customerStartedInteraction;
+    local customerStartedInteraction = overrides and overrides.customerStartedInteraction
 
-    response.crafterName = crafter;
-    response.professionID = profID;
-    response.parentProfID = profInfo.parentProfessionID;
-    response.professionName = profInfo.parentProfessionName;
-    response.itemID = itemID;
-    response.recipeID = recipeID;
-    response.time = now;
-    response.responseID = responseID;
-    response.greeting_sent = overrides and overrides.greeted or customerStartedInteraction;
+    response.crafterName = crafter
+    response.professionID = profID
+    response.parentProfID = profInfo.parentProfessionID
+    response.professionName = profInfo.parentProfessionName
+    response.itemID = itemID
+    response.recipeID = recipeID
+    response.time = now
+    response.responseID = responseID
+    response.greeting_sent = overrides and overrides.greeted or customerStartedInteraction
     if customerStartedInteraction then
-        response.customer_answered = true;
+        response.customer_answered = true
     end
 
     if firstInteraction then
         local order = {
             customerName = customer,
-            responseID = responseID
+            responseID = responseID,
         }
         CraftScan.DB.listed_orders[CraftScan.OrderToOrderID(order)] = order
 
+        local ppConfig = ParentProfessionConfig(crafterInfo)
 
-        local ppConfig = ParentProfessionConfig(crafterInfo);
-
-        local isAlertFiltered = (ppConfig.local_alerts_only and CraftScan.GetPlayerName(true) ~= crafterInfo.crafter)
+        local isAlertFiltered = (
+            ppConfig.local_alerts_only and CraftScan.GetPlayerName(true) ~= crafterInfo.crafter
+        )
         if ppConfig.visual_alert_enabled and not isAlertFiltered then
-            CraftScan.State.activeOrder = order;
+            CraftScan.State.activeOrder = order
 
             FlashClientIcon()
 
             if not greeting_queued and not customerStartedInteraction then
-                CraftScanScannerMenu:TriggerAlert(string.format("%s\n%s (%s)",
+                CraftScanScannerMenu:TriggerAlert(
+                    string.format(
+                        '%s\n%s (%s)',
                         CraftScan.ColorizePlayerName(customer, customerInfo.guid),
-                        itemLink or
-                        CraftScan.Utils.ColorizeProfessionName(profInfo.parentProfessionID, profInfo
-                            .parentProfessionName),
-                        CraftScan.ColorizeCrafterName(crafter)),
-                    order)
+                        itemLink
+                            or CraftScan.Utils.ColorizeProfessionName(
+                                profInfo.parentProfessionID,
+                                profInfo.parentProfessionName
+                            ),
+                        CraftScan.ColorizeCrafterName(crafter)
+                    ),
+                    order
+                )
 
                 if not CraftScanCraftingOrderPage:IsShown() then
-                    CraftScanScannerMenu:TriggerPulseLock("scanned")
+                    CraftScanScannerMenu:TriggerPulseLock('scanned')
                 end
             end
         end
 
         if ppConfig.sound_alert_enabled and not isAlertFiltered then
-            PlaySoundFile(CraftScan.Utils.GetSetting("ping_sound"), "Master");
+            PlaySoundFile(CraftScan.Utils.GetSetting('ping_sound'), 'Master')
         end
 
         CraftScanCraftingOrderPage:ShowGeneric()
     end
 
-    CraftScanComm:ShareCustomerOrder(message, customer, customerInfo.guid, chat_history[#chat_history]);
+    CraftScanComm:ShareCustomerOrder(
+        message,
+        customer,
+        customerInfo.guid,
+        chat_history[#chat_history]
+    )
 end
 
 function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
@@ -1098,25 +1123,25 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
         return false
     end
 
-    local ignored = CraftScan.DB.settings.ignored and CraftScan.DB.settings.ignored[customer];
+    local ignored = CraftScan.DB.settings.ignored and CraftScan.DB.settings.ignored[customer]
     if ignored then
         return false
     end
 
     local customerInfo = CraftScan.DB.customers[customer]
 
-    if event == "CHAT_MSG_WHISPER_INFORM" then
+    if event == 'CHAT_MSG_WHISPER_INFORM' then
         if customerInfo then
             local chat_history = saved(customerInfo, 'chat_history', {})
-            table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
+            table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message))
         end
         return false
     end
 
-    if event == "CHAT_MSG_WHISPER" then
+    if event == 'CHAT_MSG_WHISPER' then
         if customerInfo then
             local chat_history = saved(customerInfo, 'chat_history', {})
-            table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message));
+            table.insert(chat_history, MakeChatHistoryEntryDefault(customer, message))
 
             for _, response in pairs(customerInfo.responses) do
                 if response.greeting_sent then
@@ -1128,22 +1153,22 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
             return false
         end
         if not overrides then
-            overrides = {};
+            overrides = {}
         end
 
         -- If they are whispering us about a craft, we want to match it and get
         -- it in our table so we can keep track of them, but we don't need a big
         -- alert. We'll still flash the client icon so you know to tab back in.
-        overrides.customerStartedInteraction = true;
+        overrides.customerStartedInteraction = true
     end
 
-    local crafterInfo, itemID, recipeInfo, categoryID = getCrafterForMessage(customer, message, overrides);
+    local crafterInfo, itemID, recipeInfo = GetCrafterForMessage(customer, message, overrides)
     if not crafterInfo then
         return false
     end
 
     local customerInfo = saved(CraftScan.DB.customers, customer, {})
-    customerInfo.guid = customerGuid;
+    customerInfo.guid = customerGuid
 
     if itemID or recipeInfo then
         if not itemID then
@@ -1156,24 +1181,24 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
         if itemID then
             local item = Item:CreateFromItemID(itemID)
             item:ContinueOnItemLoad(function()
-                handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, item, overrides)
+                handleResponse(message, customer, crafterInfo, itemID, recipeInfo, item, overrides)
             end)
             return false
         end
     end
 
-    handleResponse(message, customer, crafterInfo, itemID, recipeInfo, categoryID, nil, overrides)
+    handleResponse(message, customer, crafterInfo, itemID, recipeInfo, nil, overrides)
 
     return false
 end
 
 local function OnMessage_(self, event, ...)
-    local message, customer = ...;
-    local customerGuid = select(12, ...);
-    CraftScan.OnMessage(event, message, customer, customerGuid);
+    local message, customer = ...
+    local customerGuid = select(12, ...)
+    CraftScan.OnMessage(event, message, customer, customerGuid)
 end
 
-local frame = CreateFrame("frame")
+local frame = CreateFrame('frame')
 
 -- Can't unhook, so we disable it without the table allocation at least.
 local registered = false
@@ -1181,36 +1206,38 @@ local disableHook = false
 
 local function InsertChatFrame(message, args)
     if #lastChatFrameMessages < CHAT_FRAME_BUFFER_SIZE then
-        table.insert(lastChatFrameMessages, {});
+        table.insert(lastChatFrameMessages, {})
     end
-    lastChatFrameIndex = lastChatFrameIndex % CHAT_FRAME_BUFFER_SIZE + 1; -- Wow this looks weird. Thanks Lua 1-basedness
-    local currentChatFrame = lastChatFrameMessages[lastChatFrameIndex];
+    lastChatFrameIndex = lastChatFrameIndex % CHAT_FRAME_BUFFER_SIZE + 1 -- Wow this looks weird. Thanks Lua 1-basedness
+    local currentChatFrame = lastChatFrameMessages[lastChatFrameIndex]
 
-    currentChatFrame.message = message;
-    currentChatFrame.args = args;
+    currentChatFrame.message = message
+    currentChatFrame.args = args
 end
 local function CaptureChatMessage(chatFrame, message, ...)
-    if disableHook then return end
+    if disableHook then
+        return
+    end
 
     -- For Prat integration, we grab the historyBuffer value, which has
     -- the timestamp separately added. 'message' does not include it.
-    InsertChatFrame(chatFrame.historyBuffer:GetEntryAtIndex(1).message, SafePack(...));
+    InsertChatFrame(chatFrame.historyBuffer:GetEntryAtIndex(1).message, SafePack(...))
 end
 
 function CraftScan.InjectLastChatFrameMessage(customer, message, last)
     -- If we didn't see the same message, append it to our history and return
     -- that we should continue processing it. Otherwise, this account has
     -- already seen it so we can stop working.
-    local found = MakeChatHistoryEntry(customer);
+    local found = MakeChatHistoryEntry(customer)
     if not found or found.message ~= last.message then
-        CraftScan.Utils.printTable("Inserting", last.message);
-        InsertChatFrame(last.message, last.args);
-        return true;
+        CraftScan.Utils.printTable('Inserting', last.message)
+        InsertChatFrame(last.message, last.args)
+        return true
     else
-        CraftScan.Utils.printTable("Filtering", last.message);
-        CraftScan.Utils.printTable("Because", found.message);
+        CraftScan.Utils.printTable('Filtering', last.message)
+        CraftScan.Utils.printTable('Because', found.message)
     end
-    return false;
+    return false
 end
 
 local function UpdateScannerEventRegistry(...)
@@ -1222,27 +1249,27 @@ local function UpdateScannerEventRegistry(...)
     -- event that matches, we grab the last message recorded here to get the
     -- full ChatFrame format.
     if CraftScan.Utils.IsScanningEnbled(...) then
-        disableHook = false;
+        disableHook = false
 
         if not registered then
-            frame:RegisterEvent("CHAT_MSG_SAY")
-            frame:RegisterEvent("CHAT_MSG_PARTY")
-            frame:RegisterEvent("CHAT_MSG_CHANNEL")
-            frame:RegisterEvent("CHAT_MSG_GUILD")
-            frame:RegisterEvent("CHAT_MSG_WHISPER")
-            frame:RegisterEvent("CHAT_MSG_WHISPER_INFORM")
-            registered = true;
+            frame:RegisterEvent('CHAT_MSG_SAY')
+            frame:RegisterEvent('CHAT_MSG_PARTY')
+            frame:RegisterEvent('CHAT_MSG_CHANNEL')
+            frame:RegisterEvent('CHAT_MSG_GUILD')
+            frame:RegisterEvent('CHAT_MSG_WHISPER')
+            frame:RegisterEvent('CHAT_MSG_WHISPER_INFORM')
+            registered = true
         end
     else
-        disableHook = true;
+        disableHook = true
         if registered then
-            registered = false;
-            frame:UnregisterEvent("CHAT_MSG_SAY")
-            frame:UnregisterEvent("CHAT_MSG_PARTY")
-            frame:UnregisterEvent("CHAT_MSG_CHANNEL")
-            frame:UnregisterEvent("CHAT_MSG_GUILD")
-            frame:UnregisterEvent("CHAT_MSG_WHISPER")
-            frame:UnregisterEvent("CHAT_MSG_WHISPER_INFORM")
+            registered = false
+            frame:UnregisterEvent('CHAT_MSG_SAY')
+            frame:UnregisterEvent('CHAT_MSG_PARTY')
+            frame:UnregisterEvent('CHAT_MSG_CHANNEL')
+            frame:UnregisterEvent('CHAT_MSG_GUILD')
+            frame:UnregisterEvent('CHAT_MSG_WHISPER')
+            frame:UnregisterEvent('CHAT_MSG_WHISPER_INFORM')
         end
     end
 end
@@ -1250,11 +1277,11 @@ end
 CraftScan.Utils.onLoad(function()
     CraftScan.Scanner.LoadConfig()
 
-    frame:SetScript("OnEvent", OnMessage_);
+    frame:SetScript('OnEvent', OnMessage_)
 
     CraftScan.Utils.RegisterEnableDisableCallback(UpdateScannerEventRegistry)
-    hooksecurefunc(_G.ChatFrame1, "AddMessage", CaptureChatMessage);
-    UpdateScannerEventRegistry();
+    hooksecurefunc(_G.ChatFrame1, 'AddMessage', CaptureChatMessage)
+    UpdateScannerEventRegistry()
 
-    CleanRecentAnalytics();
+    CleanRecentAnalytics()
 end)

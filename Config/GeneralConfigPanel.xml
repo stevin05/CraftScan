@@ -1,0 +1,105 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <Script file="GeneralConfigPanel.lua"/>
+
+    <Frame name="CraftScanGeneralConfigPanelTemplate" mixin="CraftScanGeneralConfigPanelMixin" virtual="true" hidden="true">
+        <Size x="750" y="575" />
+        <Anchors>
+            <Anchor point="TOPLEFT" y="-6"/>
+        </Anchors>
+
+        <Frames>
+            <Frame parentKey="Matching" mixin="CraftScanGeneralConfigMatchingMixin">
+                <Size x="350" y="250"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="Title" inherits="GameFontNormal" justifyH="LEFT">
+                            <Size y="25"/>
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="LEFT" x="10"/>
+                                <Anchor point="RIGHT" x="-10"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <Frame parentKey="Keywords" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="80"/>
+                        <Anchors>
+                            <Anchor point="TOP" relativeKey="$parent.Title" relativePoint="BOTTOM"/>
+                            <Anchor point="LEFT" x="5"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="Exclusions" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="80"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Keywords" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+            <Frame parentKey="Greetings" mixin="CraftScanGreetingConfigPanelMixin">
+                <Size x="375" y="250"/>
+                <Anchors>
+                    <Anchor point="TOPRIGHT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="Title" inherits="GameFontNormal" justifyH="LEFT">
+                            <Size y="25"/>
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="LEFT" x="10"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <Frame parentKey="GREETING_I_CAN_CRAFT_ITEM" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="65"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Title" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="GREETING_I_HAVE_PROF" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="65"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.GREETING_I_CAN_CRAFT_ITEM" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="GREETING_ALT_CAN_CRAFT_ITEM" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="65"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.GREETING_I_HAVE_PROF" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="GREETING_ALT_HAS_PROF" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="65"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.GREETING_ALT_CAN_CRAFT_ITEM" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="GREETING_ALT_SUFFIX" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="65"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.GREETING_ALT_HAS_PROF" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="GREETING_BUSY" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="65"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.GREETING_ALT_SUFFIX" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+
+        </Frames>
+    </Frame>
+
+</Ui>

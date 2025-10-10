@@ -12,10 +12,6 @@ function CraftScan_CustomExplanationsButtonMixin:OnLoad()
     self:FitToText();
 end
 
-local function MakeTextWhite(text)
-    return "|cFFFFFFFF" .. text .. "|r";
-end
-
 local function OnCreate()
     local explanations = CraftScan.DB.settings.explanations;
 
@@ -145,7 +141,7 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
             local text = entry.text;
             local subMenu = rootDescription:CreateButton(label);
             subMenu:SetTooltip(function(tooltip, elementDescription)
-                GameTooltip_AddNormalLine(tooltip, MakeTextWhite(text));
+                GameTooltip_AddNormalLine(tooltip, CraftScan.MakeTextWhite(text));
             end);
             subMenu:CreateButton(L("Modify"), function() OnModify(label, text) end);
             subMenu:CreateButton(L("Delete"), function() OnDelete(label) end);
@@ -168,7 +164,7 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
             subMenu:CreateDivider();
             local title = subMenu:CreateTitle(prefix .. L(LID.MANUAL_MATCHING_TITLE));
             title:SetTooltip(function(tooltip, elementDescription)
-                GameTooltip_AddNormalLine(tooltip, MakeTextWhite(L(LID.MANUAL_MATCHING_DESC)));
+                GameTooltip_AddNormalLine(tooltip, CraftScan.MakeTextWhite(L(LID.MANUAL_MATCHING_DESC)));
             end);
         end
 
@@ -212,7 +208,7 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
                 end);
 
                 button:SetTooltip(function(tooltip, elementDescription)
-                    GameTooltip_AddNormalLine(tooltip, MakeTextWhite(text));
+                    GameTooltip_AddNormalLine(tooltip, CraftScan.MakeTextWhite(text));
                 end);
             end
         end
@@ -231,7 +227,7 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
                 end);
             title:SetTooltip(function(tooltip, elementDescription)
                 GameTooltip_AddNormalLine(tooltip,
-                    MakeTextWhite(L(ignored and LID.UNIGNORE_TOOLTIP or LID.IGNORE_TOOLTIP)));
+                    CraftScan.MakeTextWhite(L(ignored and LID.UNIGNORE_TOOLTIP or LID.IGNORE_TOOLTIP)));
             end);
         end
     end);

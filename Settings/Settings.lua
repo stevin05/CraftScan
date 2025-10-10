@@ -35,6 +35,7 @@ local function SetupMultiSelectDropdown(dropdown, setting, options, width, initT
         end
 
         local function SetSelected(value)
+            CraftScan.Debug.Print(value, "Selected item")
             local values = CraftScan.Utils.saved(CraftScan.DB.settings, setting.variableKey, {})
             for i, entry in ipairs(values) do
                 if entry == value then
@@ -47,7 +48,7 @@ local function SetupMultiSelectDropdown(dropdown, setting, options, width, initT
 
         local options = options();
         for _, option in ipairs(options) do
-            rootDescription:CreateCheckbox(option.label, IsSelected, SetSelected, option.text);
+            rootDescription:CreateCheckbox(option.label, IsSelected, SetSelected, option.value);
         end
 
         -- TODO: Scrolling is bugged or I'm doing something wrong. If you select
@@ -128,8 +129,10 @@ CraftScan.Utils.onLoad(function()
 
     do
         -- The addon list is likely to be large, so we list this option first so
-        -- it expandss downward instead of overlapping on top of the button.
+        -- it expands downward instead of overlapping on top of the button.
         local function GetOptions()
+            local selected = CraftScan.DB.settings['disabled_addon_whitelist']
+            local found = {}
             local container = Settings.CreateControlTextContainer();
 
             local numAddOns = C_AddOns.GetNumAddOns()
@@ -137,6 +140,14 @@ CraftScan.Utils.onLoad(function()
                 local name, _, _, enabled = C_AddOns.GetAddOnInfo(i)
                 if name ~= 'CraftScan' then
                     container:Add(name, name);
+                    found[name] = 1
+                end
+            end
+            -- If the user deletes an addon, leave it in the list so they can
+            -- remove it from the whitelist.
+            for _, s in ipairs(selected) do
+                if not found[s] then
+                    container:Add(s, L("DELETED ") .. s);
                 end
             end
             return container:GetData();

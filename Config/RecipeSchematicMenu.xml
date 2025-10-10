@@ -50,7 +50,6 @@
     </Layers>
   </Frame>
 
-
   <Frame name="CraftScan_SectionTemplate" inherits="CraftScan_SectionPanelTemplate" setAllPoints="false" virtual="true">
     <Size x="380" y="25"/>
     <Anchors>
@@ -92,47 +91,6 @@
       <KeyValue key="hideCharCount" value="true" type="boolean"/>
     </KeyValues>
   </ScrollFrame>
-  <Frame name="CraftScanFrame" inherits="DefaultPanelFlatTemplate" mixin="CraftScan_CraftScanFrameMixin" parent="UIParent" movable="true" enableMouse="true" frameStrata="DIALOG" hidden="true">
-    <Size x="400" y="658" />
-    <Frames>
-      <Button parentKey="TutorialButton" inherits="MainHelpPlateButton">
-        <Anchors>
-          <Anchor point="TOPLEFT" x="-15" y="20" />
-        </Anchors>
-        <Scripts>
-          <OnClick>self:GetParent():ToggleTutorial();</OnClick>
-        </Scripts>
-      </Button>
-      <ScrollFrame parentKey="ScrollFrame" name="$parentScrollFrame" inherits="ScrollFrameTemplate">
-        <KeyValues>
-          <KeyValue key="scrollBarX" value="-17" type="number"/>
-          <KeyValue key="scrollBarTopY" value="-15" type="number"/>
-          <KeyValue key="scrollBarBottomY" value="5" type="number"/>
-        </KeyValues>
-        <Frames>
-          <Frame parentKey="Content" name="$parentContent">
-            <Size x="400" y="1200" />
-            <Anchors>
-              <Anchor point="TOPLEFT" x="5" y="5" />
-              <Anchor point="BOTTOMRIGHT" x="-5" y="-5" />
-            </Anchors>
-          </Frame>
-        </Frames>
-        <Anchors>
-          <Anchor point="TOPLEFT" y="-20"/>
-          <Anchor point="BOTTOMRIGHT" y="5" />
-        </Anchors>
-      </ScrollFrame>
-      <Button parentKey="ClosePanelButton" inherits="UIPanelCloseButtonDefaultAnchors" mixin="CraftScan_CloseCraftScanFrameMixin">
-        <Scripts>
-          <OnClick method="OnClick"/>
-        </Scripts>
-      </Button>
-    </Frames>
-    <Scripts>
-      <OnHide method="OnHide"/>
-    </Scripts>
-  </Frame>
 
   <Button name="CraftScan_ScannerConfigButtonTemplate" inherits="UIPanelButtonTemplate" mixin="CraftScan_ScannerConfigButtonMixin" virtual="true" frameLevel="501">
     <Size x="140" y="22"/>
@@ -140,23 +98,5 @@
       <OnClick method="OnClick"/>
     </Scripts>
   </Button>
-
-  <Frame name="CraftScan_RecipeEnabledIndicatorTemplate" mixin="CraftScan_RecipeEnabledIndicatorMixin" virtual="true">
-    <Size x="18" y="18"/>
-    <Layers>
-      <Layer level="BACKGROUND" textureSubLevel="1">
-        <Texture parentKey="EnabledIcon">
-          <Size x="14" y="14"/>
-          <Anchors>
-            <Anchor point="CENTER" relativePoint="CENTER" />
-          </Anchors>
-        </Texture>
-      </Layer>
-    </Layers>
-    <Scripts>
-      <OnEnter method="OnEnter" />
-      <OnLeave method="OnLeave" />
-    </Scripts>
-  </Frame>
 
 </Ui>

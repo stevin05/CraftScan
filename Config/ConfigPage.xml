@@ -1,0 +1,237 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<Script file="ConfigPage.lua" />
+
+	<Frame name="CraftScanConfigPage" parent="UIParent" mixin="CraftScanConfigPageMixin"
+		inherits="PortraitFrameTemplateNoCloseButton" hidden="true" toplevel="true">
+		<Size x="1105" y="658" />
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+
+		<Scripts>
+			<OnLoad method="OnLoad" />
+			<OnShow method="OnShow" />
+		</Scripts>
+
+		<Frames>
+			<Button parentKey="CloseButton" inherits="UIPanelCloseButtonDefaultAnchors" />
+
+			<Frame parentKey="Menu" mixin="CraftScanConfigMenuMixin">
+				<Scripts>
+					<OnLoad method="OnLoad" />
+					<OnShow method="OnShow" />
+				</Scripts>
+
+				<Size x="350" />
+				<Anchors>
+					<Anchor point="TOPLEFT" y="-62" />
+					<Anchor point="BOTTOMLEFT" y="4" />
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Background" atlas="Professions-background-summarylist">
+							<Anchors>
+								<Anchor point="TOPLEFT" />
+								<Anchor point="BOTTOMRIGHT" />
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK">
+						<FontString parentKey="NoResultsText" inherits="GameFontNormal"
+							text="PROFESSIONS_NO_JOURNAL_ENTRIES" hidden="true">
+							<Size x="200" y="0" />
+							<Anchors>
+								<Anchor point="TOP" x="0" y="-60" />
+							</Anchors>
+						</FontString>
+					</Layer>
+
+				</Layers>
+				<Frames>
+					<Frame parentKey="NineSlice" useParentLevel="true"
+						inherits="NineSlicePanelTemplate">
+						<KeyValues>
+							<KeyValue key="layoutType" value="InsetFrameTemplate" type="string" />
+						</KeyValues>
+						<Anchors>
+							<Anchor point="TOPLEFT" x="0" y="0" />
+							<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+						</Anchors>
+					</Frame>
+					<Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.Background"
+								relativePoint="TOPLEFT" />
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Background"
+								relativePoint="BOTTOMRIGHT" x="-14" y="0" />
+						</Anchors>
+					</Frame>
+					<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox"
+								relativePoint="TOPRIGHT" x="0" y="-2" />
+							<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox"
+								relativePoint="BOTTOMRIGHT" x="0" y="2" />
+						</Anchors>
+					</EventFrame>
+				</Frames>
+
+			</Frame>
+
+			<!-- Probably makes more sense to let the contents control their own scrolling,
+			but if we ever get lots of long menus going, can just swap the whole content
+			window back to a ScrollFrame to do it generically.-->
+			<!--<ScrollFrame
+			parentKey="Options" inherits="ScrollFrameTemplate">
+				<KeyValues>
+					<KeyValue key="scrollBarX" value="-17" type="number"/>
+					<KeyValue key="scrollBarTopY" value="-30" type="number"/>
+					<KeyValue key="scrollBarBottomY" value="5" type="number"/>
+					<KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+					<KeyValue key="scrollBarHideTrackIfThumbExceedsTrack" value="true" type="boolean"/>
+				</KeyValues>-->
+			<Frame parentKey="Options">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.Menu" relativePoint="TOPRIGHT" />
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT"
+						y="4" />
+				</Anchors>
+				<Layers>
+					<Layer>
+						<Texture parentKey="Background" atlas="auctionhouse-background-index">
+							<Anchors>
+								<Anchor point="TOPLEFT" />
+								<Anchor point="BOTTOMRIGHT" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame parentKey="NineSlice" useParentLevel="true"
+						inherits="NineSlicePanelTemplate">
+						<KeyValues>
+							<KeyValue key="layoutType" value="InsetFrameTemplate" type="string" />
+						</KeyValues>
+						<Anchors>
+							<Anchor point="TOPLEFT" x="0" y="0" />
+							<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+			<!-- </ScrollFrame> -->
+
+		</Frames>
+	</Frame>
+
+	<Button name="CraftScanConfigMenuHeaderTemplate" mixin="CraftScanConfigMenuHeaderMixin"
+		virtual="true">
+		<Size y="25" />
+		<Layers>
+			<Layer level="OVERLAY" textureSubLevel="1">
+				<FontString parentKey="Label" inherits="GameFontNormal_NoShadow" justifyH="LEFT">
+					<Size y="10" />
+					<Anchors>
+						<Anchor point="LEFT" x="10" y="2" />
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="LeftPiece" atlas="Professions-recipe-header-left"
+					useAtlasSize="true">
+					<Anchors>
+						<Anchor point="LEFT" y="2" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="RightPiece" atlas="Professions-recipe-header-right"
+					useAtlasSize="true">
+					<Anchors>
+						<Anchor point="RIGHT" y="2" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="CenterPiece" atlas="Professions-recipe-header-middle"
+					useAtlasSize="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT"
+							relativeKey="$parent.LeftPiece" />
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT"
+							relativeKey="$parent.RightPiece" />
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="CollapseIcon">
+					<Anchors>
+						<Anchor point="RIGHT" x="-10" y="2" />
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="CollapseIconAlphaAdd" alphaMode="ADD">
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.CollapseIcon" />
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="2">
+				<Texture parentKey="SelectedOverlay" atlas="Professions_Recipe_Active"
+					useAtlasSize="true" hidden="true">
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="2" />
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="HighlightOverlay" atlas="Professions_Recipe_Hover"
+					useAtlasSize="true" alpha="0.5">
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="2" />
+					</Anchors>
+				</Texture>
+			</Layer>
+
+		</Layers>
+		<Scripts>
+			<OnEnter method="OnEnter" />
+			<OnLeave method="OnLeave" />
+		</Scripts>
+	</Button>
+
+	<Button name="CraftScanConfigMenuItemTemplate" mixin="CraftScanConfigMenuItemMixin"
+		registerForClicks="RightButtonUp, LeftButtonUp" virtual="true">
+		<Size y="20" />
+		<Layers>
+			<Layer level="OVERLAY" textureSubLevel="1">
+				<FontString parentKey="Label" inherits="GameFontHighlight_NoShadow" justifyH="LEFT">
+					<Size y="12" />
+					<Anchors>
+						<Anchor point="LEFT" x="10" />
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="2">
+				<Texture parentKey="SelectedOverlay" atlas="Professions_Recipe_Active"
+					useAtlasSize="true" hidden="true">
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="-1" />
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="HighlightOverlay" atlas="Professions_Recipe_Hover"
+					useAtlasSize="true" alpha="0.5">
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="-1" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter method="OnEnter" />
+			<OnLeave method="OnLeave" />
+		</Scripts>
+	</Button>
+
+</Ui>

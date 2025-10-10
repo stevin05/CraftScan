@@ -17,11 +17,11 @@ end;
 
 local function GetSortedProfessions()
     local result = {}
-    for parentProfID, color in pairs(CraftScan.CONST.PROFESSION_COLORS) do
+    for parentProfID, hex in pairs(CraftScan.CONST.PROFESSION_COLORS) do
         local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(parentProfID);
         table.insert(result, {
             key = profInfo.professionName,
-            name = CraftScan.Utils.ColorizeText(profInfo.professionName, color),
+            name = CraftScan.Utils.ColorizeText(profInfo.professionName, hex),
             ppID = parentProfID,
         });
     end
@@ -1280,11 +1280,12 @@ local function SetupPopupDialog(key, config)
         preferredIndex = 3, -- Avoid UI taint issues by using a higher index
         EditBoxOnEnterPressed = function(self)
             local parent = self:GetParent()
-            parent.button1:Click() -- Simulate a click on the Confirm button
+            CraftScan.Debug.Print(parent)
+            parent:GetButton1():Click() -- Simulate a click on the Confirm button
         end,
         EditBoxOnEscapePressed = function(self)
             local parent = self:GetParent()
-            parent.button2:Click() -- Simulate a click on the Cancel button
+            parent:GetButton2():Click() -- Simulate a click on the Cancel button
         end,
     };
     for key, value in pairs(config) do
@@ -1331,6 +1332,7 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", {
             local ppChangeOnly = true;
             CraftScanComm:ShareCharacterModification(crafterInfo.name, parentProfID, ppChangeOnly);
 
+            CraftScan.Config.RemoveMissingProfessionNodes(crafterInfo.name)
             CraftScan.OnCrafterListModified();
         else
             print("CraftScan confirmation failed.")
@@ -1358,6 +1360,7 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_CLEANUP", {
                 end
             end
 
+            CraftScan.Config.RemoveMissingProfessionNodes(crafterInfo.name)
             CraftScan.OnCrafterListModified();
         else
             print("CraftScan confirmation failed.")
@@ -2237,6 +2240,17 @@ function CraftScan_OpenSettingsButtonMixin:OnClick(button)
     end
 end
 
+CraftScan_OpenConfigButtonMixin = {}
+
+function CraftScan_OpenConfigButtonMixin:OnLoad()
+    self:SetText(L("Config"))
+    self:FitToText();
+end
+
+function CraftScan_OpenConfigButtonMixin:OnClick(button)
+    CraftScan.Frames.ConfigPage:ToggleVisibility()
+end
+
 CraftScan_BusyCheckButtonMixin = {}
 
 function CraftScan_BusyCheckButtonMixin:OnLoad()
@@ -2256,102 +2270,6 @@ end
 
 function CraftScan_BusyCheckButtonMixin:OnLeave()
     GameTooltip:Hide();
-end
-
-CraftScan_CustomGreetingButtonMixin = {}
-
-function CraftScan_CustomGreetingButtonMixin:OnLoad()
-    self:SetText(L("Customize Greeting"))
-    self:FitToText();
-end
-
-function CraftScan_CustomGreetingButtonMixin:OnClick()
-    local greetings = {
-        { key = 'GREETING_I_CAN_CRAFT_ITEM',   placeholders = { '{crafter}', '{item}' } },
-        { key = 'GREETING_I_HAVE_PROF',        placeholders = { '{crafter}', '{profession}', '{profession_link}' } },
-        { key = 'GREETING_ALT_CAN_CRAFT_ITEM', placeholders = { '{crafter}', '{item}' } },
-        { key = 'GREETING_ALT_HAS_PROF',       placeholders = { '{crafter}', '{profession}' } },
-        { key = 'GREETING_ALT_SUFFIX',         placeholders = {}, },
-        { key = 'GREETING_BUSY',               placeholders = {}, },
-    };
-
-    local function Validator(index, text)
-        local extra_placeholders = {};
-        local num_extra_placeholders = 0;
-        for placeholder in string.gmatch(text, "%b{}") do
-            if not CraftScan.Utils.Contains(greetings[index].placeholders, placeholder) then
-                table.insert(extra_placeholders, placeholder);
-                num_extra_placeholders = num_extra_placeholders + 1;
-            end
-        end
-        local missing_placeholders = {};
-        local num_missing_placeholders = 0;
-        for i, placeholder in ipairs(greetings[index].placeholders) do
-            if not text:match(placeholder) then
-                table.insert(missing_placeholders, placeholder);
-                num_missing_placeholders = num_missing_placeholders + 1;
-            end
-        end
-
-        local messages = {};
-        if num_extra_placeholders > 0 then
-            table.insert(messages, string.format(L(LID.EXTRA_PLACEHOLDERS), table.concat(extra_placeholders, ", ")));
-        end
-        if text:match("%%s") then
-            table.insert(messages, L(LID.LEGACY_PLACEHOLDERS))
-        end
-        if num_missing_placeholders > 0 then
-            table.insert(messages, string.format(L(LID.MISSING_PLACEHOLDERS), table.concat(missing_placeholders, ", ")));
-        end
-        local message = table.concat(messages, "\n\n");
-        if num_extra_placeholders > 0 then
-            return { error = message };
-        elseif message ~= '' then
-            return { warning = message };
-        end
-
-        return nil;
-    end
-
-    local function OnAccept(...)
-        local sv = CraftScan.Utils.saved(CraftScan.DB.settings, 'greeting', {})
-        local numArgs = select("#", ...)
-        for i = 1, numArgs do
-            local value = select(i, ...)
-            local greeting = greetings[i];
-
-            sv[greeting.key] = value;
-        end
-        CraftScanComm:ShareCustomGreeting(sv);
-    end
-
-    local elements = {
-        {
-            type = CraftScan.Dialog.Element.Text,
-            text = string.format(L(LID.CUSTOM_GREETING_INFO)),
-        },
-    };
-
-    local sv = CraftScan.DB.settings.greeting or {};
-    for _, greeting in ipairs(greetings) do
-        local default = L(LID[greeting.key]);
-        table.insert(elements, {
-            type = CraftScan.Dialog.Element.EditBox,
-            initial_text = sv[greeting.key] or default,
-            default_text = default,
-            Validator = Validator,
-            allowEmpty = true,
-            padding = 5,
-        })
-    end
-    CraftScan.Dialog.Show({
-        key = "customize_greeting",
-        width = 450,
-        title = L("Customize Greeting"),
-        submit = L("Customize Greeting"),
-        OnAccept = OnAccept,
-        elements = elements,
-    })
 end
 
 local openChatOrdersFrame = nil
@@ -2402,6 +2320,7 @@ CraftScan.Utils.onLoad(function()
                 "CraftScan_OpenChatOrdersButtonTemplate");
             openChatOrdersFrame:Init();
             openChatOrdersFrame:SetPoint("TOPLEFT", ProfessionsFrame.TabSystem, "TOPRIGHT", 2, 0);
+
             CraftScan.UpdateShowChatOrdersTab()
 
             initialized = true;

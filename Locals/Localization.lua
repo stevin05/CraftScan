@@ -47,6 +47,10 @@ function CraftScan.LOCAL:GetText(ID)
 end
 ]]
 
+function CraftScan.LOCAL:Exists(ID)
+    return CraftScan.LOCAL.LOCAL_EN[ID] ~= nil
+end
+
 function CraftScan.LOCAL:GetText(ID)
     local localizedText = CraftScan.LOCAL.LOCAL_CLIENT[ID]
 

@@ -33,23 +33,31 @@ Locals/Localization.lua
 Utils/Utils.xml
 Utils/ReleaseNotes.xml
 Utils/Dialog.xml
+Utils/Tooltip.lua
 Utils/TooltipPlot.lua
 Utils/Comm.lua
 Utils/FStrings.lua
 Utils/Debug.lua
 
-RecipeSchematicMenu.xml
+Config/RecipeSchematicMenu.xml
 
-AlertIcon.xml
+Customer/AlertIcon.xml
 
-ChatScanner.lua
+Customer/ChatScanner.lua
 
-OrderTableTemplate.xml
+Customer/OrderTableTemplate.xml
 
-AnalyticsTableTemplate.xml
+Customer/AnalyticsTableTemplate.xml
 
-OrderPage.xml
+Customer/OrderPage.xml
 
-Settings.xml
+Settings/Settings.xml
 
-CustomerPage.xml
+Customer/CustomerPage.xml
+
+Config/ConfigPage.xml
+Config/BasicTemplates.xml
+Config/RecipeConfigPanel.xml
+Config/ProfessionConfigPanel.xml
+Config/GeneralConfigPanel.xml
+Config/SubstitutionTagPanel.xml

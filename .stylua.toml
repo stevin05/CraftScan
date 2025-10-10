@@ -1,0 +1,5 @@
+column_width = 100          # max characters per line
+indent_type = "Spaces"     # Spaces vs Tabs
+indent_width = 4           # number of spaces per indent
+quote_style = "AutoPreferSingle" # single vs double quotes
+call_parentheses = "Always"  # always add parentheses on function calls

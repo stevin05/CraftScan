@@ -1,0 +1,122 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <Script file="RecipeConfigPanel.lua"/>
+
+    <Frame name="CraftScanRecipeConfigPanelTemplate" mixin="CraftScanRecipeConfigPanelMixin" virtual="true" hidden="true">
+        <Size x="750" y="575" />
+        <Anchors>
+            <Anchor point="TOPLEFT" y="-6"/>
+        </Anchors>
+
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="IconLabel" inherits="GameFontHighlightMed2" justifyV="TOP" justifyH="LEFT">
+                    <Size x="400" y="0"/>
+                    <!--
+                    This isn't working for some reason. Doing it in code instead.
+                    <Anchors>
+                        Anchor point="LEFT" relativeKey="$parent.RecipeIcon" relativePoint="RIGHT" x="14" y="17"/> 
+                    Anchors> -->
+                </FontString>
+				<FontString parentKey="IconSubLabel" inherits="GameFontHighlightSmall2" wordwrap="true" justifyV="TOP" justifyH="LEFT">
+					<Size x="392" y="60"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.IconLabel" relativePoint="BOTTOMLEFT" y="-3"/>
+					</Anchors>
+				</FontString>
+	
+            </Layer>
+        </Layers>
+
+        <Frames>
+            <Button parentKey="RecipeIcon" inherits="ProfessionsOutputButtonTemplate">
+                <KeyValues>
+                    <KeyValue key="noProfessionQualityOverlay" value="true" type="boolean"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="28" y="-33"/>
+                </Anchors>
+            </Button>
+
+            <Frame parentKey="Left" mixin="CraftScanGeneralConfigMatchingMixin">
+                <Size x="350" y="500"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" y="-80"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="Title" inherits="GameFontNormal" justifyH="LEFT">
+                            <Size y="25"/>
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="LEFT" x="10"/>
+                                <Anchor point="RIGHT" x="-10"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <Frame parentKey="Keywords" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="80"/>
+                        <Anchors>
+                            <Anchor point="TOP" relativeKey="$parent.Title" relativePoint="BOTTOM"/>
+                            <Anchor point="LEFT" x="5"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="SecondaryKeywords" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="80"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Keywords" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="Commission" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="55"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.SecondaryKeywords" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+            <Frame parentKey="Right" mixin="CraftScanGreetingConfigPanelMixin">
+                <Size x="375" y="250"/>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" y="-80"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="Title" inherits="GameFontNormal" justifyH="LEFT">
+                            <Size y="25"/>
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="LEFT" x="10"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <Frame parentKey="Greeting" inherits="CraftScanTextInputTemplate">
+                        <Size x="335" y="80"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Title" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="OmitGeneral" inherits="CraftScanCheckButtonTemplate">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Greeting" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="OmitProfession" inherits="CraftScanCheckButtonTemplate">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.OmitGeneral" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+            <Button parentKey="EnableScanning" inherits="CraftScanConfigButtonTemplate" />
+            <Button parentKey="DisableScanning" inherits="CraftScanConfigButtonTemplate" />
+        </Frames>
+
+    </Frame>
+
+</Ui>

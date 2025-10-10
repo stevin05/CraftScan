@@ -1,0 +1,130 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <Script file="SubstitutionTagPanel.lua" />
+
+    <Frame name="CraftScanExistingTagEntryTemplate" mixin="CraftScanExistingTagEntryMixin"
+        virtual="true">
+        <Size x="680" y="40" />
+        <Layers>
+            <Layer level="OVERLAY" textureSubLevel="2">
+                <Texture parentKey="HeaderDivider" atlas="RecipeList-Divider"
+                    alpha="0.25">
+                    <Size y="6" x="310" />
+                    <Anchors>
+                        <Anchor point="BOTTOM" x="-150" y="3" />
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button parentKey="KeyRegion" registerForClicks="RightButtonUp">
+                <Size x="200" y="25" />
+                <Anchors>
+                    <Anchor point="TOPLEFT" y="-5" />
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Key" inherits="GameFontNormal"
+                            justifyV="TOP"
+                            justifyH="RIGHT">
+                            <Size x="200" y="25" />
+                            <Anchors>
+                                <Anchor point="TOPLEFT" />
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Button>
+            <Frame parentKey="Value" inherits="CraftScanTextInputNoInfoTemplate">
+                <Size x="500" y="25" />
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="212" y="0" />
+                </Anchors>
+            </Frame>
+        </Frames>
+    </Frame>
+
+    <Frame name="CraftScanTagConfigPanelTemplate"
+        mixin="CraftScanTagConfigPanelMixin" virtual="true" hidden="true">
+        <Size x="750" y="575" />
+        <Anchors>
+            <Anchor point="TOPLEFT" y="-6" />
+        </Anchors>
+        <Scripts>
+            <OnLoad method="OnLoad" />
+        </Scripts>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="KeyHeader" inherits="GameFontNormalLarge" justifyH="RIGHT">
+                    <Size x="200" y="25" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="0" y="-5" />
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="ValueHeader" inherits="GameFontNormalLarge" justifyH="LEFT">
+                    <Size x="400" y="25" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="212" y="-5" />
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="DeleteTagHelp" inherits="GameFontNormal" justifyH="LEFT">
+                    <Size x="180" y="25" />
+                </FontString>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="2">
+                <Texture parentKey="HeaderDivider" atlas="RecipeList-Divider">
+                    <Size y="4" x="480" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" y="-30" />
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="FooterDivider" atlas="RecipeList-Divider">
+                    <Size y="4" x="480" />
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" y="58" />
+                    </Anchors>
+                </Texture>
+            </Layer>
+
+        </Layers>
+
+        <Frames>
+            <Button parentKey="HeaderInfo" inherits="CraftScanInfoButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.ValueHeader" relativePoint="RIGHT" />
+                </Anchors>
+            </Button>
+            <Frame parentKey="AddTag" inherits="CraftScanTextInputTemplate">
+                <Size x="240" y="53" />
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" x="10" y="10" />
+                </Anchors>
+            </Frame>
+            <Button parentKey="AddTagButton" inherits="CraftScanConfigButtonTemplate" />
+            <Frame parentKey="AutoCompleteEnabled" inherits="CraftScanCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.DeleteTagHelp"
+                        relativePoint="RIGHT" />
+                </Anchors>
+            </Frame>
+            <Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Background" relativePoint="TOPLEFT"
+                        y="-40" />
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Background"
+                        relativePoint="BOTTOMRIGHT" x="-14" y="65" />
+                </Anchors>
+            </Frame>
+            <EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox" relativePoint="TOPRIGHT"
+                        x="0" y="-2" />
+                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox"
+                        relativePoint="BOTTOMRIGHT" x="0" y="2" />
+                </Anchors>
+            </EventFrame>
+        </Frames>
+    </Frame>
+
+</Ui>

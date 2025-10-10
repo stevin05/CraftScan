@@ -2,6 +2,9 @@
   <Binding name="CRAFT_SCAN_TOGGLE" category="CraftScan">
     CraftScanScannerMenu.PageButton:OnClick();
   </Binding>
+  <Binding name="CRAFT_SCAN_CONFIG_TOGGLE" category="CraftScan">
+    CraftScanConfigPage:ToggleVisibility()
+  </Binding>
   <Binding name="CRAFT_SCAN_GREET_CURRENT_CUSTOMER" category="CraftScan">
     CraftScanScannerMenu.AlertBGButton:OnClick("LeftButton");
   </Binding>

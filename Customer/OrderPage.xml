@@ -1,6 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
-..\..\FrameXML\UI.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<Script file="OrderPage.lua"/>
 	<Script file="CustomExplanations.lua"/>
@@ -276,10 +275,22 @@
 				</Scripts>
 			</Button>
 
+			<Button parentKey="ConfigButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonUp" mixin="CraftScan_OpenConfigButtonMixin" frameLevel="510">
+				<Size x="80" y="22"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent.SettingsButton" relativePoint="LEFT" x="-2" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+
+
 			<Button parentKey="ReleaseNotesButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonUp" mixin="CraftScan_ReleaseNotesButtonMixin" frameLevel="510">
 				<Size x="120" y="22"/>
 				<Anchors>
-					<Anchor point="RIGHT" relativeKey="$parent.SettingsButton" relativePoint="LEFT" x="-2" y="0"/>
+					<Anchor point="RIGHT" relativeKey="$parent.ConfigButton" relativePoint="LEFT" x="-2" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad method="OnLoad"/>
@@ -554,16 +565,15 @@
 						</Scripts>
 					</Button>
 
-					<Button parentKey="CustomGreetingButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_CustomGreetingButtonMixin">
+					<DropdownButton parentKey="ResetAnalyticsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_ResetAnalyticsButtonMixin">
 						<Size x="120" y="22"/>
 						<Anchors>
 							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.OrderList" relativePoint="TOPRIGHT" x="-5" y="5"/>
 						</Anchors>
 						<Scripts>
 							<OnLoad method="OnLoad"/>
-							<OnClick method="OnClick"/>
 						</Scripts>
-					</Button>
+					</DropdownButton>
 
 					<CheckButton parentKey="BusyCheckButton" mixin="CraftScan_BusyCheckButtonMixin">
 						<Size x="18" y="18"/>
@@ -590,19 +600,9 @@
 						<CheckedTexture atlas="checkmark-minimal" useAtlasSize="true"/>
 						<DisabledCheckedTexture atlas="checkmark-minimal-disabled" useAtlasSize="true"/>
 						<Anchors>
-							<Anchor point="BOTTOMLEFT" relativeKey="$parent.CustomGreetingButton" relativePoint="TOPLEFT" x="0" y="0"/>
+							<Anchor point="BOTTOMLEFT" relativeKey="$parent.ResetAnalyticsButton" relativePoint="TOPLEFT" x="0" y="0"/>
 						</Anchors>
 					</CheckButton>
-
-					<DropdownButton parentKey="ResetAnalyticsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_ResetAnalyticsButtonMixin">
-						<Size x="120" y="22"/>
-						<Anchors>
-							<Anchor point="RIGHT" relativeKey="$parent.CustomGreetingButton" relativePoint="LEFT" x="-5" y="0"/>
-						</Anchors>
-						<Scripts>
-							<OnLoad method="OnLoad"/>
-						</Scripts>
-					</DropdownButton>
 
 					<DropdownButton parentKey="CustomExplanationsButton" inherits="UIPanelButtonTemplate" registerForClicks="LeftButtonDown" mixin="CraftScan_CustomExplanationsButtonMixin">
 						<Size x="120" y="22"/>
