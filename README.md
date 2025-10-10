@@ -1,5 +1,7 @@
 ### Welcome to CraftScan!
 
+Lots of changes recently. New documentation on Discord: https://discord.gg/BCnAswxsSj
+
 #### Remember recent crafting requests, even after swapping characters:
 ![Screenshot](https://github.com/stevin05/CraftScan-Images/blob/main/README/ChatHistoryItemLinkMatch.png)
 
