@@ -1,6 +1,6 @@
-## Interface: 110200
+## Interface: 110205
 ## Title: CraftScan
-## Version: 1.3.16
+## Version: 1.5.1
 ## Notes: Scans chat for potential work orders
 ## Author: Stevin
 ## Category: Professions

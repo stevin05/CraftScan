@@ -49,6 +49,10 @@ end
 
 -- Expecting AARRGGBB
 function CraftScan.Utils.ColorFromHex(hex)
+    if not hex then
+        return CreateColor(1, 1, 1)
+    end
+
     return CreateColor(
         tonumber(hex:sub(3, 4), 16) / 255,
         tonumber(hex:sub(5, 6), 16) / 255,
