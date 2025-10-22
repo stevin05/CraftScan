@@ -385,7 +385,7 @@ end
 -- A check to be paired with RegisterEnableDisableCallback to perform actions to
 -- enable/disable this addons functionality. The callback arguments should be
 -- passed through to this helper.
-function CraftScan.Utils.IsScanningEnbled(event)
+function CraftScan.Utils.IsScanningEnabled(event)
     return IsResting() and event ~= 'CINEMATIC_START' and event ~= 'PLAY_MOVIE'
 end
 

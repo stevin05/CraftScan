@@ -161,4 +161,35 @@
         </Frames>
     </Frame>
 
+    <Frame name="CraftScanSliderTemplate" virtual="true">
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Title" inherits="GameFontNormal" justifyH="LEFT">
+                    <Size y="25" />
+                    <Anchors>
+                        <Anchor point="TOP" y="-5" />
+                        <Anchor point="LEFT" x="10" />
+                        <Anchor point="RIGHT" x="-10" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button parentKey="Info" inherits="CraftScanInfoButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOP" y="6" relativeKey="$parent.Title" relativePoint="TOP" />
+                    <Anchor point="RIGHT" x="0" />
+                </Anchors>
+            </Button>
+            <Frame parentKey="Slider" inherits="MinimalSliderWithSteppersTemplate">
+                <Anchors>
+                    <Anchor point="TOP" y="-23" relativeKey="$parent.Title" relativePoint="BOTTOM" />
+                    <Anchor point="LEFT" x="8" />
+                    <Anchor point="RIGHT" x="-38" />
+                    <Anchor point="BOTTOM" y="5" />
+                </Anchors>
+            </Frame>
+        </Frames>
+    </Frame>
+
 </Ui>

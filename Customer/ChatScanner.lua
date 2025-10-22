@@ -151,8 +151,19 @@ local RecipeCreatesEpicItem = function(recipeID)
     return false
 end
 
-function CraftScan.Scanner.RecipeScanningOn(recipeConfig)
-    return recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.SCANNING_ON
+function CraftScan.Scanner.RecipeScanningOn(profConfig, recipeConfig)
+    if recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.SCANNING_ON then
+        if recipeConfig.required_concentration and profConfig.concentration then
+            local concentration = CraftScan.ConcentrationData:Deserialize(profConfig.concentration)
+            if concentration:GetCurrentAmount() < recipeConfig.required_concentration then
+                return false, concentration:GetTimeUntil(recipeConfig.required_concentration)
+            end
+        end
+
+        return true
+    end
+
+    return false
 end
 
 -- The usage of this method is *very* inefficient. On any profession
@@ -222,6 +233,7 @@ function CraftScan.Scanner.LoadConfig()
     --
     -- Convert recipeIDs to itemIDs, which is what we will find in chat message
     -- links.
+    local concentrationMinTime = 0
     for _, entry in ipairs(parentProfessions) do
         local crafter = entry.crafter
         local parentProf = entry.parentProfession
@@ -242,7 +254,9 @@ function CraftScan.Scanner.LoadConfig()
             if prof.recipes then
                 local profID = pEntry.profID
                 for recipeID, recipe in pairs(prof.recipes) do
-                    if CraftScan.Scanner.RecipeScanningOn(recipe) then
+                    local scanningOn, timeToScanningOn =
+                        CraftScan.Scanner.RecipeScanningOn(prof, recipe)
+                    if scanningOn then
                         -- Look up the itemIDs associated with the recipe
                         local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
                         local itemIDs = CraftScan.Utils.GetOutputItems(recipeInfo)
@@ -257,10 +271,33 @@ function CraftScan.Scanner.LoadConfig()
                                 end
                             end
                         end
+                    elseif
+                        timeToScanningOn
+                        and (concentrationMinTime == 0 or timeToScanningOn < concentrationMinTime)
+                    then
+                        concentrationMinTime = timeToScanningOn
                     end
                 end
             end
         end
+    end
+
+    -- Very unlikely to matter, but if the user is logged on as they reach a
+    -- concentration threshold, reload the config to scan for that recipe.
+    --
+    -- This can be heavy weight work with a large config, so we only do it if
+    -- scanning is enabled (currently just IsResting()), so we don't lock up
+    -- someone's UI in a dungeon.
+    if concentrationMinTime ~= 0 then
+        local function LoadIfScanning()
+            if not CraftScan.Utils.IsScanningEnabled() then
+                C_Timer.After(60, LoadIfScanning)
+            else
+                CraftScan.Scanner.LoadConfig()
+            end
+        end
+        C_Timer.After(concentrationMinTime + 1, LoadIfScanning)
+        CraftScan.Debug.Print(concentrationMinTime, 'Reloading for concentration in')
     end
 end
 
@@ -285,7 +322,9 @@ local function RecipeIdForKeywords(message, profConfig)
     local num = 0
     local result = nil
     for id, recipeConfig in pairs(recipeConfigs) do
-        if CraftScan.Scanner.RecipeScanningOn(recipeConfig) and recipeConfig.keywords then
+        if
+            CraftScan.Scanner.RecipeScanningOn(profConfig, recipeConfig) and recipeConfig.keywords
+        then
             local matchLen, numMatches = HasMatch(
                 message,
                 ParseStringList(recipeConfig.keywords),
@@ -1248,7 +1287,7 @@ local function UpdateScannerEventRegistry(...)
     -- AddMessage call on the main window, and then when we process a CHAT_MSG
     -- event that matches, we grab the last message recorded here to get the
     -- full ChatFrame format.
-    if CraftScan.Utils.IsScanningEnbled(...) then
+    if CraftScan.Utils.IsScanningEnabled(...) then
         disableHook = false
 
         if not registered then

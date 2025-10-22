@@ -24,8 +24,6 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.GREET_BUTTON_BINDING_NAME] = 'Greet Banner Customer',
         [LID.DISMISS_BUTTON_BINDING_NAME] = 'Dismiss Banner Customer',
         [LID.TOGGLE_CHAT_TOOLTIP] = 'Toggle chat orders%s', -- Keybind
-        [LID.SCANNER_CONFIG_SHOW] = 'Show CraftScan',
-        [LID.SCANNER_CONFIG_HIDE] = 'Hide CraftScan',
         [LID.CRAFT_SCAN_OPTIONS] = 'CraftScan Options',
         [LID.HELP_PROFESSION_KEYWORDS] = "A message must contain one of these terms. To match a message such as 'LF Lariat', 'lariet' should be listed here. To generate an item link for the Elemental Lariat in the response, 'lariat' should also be included in the item configuration keywords for the Elemental Lariat.",
         [LID.HELP_PROFESSION_EXCLUSIONS] = "A message will be ignored if it contains one of these terms, even if it would otherwise be a match. To avoid responding to 'LF JC Lariat' with 'I have Jewelcrafting' when you do not have the Lariat recipe, 'lariat' should be listed here.",
@@ -439,6 +437,18 @@ function CraftScan.LOCAL_EN:GetData()
         [LID.RN_SUBSTITUTION_TAGS + 5] = 'Greetings also support tags, so you can easily categorize and update commissions as the competition logs on and off.',
         [LID.RN_SUBSTITUTION_TAGS + 6] = 'With the introduction of tags, support for config based on the built in profession categories has been removed. You can now create your own groupings via tags instead.',
         [LID.RN_SUBSTITUTION_TAGS + 7] = "Tags support a very rudimentary auto-completion system. Choices pop up as you type, and once there is only one possible choice, it finishes the tag for you. If it's too annoying, it can be disabled.",
+
+        ['Concentration Dependent'] = 'Concentration Dependent',
+
+        ['dialog.item.required_concentration'] = 'Required Concentration',
+        ['dialog.item.required_concentration.tooltip.body'] = 'Conditionally scan for this item based on available concentration.\n\nThe exact amount of concentration required depends on your profession tree and the materials provided. Use simulation mode in CraftSim to come up with a good estimate.\n\nWhen set to a non-zero value, this recipe will be placed in a separate section that indicates that scanning depends on concentration.',
+        ['dialog.item.required_concentration.tooltip.body.ready'] = 'Current concentration: %d.\n\nScanning on.',
+        ['dialog.item.required_concentration.tooltip.body.cooldown'] = 'Current concentration: %d.\n\nScanning will be enabled in %s.',
+
+        ['dialog.pending_review_state'] = 'Pending review',
+        ['dialog.pending_review_state.tooltip.body'] = 'Move this recipe back to the pending review section.\n\nPending review is intended as a staging area so you can easily track recipes you intend to enable once you have enough knowledge to craft them at max rank.',
+
+        ['Open in CraftScan'] = 'Open in CraftScan',
 
         -- ChatGPT prompt:
         -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.

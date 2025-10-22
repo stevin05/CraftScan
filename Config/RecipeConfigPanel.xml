@@ -76,6 +76,12 @@
                             <Anchor point="TOPLEFT" relativeKey="$parent.SecondaryKeywords" relativePoint="BOTTOMLEFT"/>
                         </Anchors>
                     </Frame>
+                    <Frame parentKey="RequiredConcentration" inherits="CraftScanSliderTemplate">
+                        <Size x="335" y="28"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Commission" relativePoint="BOTTOMLEFT"/>
+                        </Anchors>
+                    </Frame>
                 </Frames>
             </Frame>
             <Frame parentKey="Right" mixin="CraftScanGreetingConfigPanelMixin">
@@ -115,6 +121,7 @@
             </Frame>
             <Button parentKey="EnableScanning" inherits="CraftScanConfigButtonTemplate" />
             <Button parentKey="DisableScanning" inherits="CraftScanConfigButtonTemplate" />
+            <Button parentKey="PendingReview" inherits="CraftScanConfigButtonTemplate" />
         </Frames>
 
     </Frame>

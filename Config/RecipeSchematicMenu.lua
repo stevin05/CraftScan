@@ -49,7 +49,7 @@ local function CreateMenuShownButton()
         ProfessionsFrame.CraftingPage.SchematicForm,
         'CraftScan_ScannerConfigButtonTemplate'
     )
-    showMenuButton:SetText(L(LID.SCANNER_CONFIG_SHOW))
+    showMenuButton:SetText(L('Open in CraftScan'))
     CraftScan.UpdateShowButtonHeight()
     showMenuButtonInitialized = true
 end
@@ -156,6 +156,8 @@ local function OnRecipeSelected()
     db_prof = saved(db_player.professions, profession.professionID, {})
     db_prof.parentProfID = profession.parentProfessionID
 
+    CraftScan.SaveConcentrationData()
+
     db_recipes = saved(db_prof, 'recipes', {})
 
     CraftScan.State.professionID = profession.parentProfessionID
@@ -174,11 +176,9 @@ local function OnRecipeSelected()
     end
 end
 
-CraftScan_ScannerConfigButtonMixin = { isSelected = false, isEnabled = true }
+CraftScan_ScannerConfigButtonMixin = {}
 
 function CraftScan_ScannerConfigButtonMixin:SetDisabled()
-    self.isSelected = false
-    self.isEnabled = false
     self:SetText(L(LID.SCANNER_CONFIG_DISABLED))
     self:Show()
 end
@@ -187,31 +187,23 @@ function CraftScan_ScannerConfigButtonMixin:OnClick(button)
     local recipe = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
     local profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(recipe.recipeID)
 
-    if not self.isEnabled then
-        self.isEnabled = true
-        self.isSelected = true
+    if db_parent_prof.character_disabled then
         db_parent_prof.character_disabled = false
 
         ScanAllRecipes(profession)
 
         local playerNameWithRealm = CraftScan.GetPlayerName(true)
         CraftScanComm:ShareCharacterModification(playerNameWithRealm, profession.parentProfessionID)
-    else
-        self.isSelected = not self.isSelected
+
+        showMenuButton:SetText(L('Open in CraftScan'))
     end
 
-    if self.isSelected then
-        CraftScanConfigPage:Show()
-        CraftScanConfigPage:SelectRecipe(
-            CraftScan.GetPlayerName(true),
-            profession.professionID,
-            recipe.recipeID
-        )
-        self:SetText(L(LID.SCANNER_CONFIG_HIDE))
-    else
-        self:SetText(L(LID.SCANNER_CONFIG_SHOW))
-        CraftScanConfigPage:Hide()
-    end
+    CraftScanConfigPage:Show()
+    CraftScanConfigPage:SelectRecipe(
+        CraftScan.GetPlayerName(true),
+        profession.professionID,
+        recipe.recipeID
+    )
 end
 
 CraftScan.Utils.onLoad(function()

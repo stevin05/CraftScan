@@ -12,6 +12,7 @@
 
 embeds.xml
 
+Libs/classic.lua
 Libs/LibSerialize.lua
 Libs/LibDeflate.lua
 
@@ -55,6 +56,7 @@ Settings/Settings.xml
 
 Customer/CustomerPage.xml
 
+Config/Concentration.lua
 Config/ConfigPage.xml
 Config/BasicTemplates.xml
 Config/RecipeConfigPanel.xml

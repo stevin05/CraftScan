@@ -30,7 +30,7 @@ function CraftScan.SetupCheckBox(panel, field, keyword, size)
 
     field.Act:SetScript('OnClick', function(element)
         panel:UpdateConfigValue(keyword, element:GetChecked())
-        panel:OnConfigChange()
+        panel:OnConfigChange(keyword)
     end)
     if size then
         field:SetWidth(size)
@@ -61,7 +61,11 @@ function CraftScan.SetupInfoIcon(info, keyword)
         GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
         GameTooltip:SetText(L('dialog.' .. keyword))
         GameTooltip:AddLine(' ')
-        CraftScan.GameTooltip_AddWhite(L('dialog.' .. keyword .. '.tooltip.body'))
+        local tooltip_keyword = 'dialog.' .. keyword .. '.tooltip.body'
+        CraftScan.GameTooltip_AddWhite(L(tooltip_keyword))
+        if type(info.ExtendTooltip) == 'function' then
+            info.ExtendTooltip(tooltip_keyword)
+        end
         GameTooltip:Show()
     end)
     info:SetScript('OnLeave', function(self)
@@ -126,7 +130,7 @@ function CraftScan.SetupTextInput(panel, field, keyword)
         end
         local function DoUpdate()
             panel:UpdateConfigValue(keyword, self:GetText())
-            panel:OnConfigChange()
+            panel:OnConfigChange(keyword)
 
             if CraftScan.Config.ContainsSubstitutionTags(self:GetText()) then
                 -- When the user is done editing and we've saved their input,
@@ -174,7 +178,6 @@ function CraftScan.SetupTextInput(panel, field, keyword)
 
             if #suggestions then
                 local function DoAutoComplete(editBox, tag, force)
-
                     editBox.auto_completed = editBox.auto_completed or {}
                     if not force and editBox.auto_completed[tag] then
                         return
@@ -343,4 +346,36 @@ end
 
 function CraftScanTextInputValidationIconMixin:OnLeave()
     GameTooltip:Hide()
+end
+
+function CraftScan.SetupSlider(panel, field, keyword, min, max, steps)
+    field.Title:SetText(L('dialog.' .. keyword))
+    CraftScan.SetupInfoIcon(field.Info, keyword)
+    max = max or 1200
+    min = min or 0
+    local formatters = {
+        [MinimalSliderWithSteppersMixin.Label.Right] = function(value)
+            return tostring(value)
+        end,
+    }
+
+    field.Slider:Init(panel:GetConfigValue(keyword), min, max, steps or 40, formatters)
+
+    field.cbrHandles = EventUtil.CreateCallbackHandleContainer()
+    field.cbrHandles:RegisterCallback(
+        field.Slider,
+        MinimalSliderWithSteppersMixin.Event.OnValueChanged,
+        function(self, value)
+            panel:UpdateConfigValue(keyword, value)
+        end,
+        field.Slider
+    )
+    field.cbrHandles:RegisterCallback(
+        field.Slider,
+        MinimalSliderWithSteppersMixin.Event.OnInteractEnd,
+        function()
+            panel:OnConfigChange(keyword)
+        end,
+        field.Slider
+    )
 end

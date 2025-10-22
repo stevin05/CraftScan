@@ -1,5 +1,6 @@
 local CraftScan = select(2, ...)
 
+local C = CraftScan.CONST
 local LID = CraftScan.CONST.TEXT
 local function L(id)
     return CraftScan.LOCAL:GetText(id)
@@ -19,7 +20,67 @@ function CraftScan.Config.LoadRecipeConfigOptions(configInfo)
     return panel
 end
 
+local function ExtendRequiredConcentrationTooltip(tooltip_keyword, configInfo)
+    local rc = configInfo.recipeConfig.required_concentration
+    if not rc or rc == 0 or not configInfo.profConfig.concentration then
+        return
+    end
+
+    local concentration =
+        CraftScan.ConcentrationData:Deserialize(configInfo.profConfig.concentration)
+    local time, readyNow = concentration:GetFormattedTimerUntil(rc)
+    local current = concentration:GetCurrentAmount()
+    GameTooltip:AddLine(' ')
+    if readyNow then
+        GameTooltip:AddLine(string.format(L(tooltip_keyword .. '.ready'), current), 0, 1, 0, true)
+    else
+        GameTooltip:AddLine(
+            string.format(L(tooltip_keyword .. '.cooldown'), current, time),
+            1,
+            0,
+            0,
+            true
+        )
+    end
+end
+
 CraftScanRecipeConfigPanelMixin = {}
+
+function CraftScanRecipeConfigPanelMixin:PlaceStateButtons()
+    local state = self.configInfo.recipeConfig.scan_state
+    local ON = C.RECIPE_STATES.SCANNING_ON
+    local OFF = C.RECIPE_STATES.SCANNING_OFF
+    local PENDING = C.RECIPE_STATES.PENDING_REVIEW
+    local UNLEARNED = C.RECIPE_STATES.UNLEARNED
+
+    if state == ON then
+        self.EnableScanning:Hide()
+        self:SetupButton(self.PendingReview, PENDING, 'pending_review_state', 'BOTTOMRIGHT', -20, 28)
+        self:SetupButton(self.DisableScanning, OFF, 'disable_scan_state', 'BOTTOMRIGHT', -20, 0)
+        return true -- display menus
+    end
+
+    if state == OFF then
+        self.DisableScanning:Hide()
+        self:SetupButton(self.PendingReview, PENDING, 'pending_review_state', 'TOPLEFT', 10, -120)
+        self:SetupButton(self.EnableScanning, ON, 'enable_scan_state', 'TOPLEFT', 10, -148)
+        return false -- hide menus
+    end
+
+    if state == PENDING then
+        self.PendingReview:Hide()
+        self:SetupButton(self.EnableScanning, ON, 'enable_scan_state', 'TOPLEFT', 10, -120)
+        self:SetupButton(self.DisableScanning, OFF, 'disable_scan_state', 'TOPLEFT', 10, -148)
+        return false -- hide menus
+    end
+
+    if state == UNLEARNED then
+        self.PendingReview:Hide()
+        self.EnableScanning:Hide()
+        self.DisableScanning:Hide()
+        return true -- display menus
+    end
+end
 
 function CraftScanRecipeConfigPanelMixin:Init(configInfo)
     self.configInfo = configInfo
@@ -34,54 +95,8 @@ function CraftScanRecipeConfigPanelMixin:Init(configInfo)
     -- items, we show only an enable button. For enabled items, we show a disable
     -- button. For pending items we show both an enable and disable button. For
     -- unlearned items, we don't show a button, but do allow pre-configuration.
-    if self.configInfo.recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.SCANNING_ON then
-        self.EnableScanning:Hide()
-        self:SetupButton(
-            self.DisableScanning,
-            CraftScan.CONST.RECIPE_STATES.SCANNING_OFF,
-            'disable_scan_state',
-            'BOTTOMRIGHT',
-            -20,
-            00
-        )
-        -- Fall through to show all other config options.
-    elseif
-        self.configInfo.recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.SCANNING_OFF
-    then
-        self.DisableScanning:Hide()
-        self:SetupButton(
-            self.EnableScanning,
-            CraftScan.CONST.RECIPE_STATES.SCANNING_ON,
-            'enable_scan_state',
-            'TOPLEFT',
-            10,
-            -120
-        )
-        return -- Don't show other configuration options
-    elseif
-        self.configInfo.recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
-    then
-        self:SetupButton(
-            self.EnableScanning,
-            CraftScan.CONST.RECIPE_STATES.SCANNING_ON,
-            'enable_scan_state',
-            'TOPLEFT',
-            10,
-            -120
-        )
-        self:SetupButton(
-            self.DisableScanning,
-            CraftScan.CONST.RECIPE_STATES.SCANNING_OFF,
-            'disable_scan_state',
-            'TOPLEFT',
-            10,
-            -148
-        )
-        return -- Don't show other configuration options
-    elseif self.configInfo.recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.UNLEARNED then
-        self.EnableScanning:Hide()
-        self.DisableScanning:Hide()
-        -- Fall through to show all other config options.
+    if not self:PlaceStateButtons() then
+        return
     end
 
     self.defaults = {
@@ -91,11 +106,17 @@ function CraftScanRecipeConfigPanelMixin:Init(configInfo)
         greeting = '',
         omit_general = false,
         omit_profession = false,
+        required_concentration = 0,
     }
 
     CraftScan.SetupTextInput(self, self.Left.Keywords, 'item.keywords')
     CraftScan.SetupTextInput(self, self.Left.SecondaryKeywords, 'item.secondary_keywords')
     CraftScan.SetupTextInput(self, self.Left.Commission, 'item.commission')
+
+    self.Left.RequiredConcentration.Info.ExtendTooltip = function(tooltip_keyword)
+        ExtendRequiredConcentrationTooltip(tooltip_keyword, self.configInfo)
+    end
+    CraftScan.SetupSlider(self, self.Left.RequiredConcentration, 'item.required_concentration')
 
     local CHECK_BOX_WIDTH = 240
     CraftScan.SetupTextInput(self, self.Right.Greeting, 'item.greeting')
@@ -141,7 +162,7 @@ function CraftScanRecipeConfigPanelMixin:SetupRecipeIcon()
         self.IconLabel:SetHeight(self.IconLabel:GetStringHeight())
 
         self.IconSubLabel:SetText(
-            CraftScan.RecipeStateName(self.configInfo.recipeConfig.scan_state)
+            CraftScan.RecipeStateName(self.configInfo.recipeConfig, self.configInfo.profConfig)
         )
     end
 
@@ -150,8 +171,13 @@ function CraftScanRecipeConfigPanelMixin:SetupRecipeIcon()
         GameTooltip:SetOwner(self.RecipeIcon, 'ANCHOR_RIGHT')
         GameTooltip:SetRecipeResultItem(self.configInfo.recipeID)
     end)
+
     self.RecipeIcon:SetScript('OnLeave', function()
         GameTooltip_Hide()
+    end)
+
+    self.RecipeIcon:SetScript('OnClick', function()
+        HandleModifiedItemClick(outputItemInfo.hyperlink)
     end)
 
     SetItemButtonQuality(self.RecipeIcon, quality, outputItemInfo.hyperlink)
@@ -172,8 +198,13 @@ function CraftScanRecipeConfigPanelMixin:UpdateConfigValue(keyword, value)
     self.configInfo.recipeConfig[KeywordToConfigKey(keyword)] = value
 end
 
-function CraftScanRecipeConfigPanelMixin:OnConfigChange()
+function CraftScanRecipeConfigPanelMixin:OnConfigChange(keyword)
     CraftScan.Config.OnConfigChange(self.configInfo)
+
+    if keyword == 'item.required_concentration' then
+        -- Transitions to/from 0 move the recipe between tree sections
+        CraftScan.Config.OnRecipeScanStateChange(self.configInfo)
+    end
 end
 
 function CraftScanRecipeConfigPanelMixin:Validate(keyword, value, reporter) end

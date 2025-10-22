@@ -1,6 +1,7 @@
 local CraftScan = select(2, ...)
 
-local LID = CraftScan.CONST.TEXT
+local C = CraftScan.CONST
+local LID = C.TEXT
 local function L(id)
     return CraftScan.LOCAL:GetText(id)
 end
@@ -63,8 +64,93 @@ AceConfig:RegisterOptionsTable('CraftScan', options)
 AceConfigCmd:CreateChatCommand('craftscan', 'CraftScan')
 AceConfigCmd:CreateChatCommand('cs', 'CraftScan')
 
-function CraftScan.RecipeStateName(scan_state)
-    return L(CraftScan.CONST.RECIPE_STATE_NAMES[scan_state])
+local function IsEmptyNode(node)
+    for _, child in ipairs(node:GetNodes()) do
+        if child.data and (child.data.configInfo or child.data.headerInfo) then
+            return false
+        end
+    end
+    return true
+end
+
+local function EraseEmptyParents(node)
+    if IsEmptyNode(node) then
+        local parent = node:GetParent()
+        CraftScan.Debug.Print(node, 'removed')
+        parent:Remove(node)
+        CraftScan.Debug.Print(node.data.parentKey, 'parentKey')
+        parent[node.data.parentKey] = nil
+        EraseEmptyParents(parent)
+    end
+end
+
+local function IsConcentrationDependent(recipeConfig)
+    return C.RECIPE_STATES.SCANNING_ON == recipeConfig.scan_state
+        and recipeConfig.required_concentration
+        and recipeConfig.required_concentration ~= 0
+end
+
+local function HasRequiredConcentration(recipeConfig, profConfig)
+    if not profConfig.concentration then
+        return true -- Don't know concentration, so err on the side of scanning.
+    end
+
+    local concentration = CraftScan.ConcentrationData:Deserialize(profConfig.concentration)
+    return recipeConfig.required_concentration <= concentration:GetCurrentAmount()
+end
+
+local function ConcentrationScanningSuffix(r, g, state)
+    return ' - ' .. CreateColor(r, g, 0):WrapTextInColorCode(L(C.RECIPE_STATE_NAMES[state]))
+end
+
+local function ConcentrationScanningOnText()
+    return L('Concentration Dependent')
+        .. ConcentrationScanningSuffix(0, 1, C.RECIPE_STATES.SCANNING_ON)
+end
+
+local function ConcentrationScanningOffText()
+    return L('Concentration Dependent')
+        .. ConcentrationScanningSuffix(1, 0, C.RECIPE_STATES.SCANNING_OFF)
+end
+
+function CraftScan.RecipeStateName(recipeConfig, profConfig)
+    if IsConcentrationDependent(recipeConfig) then
+        if HasRequiredConcentration(recipeConfig, profConfig) then
+            return ConcentrationScanningOnText()
+        end
+        return ConcentrationScanningOffText()
+    end
+    return L(C.RECIPE_STATE_NAMES[recipeConfig.scan_state])
+end
+
+local function GetScanStateDisplayOrder(recipeConfig, profConfig)
+    local state = recipeConfig.scan_state
+    local states = CraftScan.CONST.RECIPE_STATES
+    if IsConcentrationDependent(recipeConfig) then
+        if HasRequiredConcentration(recipeConfig, profConfig) then
+            return 2
+        end
+        return 3
+    elseif states.PENDING_REVIEW == state then
+        return 1
+    elseif states.SCANNING_ON == state then
+        return 4
+    elseif states.SCANNING_OFF == state then
+        return 5
+    elseif states.UNLEARNED == state then
+        return 6
+    end
+end
+
+function CraftScan.SaveConcentrationData()
+    local skillLineID = C_TradeSkillUI.GetProfessionChildSkillLineID()
+    if C_ProfSpecs.SkillLineHasSpecialization(skillLineID) then
+        local currencyID = C_TradeSkillUI.GetConcentrationCurrencyID(skillLineID)
+        local concentrationData = CraftScan.ConcentrationData(currencyID)
+        local char = CraftScan.GetPlayerName(true)
+        local profConfig = CraftScan.DB.characters[char].professions[skillLineID]
+        profConfig.concentration = concentrationData:Serialize()
+    end
 end
 
 local function MakeProfessionNodeFactory(root)
@@ -124,6 +210,7 @@ local function MakeProfessionNodeFactory(root)
                 return color
             end
             local charNode = db[isCurrent]:Insert({
+                parentKey = char,
                 order = 0,
                 headerInfo = {
                     GetLabelColor = GetCrafterNameColor,
@@ -146,6 +233,7 @@ local function MakeProfessionNodeFactory(root)
             end
 
             local profNode = db[isCurrent][char]:Insert({
+                parentKey = profID,
                 order = 0,
                 headerInfo = {
                     -- TODO Add a 'refresh' style button to read in the profession on the current character.
@@ -173,12 +261,13 @@ local function MakeProfessionNodeFactory(root)
 
     local function GetRecipeParentNode(char, profID, profConfig, recipeConfig)
         local profNode = GetProfessionNode(char, profID, profConfig)
-        local recipeScanState = recipeConfig.scan_state
+        local recipeScanState = GetScanStateDisplayOrder(recipeConfig, profConfig)
         if not profNode[recipeScanState] then
             local sectionNode = profNode:Insert({
+                parentKey = recipeScanState,
                 order = recipeScanState,
                 headerInfo = {
-                    label = CraftScan.RecipeStateName(recipeScanState),
+                    label = CraftScan.RecipeStateName(recipeConfig, profConfig),
                     startCollapsed = true,
                 },
             })
@@ -196,7 +285,7 @@ local function MakeProfessionNodeFactory(root)
         local recipeConfig = configInfo.recipeConfig
 
         local isCurrent = CraftScan.Utils.IsCurrentExpansion(profID)
-        local recipeScanState = recipeConfig.scan_state
+        local recipeScanState = GetScanStateDisplayOrder(recipeConfig, configInfo.profConfig)
 
         -- Expand the root
         root:SetCollapsed(
@@ -261,13 +350,14 @@ local function MakeProfessionNodeFactory(root)
         for _, scanStateNode in ipairs(profNode:GetNodes()) do
             for _, recipeNode in ipairs(scanStateNode:GetNodes()) do
                 if recipeNode.data.configInfo then
+                    local configInfo = recipeNode.data.configInfo
                     if
-                        recipeNode.data.configInfo.recipeConfig.scan_state
+                        GetScanStateDisplayOrder(configInfo.recipeConfig, configInfo.profConfig)
                         ~= scanStateNode.data.order
                     then
                         table.insert(scanStateChanges, recipeNode.data.configInfo)
                     end
-                    existingRecipeIDs[recipeNode.data.configInfo.recipeID] = true
+                    existingRecipeIDs[configInfo.recipeID] = true
                 end
             end
         end
@@ -305,6 +395,7 @@ local function MakeProfessionNodeFactory(root)
             for _, profNode in ipairs(toBeRemoved) do
                 charNode:Remove(profNode)
                 charNode[profNode.data.configInfo.profID] = nil
+                EraseEmptyParents(charNode)
             end
         end
 
@@ -487,6 +578,7 @@ function CraftScanConfigMenuMixin:OnLoad()
     -- it. This event should allow us to move recipes from Unlearned over to
     -- Pending as they are learned.
     self:RegisterEvent('NEW_RECIPE_LEARNED')
+    self:RegisterEvent('TRADE_SKILL_ITEM_CRAFTED_RESULT')
     self:SetScript('OnEvent', function(self, event, ...)
         if event == 'NEW_RECIPE_LEARNED' then
             local recipeID, recipeLevel, baseRecipeID = ...
@@ -500,6 +592,11 @@ function CraftScanConfigMenuMixin:OnLoad()
                 CraftScan.Config.UpdateProfession(char, profInfo.professionID, profConfig)
 
                 -- else, just trained a new profession and need to open it to ScanAllRecipes
+            end
+        elseif event == 'TRADE_SKILL_ITEM_CRAFTED_RESULT' then
+            local resultData = ...
+            if resultData.concentrationSpent and resultData.concentrationSpent ~= 0 then
+                CraftScan.SaveConcentrationData()
             end
         end
     end)
@@ -675,7 +772,9 @@ function CraftScan.Config.OnRecipeScanStateChange(configInfo, skipReload)
         configInfo.profConfig,
         configInfo.recipeConfig
     )
+    local oldParent = configInfo.treeNode:GetParent()
     newParent:MoveNode(configInfo.treeNode)
+    EraseEmptyParents(oldParent)
 
     if not skipReload then
         -- TreeNodeMixin:InsertNode does invalidate prior to sort, so the node shows up

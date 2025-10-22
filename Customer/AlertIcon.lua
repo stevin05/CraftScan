@@ -58,7 +58,7 @@ function CraftScanPageButtonMixin:UpdateIcon(icon)
 end
 
 function CraftScanScannerMenuMixin:UpdateFrameVisibility(...)
-    if CraftScan.Utils.IsScanningEnbled(...) then
+    if CraftScan.Utils.IsScanningEnabled(...) then
         self:Show()
     else
         self:Hide()
