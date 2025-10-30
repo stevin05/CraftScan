@@ -351,7 +351,7 @@ end
 function CraftScan.SetupSlider(panel, field, keyword, min, max, steps)
     field.Title:SetText(L('dialog.' .. keyword))
     CraftScan.SetupInfoIcon(field.Info, keyword)
-    max = max or 1200
+    max = max or 1000
     min = min or 0
     local formatters = {
         [MinimalSliderWithSteppersMixin.Label.Right] = function(value)
