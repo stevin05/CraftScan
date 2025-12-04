@@ -1,4 +1,4 @@
-## Interface: 110205
+## Interface: 110207
 ## Title: CraftScan
 ## Version: 1.5.1
 ## Notes: Scans chat for potential work orders
