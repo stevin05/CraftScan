@@ -64,6 +64,8 @@ AceConfig:RegisterOptionsTable('CraftScan', options)
 AceConfigCmd:CreateChatCommand('craftscan', 'CraftScan')
 AceConfigCmd:CreateChatCommand('cs', 'CraftScan')
 
+table.insert(UISpecialFrames, 'CraftScanConfigPage')
+
 local function IsEmptyNode(node)
     for _, child in ipairs(node:GetNodes()) do
         if child.data and (child.data.configInfo or child.data.headerInfo) then

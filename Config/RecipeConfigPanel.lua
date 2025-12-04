@@ -55,7 +55,14 @@ function CraftScanRecipeConfigPanelMixin:PlaceStateButtons()
 
     if state == ON then
         self.EnableScanning:Hide()
-        self:SetupButton(self.PendingReview, PENDING, 'pending_review_state', 'BOTTOMRIGHT', -20, 28)
+        self:SetupButton(
+            self.PendingReview,
+            PENDING,
+            'pending_review_state',
+            'BOTTOMRIGHT',
+            -20,
+            28
+        )
         self:SetupButton(self.DisableScanning, OFF, 'disable_scan_state', 'BOTTOMRIGHT', -20, 0)
         return true -- display menus
     end
@@ -148,22 +155,24 @@ function CraftScanRecipeConfigPanelMixin:SetupRecipeIcon()
     local quality = 0
     if outputItemInfo.hyperlink then
         local item = Item:CreateFromItemLink(outputItemInfo.hyperlink)
-        self.item = item
-        quality = item:GetItemQuality()
+        item:ContinueOnItemLoad(function()
+            self.item = item
+            quality = item:GetItemQuality()
 
-        text = WrapTextInColor(item:GetItemName(), item:GetItemQualityColor().color)
+            text = WrapTextInColor(item:GetItemName(), item:GetItemQualityColor().color)
 
-        self.IconLabel:ClearAllPoints()
-        self.IconLabel:SetPoint('LEFT', self.RecipeIcon, 'RIGHT', 14, 17)
+            self.IconLabel:ClearAllPoints()
+            self.IconLabel:SetPoint('LEFT', self.RecipeIcon, 'RIGHT', 14, 17)
 
-        self.IconLabel:SetHeight(200)
-        self.IconLabel:SetText(text)
-        self.IconLabel:SetWidth(500)
-        self.IconLabel:SetHeight(self.IconLabel:GetStringHeight())
+            self.IconLabel:SetHeight(200)
+            self.IconLabel:SetText(text)
+            self.IconLabel:SetWidth(500)
+            self.IconLabel:SetHeight(self.IconLabel:GetStringHeight())
 
-        self.IconSubLabel:SetText(
-            CraftScan.RecipeStateName(self.configInfo.recipeConfig, self.configInfo.profConfig)
-        )
+            self.IconSubLabel:SetText(
+                CraftScan.RecipeStateName(self.configInfo.recipeConfig, self.configInfo.profConfig)
+            )
+        end)
     end
 
     self.RecipeIcon.Icon:SetTexture(outputItemInfo.icon)
