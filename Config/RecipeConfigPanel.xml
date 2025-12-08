@@ -122,6 +122,7 @@
             <Button parentKey="EnableScanning" inherits="CraftScanConfigButtonTemplate" />
             <Button parentKey="DisableScanning" inherits="CraftScanConfigButtonTemplate" />
             <Button parentKey="PendingReview" inherits="CraftScanConfigButtonTemplate" />
+            <Button parentKey="EnableAll" inherits="CraftScanConfigButtonTemplate" />
         </Frames>
 
     </Frame>

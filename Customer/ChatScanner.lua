@@ -297,7 +297,6 @@ function CraftScan.Scanner.LoadConfig()
             end
         end
         C_Timer.After(concentrationMinTime + 1, LoadIfScanning)
-        CraftScan.Debug.Print(concentrationMinTime, 'Reloading for concentration in')
     end
 end
 

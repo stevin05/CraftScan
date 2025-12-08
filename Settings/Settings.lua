@@ -35,7 +35,6 @@ local function SetupMultiSelectDropdown(dropdown, setting, options, width, initT
         end
 
         local function SetSelected(value)
-            CraftScan.Debug.Print(value, "Selected item")
             local values = CraftScan.Utils.saved(CraftScan.DB.settings, setting.variableKey, {})
             for i, entry in ipairs(values) do
                 if entry == value then

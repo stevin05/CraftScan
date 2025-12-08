@@ -78,9 +78,7 @@ end
 local function EraseEmptyParents(node)
     if IsEmptyNode(node) then
         local parent = node:GetParent()
-        CraftScan.Debug.Print(node, 'removed')
         parent:Remove(node)
-        CraftScan.Debug.Print(node.data.parentKey, 'parentKey')
         parent[node.data.parentKey] = nil
         EraseEmptyParents(parent)
     end
@@ -787,6 +785,8 @@ function CraftScan.Config.OnRecipeScanStateChange(configInfo, skipReload)
         -- Update the Options panel based on the new state.
         configInfo.LoadOptions(configInfo)
     end
+
+    CraftScan.RecipeSchematicMenu.UpdateLabelText(configInfo.recipeID)
 end
 
 function CraftScan.Config.UpdateProfession(char, profID, profConfig)

@@ -1280,7 +1280,6 @@ local function SetupPopupDialog(key, config)
         preferredIndex = 3, -- Avoid UI taint issues by using a higher index
         EditBoxOnEnterPressed = function(self)
             local parent = self:GetParent()
-            CraftScan.Debug.Print(parent)
             parent:GetButton1():Click() -- Simulate a click on the Confirm button
         end,
         EditBoxOnEscapePressed = function(self)

@@ -218,14 +218,10 @@ function CraftScanTagConfigPanelMixin:NewTagInvalid(value)
     local _, closes = value:gsub('}', '')
     if closes > 1 or (closes == 1 and value:sub(-1) ~= '}') then
         -- } not at the end of the string
-        CraftScan.Debug.Print(2, 'NewTagInvalid')
-        CraftScan.Debug.Print(closes, 'closes')
-        CraftScan.Debug.Print(value:sub(-1), 'sub')
         return L('tag.invalid.braces')
     end
 
     if opens ~= closes then
-        CraftScan.Debug.Print(2, 'NewTagInvalid')
         return L('tag.invalid.braces')
     end
 

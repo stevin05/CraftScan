@@ -12,6 +12,7 @@ local db_player = nil
 local db_prof = nil
 local db_parent_prof = nil
 local db_recipes = nil
+local selectedRecipeID = nil
 
 local saved = CraftScan.Utils.saved
 
@@ -76,32 +77,106 @@ local function IsPlayerProfession(profession)
         and PlayerKnowsProfession(profession)
 end
 
-function ScanAllRecipes(profession)
+local function DeleteNonOrderRecipe(recipeID)
+    -- Upgrade-style code that can be removed at some point. We
+    -- originally scanned in all recipes. Delete unconfigured
+    -- recipes that are not bind-able.
+    --
+    -- We initialize a recipe with only its scan_state. If that's still the only
+    -- value and the item has no binding (BoE/BoP), then it will never be sent
+    -- in a crafting order.
+    local deleteIt = true
+    for key, _ in pairs(db_recipes[recipeID]) do
+        if key ~= 'scan_state' then
+            deleteIt = false
+            break
+        end
+    end
+    if deleteIt then
+        db_recipes[recipeID] = nil
+    end
+end
+
+local function ScanAllRecipes(profession)
     -- TBD - Is this cheap enough to run the first time a profession is opened every login?
 
     -- This returns all recipes for all expansions. There must be a better way
     -- to filter it to only the current expansion, but not finding it, so we
     -- manually look up the profession of each recipe and ignore those that
     -- don't match the current expansion profession.
+    local loopComplete = false
+    local itemsLoaded = 0
+    local itemsPending = 0
     for _, id in pairs(C_TradeSkillUI.GetAllRecipeIDs()) do
         local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
         local profInfo = C_TradeSkillUI.GetProfessionInfoByRecipeID(id)
-        if profInfo.professionID == profession.professionID then
-            local recipeConfig = saved(db_recipes, id, {
-                scan_state = recipeInfo.learned and CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
-                    or CraftScan.CONST.RECIPE_STATES.UNLEARNED,
-            })
-            if
-                recipeInfo.learned
-                and recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.UNLEARNED
-            then
-                -- Flip recently learned recipes over to pending review in case
-                -- we missed learned event.
-                recipeConfig.scan_state = CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
+
+        local item = nil
+        if not recipeInfo.isRecraft and recipeInfo.hyperlink then
+            item = Item:CreateFromItemLink(recipeInfo.hyperlink)
+        end
+        if item and not item:IsItemEmpty() and profInfo.professionID == profession.professionID then
+            itemsPending = itemsPending + 1
+            item:ContinueOnItemLoad(function()
+                -- Not finding an enum to use for this. Non-binding items will
+                -- likely never be requested via crafting.
+                -- https://wowpedia.fandom.com/wiki/LE_ITEM_BIND
+                local bindType = select(14, GetItemInfo(item:GetItemLink()))
+                if bindType ~= 0 then
+                    local recipeConfig = saved(db_recipes, id, {
+                        scan_state = recipeInfo.learned
+                                and CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
+                            or CraftScan.CONST.RECIPE_STATES.UNLEARNED,
+                    })
+                    if
+                        recipeInfo.learned
+                        and recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.UNLEARNED
+                    then
+                        -- Flip recently learned recipes over to pending review in case
+                        -- we missed learned event.
+                        recipeConfig.scan_state = CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
+                    end
+                elseif db_recipes[id] then
+                    DeleteNonOrderRecipe(id)
+                end
+
+                itemsLoaded = itemsLoaded + 1
+                if loopComplete and itemsLoaded == itemsPending then
+                    CraftScan.Config.UpdateProfession(
+                        playerNameWithRealm,
+                        profession.professionID,
+                        db_prof
+                    )
+                end
+            end)
+        elseif db_recipes[id] then
+            DeleteNonOrderRecipe(id)
+        end
+    end
+    loopComplete = true
+    if itemsLoaded == itemsPending then
+        CraftScan.Config.UpdateProfession(playerNameWithRealm, profession.professionID, db_prof)
+    end
+end
+
+CraftScan.RecipeSchematicMenu = {}
+CraftScan.RecipeSchematicMenu.UpdateLabelText = function(recipeID)
+    if showMenuButton then
+        if db_parent_prof.character_disabled then
+            showMenuButton.ScanningLabel:Hide()
+        else
+            if recipeID == selectedRecipeID then
+                if db_recipes[recipeID] then
+                    showMenuButton.ScanningLabel:SetText(
+                        CraftScan.RecipeStateName(db_recipes[recipeID], db_prof)
+                    )
+                    showMenuButton.ScanningLabel:Show()
+                else
+                    showMenuButton.ScanningLabel:SetText(L('Not supported'))
+                end
             end
         end
     end
-    CraftScan.Config.UpdateProfession(playerNameWithRealm, profession.professionID, db_prof)
 end
 
 local seen_profs = {}
@@ -174,6 +249,9 @@ local function OnRecipeSelected()
         ScanAllRecipes(profession)
         update_scan_complete[profession.professionID] = true
     end
+
+    selectedRecipeID = recipe.recipeID
+    CraftScan.RecipeSchematicMenu.UpdateLabelText(selectedRecipeID)
 end
 
 CraftScan_ScannerConfigButtonMixin = {}

@@ -55,6 +55,7 @@ function CraftScanRecipeConfigPanelMixin:PlaceStateButtons()
 
     if state == ON then
         self.EnableScanning:Hide()
+        self.EnableAll:Hide()
         self:SetupButton(
             self.PendingReview,
             PENDING,
@@ -69,6 +70,7 @@ function CraftScanRecipeConfigPanelMixin:PlaceStateButtons()
 
     if state == OFF then
         self.DisableScanning:Hide()
+        self.EnableAll:Hide()
         self:SetupButton(self.PendingReview, PENDING, 'pending_review_state', 'TOPLEFT', 10, -120)
         self:SetupButton(self.EnableScanning, ON, 'enable_scan_state', 'TOPLEFT', 10, -148)
         return false -- hide menus
@@ -78,6 +80,9 @@ function CraftScanRecipeConfigPanelMixin:PlaceStateButtons()
         self.PendingReview:Hide()
         self:SetupButton(self.EnableScanning, ON, 'enable_scan_state', 'TOPLEFT', 10, -120)
         self:SetupButton(self.DisableScanning, OFF, 'disable_scan_state', 'TOPLEFT', 10, -148)
+
+        self:SetupEnableAllButton()
+
         return false -- hide menus
     end
 
@@ -85,6 +90,7 @@ function CraftScanRecipeConfigPanelMixin:PlaceStateButtons()
         self.PendingReview:Hide()
         self.EnableScanning:Hide()
         self.DisableScanning:Hide()
+        self.EnableAll:Hide()
         return true -- display menus
     end
 end
@@ -137,6 +143,29 @@ function CraftScanRecipeConfigPanelMixin:Init(configInfo)
 
     self.Left:Show()
     self.Right:Show()
+end
+
+function CraftScanRecipeConfigPanelMixin:SetupEnableAllButton()
+    local button = self.EnableAll
+    button:ClearAllPoints()
+    button:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -20, 0)
+    CraftScan.SetupButton(button, 'enable_all', function()
+        -- Flip everything from pending review to on, then update the tree view.
+        for _, recipe in pairs(self.configInfo.profConfig.recipes) do
+            if recipe.scan_state == C.RECIPE_STATES.PENDING_REVIEW then
+                recipe.scan_state = C.RECIPE_STATES.SCANNING_ON
+            end
+        end
+        CraftScan.Config.UpdateProfession(
+            self.configInfo.char,
+            self.configInfo.profID,
+            self.configInfo.profConfig
+        )
+
+        -- This one refreshes the menu of the currently selected item.
+        CraftScan.Config.OnRecipeScanStateChange(self.configInfo)
+    end)
+    button:Show()
 end
 
 function CraftScanRecipeConfigPanelMixin:SetupButton(button, result_state, keyword, point, x, y)
