@@ -788,32 +788,38 @@ local function UpgradePersistentConfig()
         -- 'scan_state' on, to support new scan states of off, pending, and
         -- unlearned.
         for _, charConfig in pairs(CraftScan.DB.characters) do
-            for _, profConfig in pairs(charConfig.professions) do
-                local all_enabled = profConfig.all_enabled
-                for _, recipeConfig in pairs(profConfig.recipes) do
-                    if not recipeConfig.scan_state then
-                        -- We never stored unlearned recipes prior to the
-                        -- upgrade to 'scan_state', so anything not enabled
-                        -- should be flagged pending so the user can decide to
-                        -- move it to on or off.
-                        local enabled = recipeConfig.enabled
-                        if enabled or all_enabled then
-                            recipeConfig.scan_state = CraftScan.CONST.RECIPE_STATES.SCANNING_ON
-                        else
-                            recipeConfig.scan_state = CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
+            if charConfig.professions then
+                for _, profConfig in pairs(charConfig.professions) do
+                    if profConfig.recipes then
+                        local all_enabled = profConfig.all_enabled
+                        for _, recipeConfig in pairs(profConfig.recipes) do
+                            if not recipeConfig.scan_state then
+                                -- We never stored unlearned recipes prior to the
+                                -- upgrade to 'scan_state', so anything not enabled
+                                -- should be flagged pending so the user can decide to
+                                -- move it to on or off.
+                                local enabled = recipeConfig.enabled
+                                if enabled or all_enabled then
+                                    recipeConfig.scan_state =
+                                        CraftScan.CONST.RECIPE_STATES.SCANNING_ON
+                                else
+                                    recipeConfig.scan_state =
+                                        CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
+                                end
+                                recipeConfig['enabled'] = nil
+                            end
+                            recipeConfig['categoryID'] = nil
+                            if recipeConfig['override'] then
+                                recipeConfig['omit_profession'] = recipeConfig['override']
+                                recipeConfig['override'] = nil
+                            end
                         end
-                        recipeConfig['enabled'] = nil
-                    end
-                    recipeConfig['categoryID'] = nil
-                    if recipeConfig['override'] then
-                        recipeConfig['omit_profession'] = recipeConfig['override']
-                        recipeConfig['override'] = nil
+                        -- It's becoming much easier to determine what is and is not
+                        -- enabled, so the 'all_enabled' functionality is going away.
+                        profConfig['all_enabled'] = nil
+                        profConfig['categoryIDsUpgraded'] = nil
                     end
                 end
-                -- It's becoming much easier to determine what is and is not
-                -- enabled, so the 'all_enabled' functionality is going away.
-                profConfig['all_enabled'] = nil
-                profConfig['categoryIDsUpgraded'] = nil
             end
         end
     end
