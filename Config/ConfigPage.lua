@@ -153,42 +153,42 @@ function CraftScan.SaveConcentrationData()
     end
 end
 
+local function SortByHeaderLabel(lhs, rhs)
+    return strcmputf8i(lhs.data.headerInfo.label, rhs.data.headerInfo.label) < 0
+end
+
+local function SetSortComparator(node, comparator)
+    local affectChildren = false
+    local skipSort = false
+
+    local function OrderComparatorWrapper(lhs, rhs)
+        local lhsOrder = lhs.data.order
+        local rhsOrder = rhs.data.order
+        if lhsOrder ~= rhsOrder then
+            return lhsOrder < rhsOrder
+        end
+
+        if comparator then
+            return comparator(lhs, rhs)
+        end
+        return false
+    end
+
+    node:SetSortComparator(OrderComparatorWrapper, affectChildren, skipSort)
+end
+
 local function MakeProfessionNodeFactory(root)
     local db = {}
 
-    local function SetSortComparator(node, comparator)
-        local affectChildren = false
-        local skipSort = false
-
-        local function OrderComparatorWrapper(lhs, rhs)
-            local lhsOrder = lhs.data.order
-            local rhsOrder = rhs.data.order
-            if lhsOrder ~= rhsOrder then
-                return lhsOrder < rhsOrder
-            end
-
-            if comparator then
-                return comparator(lhs, rhs)
-            end
-            return false
-        end
-
-        node:SetSortComparator(OrderComparatorWrapper, affectChildren, skipSort)
-    end
-
     local function SortByItemLabel(lhs, rhs)
         return strcmputf8i(lhs.data.configInfo.label, rhs.data.configInfo.label) < 0
-    end
-
-    local function SortByHeaderLabel(lhs, rhs)
-        return strcmputf8i(lhs.data.headerInfo.label, rhs.data.headerInfo.label) < 0
     end
 
     local function GetProfessionNode(char, profID, profConfig)
         local isCurrent = CraftScan.Utils.IsCurrentExpansion(profID)
         if not db[isCurrent] then
             local expansionNode = root:Insert({
-                order = 0,
+                order = isCurrent and 3 or 4,
                 headerInfo = {
                     label = L(isCurrent and 'Crafters' or 'Legacy Crafters'),
                     startCollapsed = not isCurrent,
@@ -322,17 +322,30 @@ local function MakeProfessionNodeFactory(root)
         })
     end
 
-    local function PopulateProfessionNode(char, profID, profConfig, existingRecipeIDs)
-        for recipeID, recipeConfig in pairs(profConfig.recipes) do
+    local function PopulateProfessionNode(char, profID, profConfig, existingRecipeIDs, onFinished)
+        -- For the initial load, the tree is not even displayed, so all this
+        -- work occurring in the background happens very quickly and the page
+        -- opens almost instantly. Once the tree is displayed and we're updating
+        -- it, there's a bit of a screen lock up as the tree is updated, so we
+        -- time slice that into small chunks so the tree updates in real time
+        -- for the user to see instead of freezing the screen.
+        local perFrame = existingRecipeIDs and 5 or 10000000
+
+        CraftScan.TimeSlice(profConfig.recipes, perFrame, function(recipeID, recipeConfig)
             if not existingRecipeIDs or not existingRecipeIDs[recipeID] then
                 local parentNode = GetRecipeParentNode(char, profID, profConfig, recipeConfig)
                 local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
                 InsertRecipeNode(parentNode, char, profID, profConfig, recipeInfo, recipeConfig)
             end
-        end
+        end, onFinished)
     end
 
     local function UpdateProfessionNode(char, profID, profConfig)
+        if not menuInitialized then
+            -- Nothing to update. It'll be correct when initialized.
+            return
+        end
+
         -- This is all  overkill. We should simply wipe out the tree and reload
         -- from the current state, but I want to play with the tree update
         -- functions and try to get them right.
@@ -347,19 +360,36 @@ local function MakeProfessionNodeFactory(root)
         local profNode = GetProfessionNode(char, profID, profConfig)
         local scanStateChanges = {}
         local existingRecipeIDs = {}
+        local emptyParents = {}
         for _, scanStateNode in ipairs(profNode:GetNodes()) do
+            local toBeErased = {}
             for _, recipeNode in ipairs(scanStateNode:GetNodes()) do
                 if recipeNode.data.configInfo then
                     local configInfo = recipeNode.data.configInfo
-                    if
-                        GetScanStateDisplayOrder(configInfo.recipeConfig, configInfo.profConfig)
-                        ~= scanStateNode.data.order
-                    then
-                        table.insert(scanStateChanges, recipeNode.data.configInfo)
+                    if not configInfo.profConfig.recipes[configInfo.recipeID] then
+                        -- If the recipe has been removed from the config, erase
+                        -- it from the tree.
+                        table.insert(toBeErased, recipeNode)
+                    else
+                        if
+                            GetScanStateDisplayOrder(configInfo.recipeConfig, configInfo.profConfig)
+                            ~= scanStateNode.data.order
+                        then
+                            table.insert(scanStateChanges, recipeNode.data.configInfo)
+                        end
+
+                        existingRecipeIDs[configInfo.recipeID] = true
                     end
-                    existingRecipeIDs[configInfo.recipeID] = true
                 end
             end
+            for _, node in ipairs(toBeErased) do
+                scanStateNode:Remove(node)
+                table.insert(emptyParents, scanStateNode)
+            end
+        end
+
+        for _, node in ipairs(emptyParents) do
+            EraseEmptyParents(node)
         end
 
         -- Move any nodes in the wrong place.
@@ -635,7 +665,10 @@ function CraftScanConfigMenuMixin:OnShow()
 
     local node = dataProvider:GetRootNode()
 
+    SetSortComparator(node, SortByHeaderLabel)
+
     node:Insert({
+        order = 0,
         configInfo = {
             label = L('General'),
             LoadOptions = CraftScan.Config.LoadGlobalConfigOptions,
@@ -643,37 +676,41 @@ function CraftScanConfigMenuMixin:OnShow()
     })
 
     node:Insert({
+        order = 1,
         configInfo = {
             label = L('dialog.tag.header'),
             LoadOptions = CraftScan.Config.LoadSubstitutionTagConfigOptions,
         },
     })
 
-    node:Insert({ bottomPadding = true })
+    node:Insert({ order = 2, bottomPadding = true })
+
+    local function CollapseTree()
+        -- Processing startCollapsed in headerInfo's Init does not work, but this seems to.
+        local excludeCollapsed = false
+        dataProvider:ForEach(function(node)
+            local elementData = node:GetData()
+            if elementData.headerInfo and elementData.headerInfo.startCollapsed then
+                node:SetCollapsed(true)
+
+                -- The button is sometimes not initialized yet? Maybe elements that
+                -- haven't been rendered haven't been init'ed yet?
+                if elementData.headerInfo.button then
+                    elementData.headerInfo.button:SetCollapseState(true)
+                end
+            end
+        end, excludeCollapsed)
+    end
 
     self.GetRecipeParentNode, self.PopulateProfessionNode, self.UpdateProfessionNode, self.RemoveMissingProfessionNodes, self.ExpandToNode =
         MakeProfessionNodeFactory(node)
     for char, charConfig in pairs(CraftScan.DB.characters) do
         for profID, profConfig in pairs(charConfig.professions) do
-            self.PopulateProfessionNode(char, profID, profConfig)
+            self.PopulateProfessionNode(char, profID, profConfig, nil, CollapseTree)
         end
     end
 
     self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
-
-    -- Processing startCollapsed in headerInfo's Init does not work, but this seems to.
-    dataProvider:ForEach(function(node)
-        local elementData = node:GetData()
-        if elementData.headerInfo and elementData.headerInfo.startCollapsed then
-            node:SetCollapsed(true)
-
-            -- The button is sometimes not initialized yet? Maybe elements that
-            -- haven't been rendered haven't been init'ed yet?
-            if elementData.headerInfo.button then
-                elementData.headerInfo.button:SetCollapseState(true)
-            end
-        end
-    end, true)
 end
 
 CraftScanConfigMenuHeaderMixin = {}

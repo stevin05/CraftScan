@@ -392,7 +392,7 @@ function CraftScan.LOCAL_EN:GetData()
         ['dialog.prof.keywords.tooltip.body'] = "A comma separated list of keywords. Keyword matching is used when a request does not include an item link.\n\nA profession term must be found in the message before any item keywords are checked.\n\nThis should include anything a customer might say that indicates a specific profession, such as 'plate' for Blacksmithing.",
 
         ['dialog.prof.exclusions'] = 'Blacklisted profession keywords',
-        ['dialog.prof.exclusions.tooltip.body'] = "A comma separated list of keywords. A message that matches the profession but includes on of these keywords will not be considered a profession match.\n\nThe primary use case for this list is profession tools. Requests often include the profession of the tool the customer wants, not the profession that can create it. For example, 'LF alc tool' is likely someone looking for a Tailor or Scribe to make them a tool for Alchemy, so we should not match that to Alchemy.",
+        ['dialog.prof.exclusions.tooltip.body'] = "A comma separated list of keywords. A message that matches the profession but includes one of these keywords will not be considered a profession match.\n\nThe primary use case for this list is profession tools. Requests often include the profession of the tool the customer wants, not the profession that can create it. For example, 'LF alc tool' is likely someone looking for a Tailor or Scribe to make them a tool for Alchemy, so we should not match that to Alchemy.",
 
         ['dialog.prof.commission'] = 'Profession commission',
         ['dialog.prof.commission.tooltip.body'] = "For example, '10000g', Default: 'Any'\nThis text appears in the customer's 'Find Crafter' table.\n\nIf specified, the item specific commission overrides this value.",
@@ -453,6 +453,7 @@ function CraftScan.LOCAL_EN:GetData()
         ['dialog.enable_all'] = 'Enable all',
         ['dialog.enable_all.tooltip.body'] = 'Enable scanning for all recipes that are currently pending review. Unlearned recipes will not be automatically enabled when they are learned.',
         ['Not supported'] = 'Not scannable',
+        ['decor'] = 'Decor',
 
         -- ChatGPT prompt:
         -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.

@@ -164,6 +164,9 @@ function CraftScanRecipeConfigPanelMixin:SetupEnableAllButton()
 
         -- This one refreshes the menu of the currently selected item.
         CraftScan.Config.OnRecipeScanStateChange(self.configInfo)
+
+        -- And update the scanner
+        CraftScan.Config.OnConfigChange(self.configInfo)
     end)
     button:Show()
 end
@@ -174,6 +177,7 @@ function CraftScanRecipeConfigPanelMixin:SetupButton(button, result_state, keywo
     CraftScan.SetupButton(button, keyword, function()
         self.configInfo.recipeConfig.scan_state = result_state
         CraftScan.Config.OnRecipeScanStateChange(self.configInfo)
+        CraftScan.Config.OnConfigChange(self.configInfo)
     end)
     button:Show()
 end
@@ -273,7 +277,9 @@ function CraftScanRecipeConfigPanelMixin:GetInstructions(keyword)
         return result
     elseif keyword == 'item.secondary_keywords' then
         local quality = self.item:GetItemQuality()
-        if quality == Enum.ItemQuality.Uncommon then
+        if CraftScan.IsDecor(self.item:GetItemID()) then
+            return Wrap(L('decor'))
+        elseif quality == Enum.ItemQuality.Uncommon then
             -- The only blue craft-able items lately are the PVP ones, so we
             -- override 'uncommon' to mean PVP by default. chatgpt says 'pvp' is
             -- universal, so we don't bother localizing.

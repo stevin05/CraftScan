@@ -34,8 +34,10 @@ Locals/Localization.lua
 Utils/Utils.xml
 Utils/ReleaseNotes.xml
 Utils/Dialog.xml
+Utils/TimeSlice.lua
 Utils/Tooltip.lua
 Utils/TooltipPlot.lua
+Utils/WaitGroup.lua
 Utils/Comm.lua
 Utils/FStrings.lua
 Utils/Debug.lua

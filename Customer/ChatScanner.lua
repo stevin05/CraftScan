@@ -175,7 +175,13 @@ end
 -- This config should change very rarely, so was more concerned with correctness
 -- over efficiency, and didn't want to code special case updates for each
 -- different button option.
+local loadInProgress = false
+local needsReload = false
 function CraftScan.Scanner.LoadConfig()
+    if loadInProgress then
+        needsReload = true
+        return
+    end
     resetConfig()
 
     config.exclusions = ParseStringList(CraftScan.DB.settings.exclusions)
@@ -228,12 +234,40 @@ function CraftScan.Scanner.LoadConfig()
         return lhs.crafter < rhs.crafter
     end)
 
+    local concentrationMinTime = 0
+    local waitGroup = CraftScan.WaitGroup(function()
+        loadInProgress = false
+        if needsReload then
+            -- A config change was made while we were processing the last config
+            -- change. Restart.
+            needsReload = false
+            C_Timer.After(0, CraftScan.Scanner.LoadConfig)
+            return
+        end
+
+        -- Very unlikely to matter, but if the user is logged on as they reach a
+        -- concentration threshold, reload the config to scan for that recipe.
+        --
+        -- This can be heavy weight work with a large config, so we only do it if
+        -- scanning is enabled (currently just IsResting()), so we don't lock up
+        -- someone's UI in a dungeon.
+        if concentrationMinTime ~= 0 then
+            local function LoadIfScanning()
+                if not CraftScan.Utils.IsScanningEnabled() then
+                    C_Timer.After(60, LoadIfScanning)
+                else
+                    CraftScan.Scanner.LoadConfig()
+                end
+            end
+            C_Timer.After(concentrationMinTime + 1, LoadIfScanning)
+        end
+    end)
+
     -- Flatten the keywords, storing the path back to their source so we can
     -- find the greeting after getting a match.
     --
     -- Convert recipeIDs to itemIDs, which is what we will find in chat message
     -- links.
-    local concentrationMinTime = 0
     for _, entry in ipairs(parentProfessions) do
         local crafter = entry.crafter
         local parentProf = entry.parentProfession
@@ -253,7 +287,8 @@ function CraftScan.Scanner.LoadConfig()
             local prof = pEntry.profession
             if prof.recipes then
                 local profID = pEntry.profID
-                for recipeID, recipe in pairs(prof.recipes) do
+
+                local function ProcessRecipe(recipeID, recipe)
                     local scanningOn, timeToScanningOn =
                         CraftScan.Scanner.RecipeScanningOn(prof, recipe)
                     if scanningOn then
@@ -278,26 +313,16 @@ function CraftScan.Scanner.LoadConfig()
                         concentrationMinTime = timeToScanningOn
                     end
                 end
-            end
-        end
-    end
 
-    -- Very unlikely to matter, but if the user is logged on as they reach a
-    -- concentration threshold, reload the config to scan for that recipe.
-    --
-    -- This can be heavy weight work with a large config, so we only do it if
-    -- scanning is enabled (currently just IsResting()), so we don't lock up
-    -- someone's UI in a dungeon.
-    if concentrationMinTime ~= 0 then
-        local function LoadIfScanning()
-            if not CraftScan.Utils.IsScanningEnabled() then
-                C_Timer.After(60, LoadIfScanning)
-            else
-                CraftScan.Scanner.LoadConfig()
+                local perFrame = 10
+                waitGroup:Add()
+                CraftScan.TimeSlice(prof.recipes, perFrame, ProcessRecipe, function()
+                    waitGroup:Done()
+                end)
             end
         end
-        C_Timer.After(concentrationMinTime + 1, LoadIfScanning)
     end
+    waitGroup:Close()
 end
 
 local function ParentProfessionConfig(crafterInfo)

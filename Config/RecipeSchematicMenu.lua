@@ -12,6 +12,8 @@ local db_player = nil
 local db_prof = nil
 local db_parent_prof = nil
 local db_recipes = nil
+local db_current_expansion_recipes = nil
+local currentExpansionProfID = nil
 local selectedRecipeID = nil
 
 local saved = CraftScan.Utils.saved
@@ -55,6 +57,12 @@ local function CreateMenuShownButton()
     showMenuButtonInitialized = true
 end
 
+local function IsDecor(itemInfo)
+    local tryGetOwnedInfo = false
+    return C_HousingCatalog.GetCatalogEntryInfoByItem(itemInfo, tryGetOwnedInfo) ~= nil
+end
+CraftScan.IsDecor = IsDecor
+
 local function PlayerKnowsProfession(profession)
     for _, prof in ipairs(CraftScan.CONST.PROFESSIONS) do
         if prof.professionID == profession.parentProfessionID then
@@ -97,17 +105,18 @@ local function DeleteNonOrderRecipe(recipeID)
     end
 end
 
-local function ScanAllRecipes(profession)
-    -- TBD - Is this cheap enough to run the first time a profession is opened every login?
+local function ScanAllRecipes()
+    -- Once all items are done processing, we update the tree view
+    local professions = {}
+    local waitGroup = CraftScan.WaitGroup(function()
+        for id, config in pairs(professions) do
+            CraftScan.Config.UpdateProfession(playerNameWithRealm, id, config)
+        end
+    end)
 
-    -- This returns all recipes for all expansions. There must be a better way
-    -- to filter it to only the current expansion, but not finding it, so we
-    -- manually look up the profession of each recipe and ignore those that
-    -- don't match the current expansion profession.
-    local loopComplete = false
-    local itemsLoaded = 0
-    local itemsPending = 0
-    for _, id in pairs(C_TradeSkillUI.GetAllRecipeIDs()) do
+    local perFrame = 1
+
+    local function ProcessRecipe(unused, id)
         local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
         local profInfo = C_TradeSkillUI.GetProfessionInfoByRecipeID(id)
 
@@ -115,19 +124,49 @@ local function ScanAllRecipes(profession)
         if not recipeInfo.isRecraft and recipeInfo.hyperlink then
             item = Item:CreateFromItemLink(recipeInfo.hyperlink)
         end
-        if item and not item:IsItemEmpty() and profInfo.professionID == profession.professionID then
-            itemsPending = itemsPending + 1
+
+        local profConfig = saved(
+            db_player.professions,
+            profInfo.professionID,
+            { parentProfID = profInfo.parentProfessionID }
+        )
+        professions[profInfo.professionID] = profConfig
+
+        local recipes = saved(profConfig, 'recipes', {})
+
+        if item and not item:IsItemEmpty() then
+            waitGroup:Add()
             item:ContinueOnItemLoad(function()
                 -- Not finding an enum to use for this. Non-binding items will
                 -- likely never be requested via crafting.
                 -- https://wowpedia.fandom.com/wiki/LE_ITEM_BIND
                 local bindType = select(14, GetItemInfo(item:GetItemLink()))
                 if bindType ~= 0 then
-                    local recipeConfig = saved(db_recipes, id, {
-                        scan_state = recipeInfo.learned
-                                and CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
-                            or CraftScan.CONST.RECIPE_STATES.UNLEARNED,
-                    })
+                    local isDecor = IsDecor(item:GetItemID())
+
+                    local recipeConfig = nil
+                    if
+                        isDecor
+                        and currentExpansionProfID ~= profInfo.professionID
+                        and recipes[id]
+                    then
+                        -- We already saved decor into legacy expansion
+                        -- configs, so if we find it there, move it to the
+                        -- current expansion config. Decor is expansion-less in
+                        -- terms of usefulness, so we store it all in the
+                        -- current expansion for convenience.
+                        recipeConfig = recipes[id]
+                        recipes[id] = nil
+                        db_current_expansion_recipes[id] = recipeConfig
+                    else
+                        recipeConfig =
+                            saved(isDecor and db_current_expansion_recipes or recipes, id, {
+                                scan_state = recipeInfo.learned
+                                        and CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
+                                    or CraftScan.CONST.RECIPE_STATES.UNLEARNED,
+                            })
+                    end
+
                     if
                         recipeInfo.learned
                         and recipeConfig.scan_state == CraftScan.CONST.RECIPE_STATES.UNLEARNED
@@ -136,27 +175,21 @@ local function ScanAllRecipes(profession)
                         -- we missed learned event.
                         recipeConfig.scan_state = CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
                     end
-                elseif db_recipes[id] then
+                elseif recipes[id] then
                     DeleteNonOrderRecipe(id)
                 end
 
-                itemsLoaded = itemsLoaded + 1
-                if loopComplete and itemsLoaded == itemsPending then
-                    CraftScan.Config.UpdateProfession(
-                        playerNameWithRealm,
-                        profession.professionID,
-                        db_prof
-                    )
-                end
+                waitGroup:Done()
             end)
-        elseif db_recipes[id] then
+        elseif recipes[id] then
             DeleteNonOrderRecipe(id)
         end
     end
-    loopComplete = true
-    if itemsLoaded == itemsPending then
-        CraftScan.Config.UpdateProfession(playerNameWithRealm, profession.professionID, db_prof)
+
+    local OnFinish = function()
+        waitGroup:Close()
     end
+    CraftScan.TimeSlice(C_TradeSkillUI.GetAllRecipeIDs(), perFrame, ProcessRecipe, OnFinish)
 end
 
 CraftScan.RecipeSchematicMenu = {}
@@ -166,9 +199,12 @@ CraftScan.RecipeSchematicMenu.UpdateLabelText = function(recipeID)
             showMenuButton.ScanningLabel:Hide()
         else
             if recipeID == selectedRecipeID then
-                if db_recipes[recipeID] then
+                if db_recipes[recipeID] or db_current_expansion_recipes[recipeID] then
                     showMenuButton.ScanningLabel:SetText(
-                        CraftScan.RecipeStateName(db_recipes[recipeID], db_prof)
+                        CraftScan.RecipeStateName(
+                            db_recipes[recipeID] or db_current_expansion_recipes[recipeID],
+                            db_prof
+                        )
                     )
                     showMenuButton.ScanningLabel:Show()
                 else
@@ -201,7 +237,8 @@ local function OnRecipeSelected()
 
     CreateMenuShownButton()
 
-    if not seen_profs[profession.parentProfessionID] then
+    local seen = seen_profs[profession.parentProfessionID]
+    if not seen then
         seen_profs[profession.parentProfessionID] = true
         CraftScan.Scanner.UpdateAnalyticsProfIDs(profession.parentProfessionID)
     end
@@ -243,11 +280,26 @@ local function OnRecipeSelected()
         CraftScanComm:ShareCharacterData()
     end
 
+    -- Decor is an expansion-less system, so we aggregate
+    -- decor items from all expansions into the primary
+    -- config for each profession.
+    --
+    -- The current expansion will always be the maximum
+    -- value profession ID with the same parent profession
+    -- ID.
+    db_current_expansion_recipes = db_recipes
+    currentExpansionProfID = profession.professionID
+    for profID, prof in pairs(db_player.professions) do
+        if prof.parentProfID == db_prof.parentProfID and currentExpansionProfID < profID then
+            currentExpansionProfID = profID
+            db_current_expansion_recipes = prof.recipes
+        end
+    end
+
     if db_parent_prof.character_disabled then
         showMenuButton:SetDisabled()
-    elseif is_new or not update_scan_complete[profession.professionID] then
-        ScanAllRecipes(profession)
-        update_scan_complete[profession.professionID] = true
+    elseif is_new or not seen then
+        ScanAllRecipes()
     end
 
     selectedRecipeID = recipe.recipeID
@@ -268,7 +320,7 @@ function CraftScan_ScannerConfigButtonMixin:OnClick(button)
     if db_parent_prof.character_disabled then
         db_parent_prof.character_disabled = false
 
-        ScanAllRecipes(profession)
+        ScanAllRecipes()
 
         local playerNameWithRealm = CraftScan.GetPlayerName(true)
         CraftScanComm:ShareCharacterModification(playerNameWithRealm, profession.parentProfessionID)
@@ -276,10 +328,12 @@ function CraftScan_ScannerConfigButtonMixin:OnClick(button)
         showMenuButton:SetText(L('Open in CraftScan'))
     end
 
+    local isDecor = IsDecor(recipe.hyperlink)
+
     CraftScanConfigPage:Show()
     CraftScanConfigPage:SelectRecipe(
         CraftScan.GetPlayerName(true),
-        profession.professionID,
+        isDecor and currentExpansionProfID or profession.professionID,
         recipe.recipeID
     )
 end
