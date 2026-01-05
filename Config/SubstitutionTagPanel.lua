@@ -41,7 +41,14 @@ local defaults = {
     ['pvp'] = false, -- needs no translation
 }
 
-function CraftScan.Config.GetSuggestions(text)
+local contextSensitiveTags = {
+    item = true,
+    profession = true,
+    profession_link = true,
+    crafter = true,
+}
+
+function CraftScan.Config.GetSuggestions(text, includeContext)
     local result = {}
     text = text:lower()
     local tags = CraftScan.Utils.saved(CraftScan.DB.settings, 'substitution_tags', {})
@@ -49,6 +56,14 @@ function CraftScan.Config.GetSuggestions(text)
         local lowered = tag:lower()
         if lowered:sub(1, #text) == text then
             table.insert(result, tag)
+        end
+    end
+    if includeContext then
+        for tag, _ in pairs(contextSensitiveTags) do
+            local lowered = tag:lower()
+            if lowered:sub(1, #text) == text then
+                table.insert(result, tag)
+            end
         end
     end
     return result
@@ -226,8 +241,13 @@ function CraftScanTagConfigPanelMixin:NewTagInvalid(value)
     end
 
     -- Make sure the tag doesn't already exist
-    if self.tags[StripTag(value)] ~= nil then
+    local tag = StripTag(value)
+    if self.tags[tag] ~= nil then
         return L('tag.invalid.unique')
+    end
+
+    if contextSensitiveTags[tag] ~= nil then
+        return L('tag.invalid.context')
     end
 
     return nil

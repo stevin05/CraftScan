@@ -231,6 +231,10 @@ local function KeywordToConfigKey(keyword)
     return keyword:sub(6)
 end
 
+function CraftScanRecipeConfigPanelMixin:IncludeContextInAutoComplete(keyword)
+    return KeywordToConfigKey(keyword) == 'greeting'
+end
+
 function CraftScanRecipeConfigPanelMixin:GetConfigValue(keyword)
     return self.configInfo.recipeConfig[KeywordToConfigKey(keyword)]
         or self.defaults[KeywordToConfigKey(keyword)]

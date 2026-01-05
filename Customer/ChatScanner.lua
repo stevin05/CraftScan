@@ -789,7 +789,8 @@ local function MakeGreetingBuilder()
         result = ConcatGreetings(result, text)
     end
 
-    local function FinalGreeting()
+    local function FinalGreeting(context)
+        result = CraftScan.Utils.FString(result, context)
         return CraftScan.Config.SubstituteTags(result)
     end
 
@@ -999,49 +1000,34 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter)
     local alt_craft = crafter ~= CraftScan.GetPlayerName()
 
+    local function GetProfessionLink()
+        local spellSkillIndex = C_SpellBook.GetSkillLineIndexByID(profInfo.parentProfessionID)
+        local skillLineInfo = C_SpellBook.GetSpellBookSkillLineInfo(spellSkillIndex)
+        local offset = skillLineInfo.itemIndexOffset
+        local skillSpellID =
+            select(2, C_SpellBook.GetSpellBookItemType(offset + 1, Enum.SpellBookSpellBank.Player))
+        return C_Spell.GetSpellTradeSkillLink(skillSpellID)
+    end
+
     local Greeting, FinalGreeting = MakeGreetingBuilder()
-    local FString = CraftScan.Utils.FString
+    local context = {
+        crafter = crafter,
+        item = itemLink or L(LID.GREETING_LINK_BACKUP),
+        profession = profInfo.parentProfessionName,
+        profession_link = alt_craft and profInfo.parentProfessionName or GetProfessionLink(),
+    }
     if not profConfig.omit_general and (not recipeConfig or not recipeConfig.omit_general) then
         if alt_craft then
             if itemID then
-                Greeting(
-                    FString(
-                        GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'),
-                        { crafter = crafter, item = itemLink or L(LID.GREETING_LINK_BACKUP) }
-                    )
-                )
+                Greeting(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'))
             else
-                Greeting(
-                    FString(
-                        GetGreeting('GREETING_ALT_HAS_PROF'),
-                        { crafter = crafter, profession = profInfo.parentProfessionName }
-                    )
-                )
+                Greeting(GetGreeting('GREETING_ALT_HAS_PROF'))
             end
         else
             if itemID then
-                Greeting(
-                    FString(
-                        GetGreeting('GREETING_I_CAN_CRAFT_ITEM'),
-                        { crafter = crafter, item = itemLink or L(LID.GREETING_LINK_BACKUP) }
-                    )
-                )
+                Greeting(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'))
             else
-                local profession = profInfo.parentProfessionName
-                local spellSkillIndex =
-                    C_SpellBook.GetSkillLineIndexByID(profInfo.parentProfessionID)
-                local skillLineInfo = C_SpellBook.GetSpellBookSkillLineInfo(spellSkillIndex)
-                local offset = skillLineInfo.itemIndexOffset
-                local skillSpellID = select(
-                    2,
-                    C_SpellBook.GetSpellBookItemType(offset + 1, Enum.SpellBookSpellBank.Player)
-                )
-                local profession_link = C_Spell.GetSpellTradeSkillLink(skillSpellID)
-                Greeting(FString(GetGreeting('GREETING_I_HAVE_PROF'), {
-                    crafter = crafter,
-                    profession = profession,
-                    profession_link = profession_link,
-                }))
+                Greeting(GetGreeting('GREETING_I_HAVE_PROF'))
             end
         end
     end
@@ -1059,10 +1045,10 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     end
 
     if alt_craft then
-        Greeting(CraftScan.Utils.FString(GetGreeting('GREETING_ALT_SUFFIX'), { crafter = crafter }))
+        Greeting(GetGreeting('GREETING_ALT_SUFFIX'))
     end
 
-    greeting = FinalGreeting()
+    greeting = FinalGreeting(context)
 
     if needsResultCallbackOnly then
         -- Erase the persistent state associated with this since it's just a

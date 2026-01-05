@@ -100,6 +100,10 @@ function CraftScanGreetingConfigPanelMixin:GetDisplayValue(keyword)
     return CraftScan.Config.SubstituteTags(self:GetConfigValue(keyword))
 end
 
+function CraftScanGreetingConfigPanelMixin:IncludeContextInAutoComplete(keyword)
+    return true
+end
+
 function CraftScanGreetingConfigPanelMixin:Validate(keyword, user_value, reporter)
     value = CraftScan.Config.SubstituteTags(user_value)
 

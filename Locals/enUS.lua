@@ -387,6 +387,7 @@ function CraftScan.LOCAL_EN:GetData()
 
         ['tag.invalid.braces'] = "Tags cannot include '{' or '}'.",
         ['tag.invalid.unique'] = 'Tags must be unique.',
+        ['tag.invalid.context'] = 'This is a built in context sensitive tag. It is only supported in greetings and will be replaced with details based on the customer request.',
 
         ['dialog.prof.keywords'] = 'Profession keywords',
         ['dialog.prof.keywords.tooltip.body'] = "A comma separated list of keywords. Keyword matching is used when a request does not include an item link.\n\nA profession term must be found in the message before any item keywords are checked.\n\nThis should include anything a customer might say that indicates a specific profession, such as 'plate' for Blacksmithing.",

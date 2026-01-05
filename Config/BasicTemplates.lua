@@ -174,7 +174,13 @@ function CraftScan.SetupTextInput(panel, field, keyword)
             local after = self:GetText():sub(cursor + 1)
             local tagSuffix = after:match('^([^ %}]+)')
 
-            local suggestions = CraftScan.Config.GetSuggestions(tagPrefix)
+            local includeContextInAutoComplete = false
+            if type(panel.IncludeContextInAutoComplete) == 'function' then
+                includeContextInAutoComplete = panel:IncludeContextInAutoComplete(keyword)
+            end
+
+            local suggestions =
+                CraftScan.Config.GetSuggestions(tagPrefix, includeContextInAutoComplete)
 
             if #suggestions then
                 local function DoAutoComplete(editBox, tag, force)

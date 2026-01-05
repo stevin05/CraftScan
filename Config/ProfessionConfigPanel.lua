@@ -87,6 +87,11 @@ local function IsPPConfigKey(key)
     return key == 'keywords' or key == 'exclusions' or key == 'commission'
 end
 
+function CraftScanProfessionConfigPanelMixin:IncludeContextInAutoComplete(keyword)
+    -- Keywords should not include context, but greetings should
+    return KeywordToConfigKey(keyword) == 'greeting'
+end
+
 function CraftScanProfessionConfigPanelMixin:GetConfigValue(keyword)
     local key = KeywordToConfigKey(keyword)
 
