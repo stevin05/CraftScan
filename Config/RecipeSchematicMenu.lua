@@ -85,7 +85,7 @@ local function IsPlayerProfession(profession)
         and PlayerKnowsProfession(profession)
 end
 
-local function DeleteNonOrderRecipe(recipeID)
+local function DeleteNonOrderRecipe(recipes, recipeID)
     -- Upgrade-style code that can be removed at some point. We
     -- originally scanned in all recipes. Delete unconfigured
     -- recipes that are not bind-able.
@@ -94,14 +94,14 @@ local function DeleteNonOrderRecipe(recipeID)
     -- value and the item has no binding (BoE/BoP), then it will never be sent
     -- in a crafting order.
     local deleteIt = true
-    for key, _ in pairs(db_recipes[recipeID]) do
+    for key, _ in pairs(recipes[recipeID]) do
         if key ~= 'scan_state' then
             deleteIt = false
             break
         end
     end
     if deleteIt then
-        db_recipes[recipeID] = nil
+        recipes[recipeID] = nil
     end
 end
 
@@ -176,13 +176,13 @@ local function ScanAllRecipes()
                         recipeConfig.scan_state = CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
                     end
                 elseif recipes[id] then
-                    DeleteNonOrderRecipe(id)
+                    DeleteNonOrderRecipe(recipes, id)
                 end
 
                 waitGroup:Done()
             end)
         elseif recipes[id] then
-            DeleteNonOrderRecipe(id)
+            DeleteNonOrderRecipe(recipes, id)
         end
     end
 
