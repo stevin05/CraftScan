@@ -125,11 +125,8 @@ local function ScanAllRecipes()
             item = Item:CreateFromItemLink(recipeInfo.hyperlink)
         end
 
-        local profConfig = saved(
-            db_player.professions,
-            profInfo.professionID,
-            { parentProfID = profInfo.parentProfessionID }
-        )
+        local profConfig = saved(db_player.professions, profInfo.professionID, {})
+        profConfig.parentProfID = profInfo.parentProfessionID
         professions[profInfo.professionID] = profConfig
 
         local recipes = saved(profConfig, 'recipes', {})

@@ -149,7 +149,9 @@ function CraftScan.SaveConcentrationData()
         local concentrationData = CraftScan.ConcentrationData(currencyID)
         local char = CraftScan.GetPlayerName(true)
         local profConfig = CraftScan.DB.characters[char].professions[skillLineID]
-        profConfig.concentration = concentrationData:Serialize()
+        if profConfig then
+            profConfig.concentration = concentrationData:Serialize()
+        end
     end
 end
 
@@ -616,10 +618,11 @@ function CraftScanConfigMenuMixin:OnLoad()
             local char = CraftScan.GetPlayerName(true)
             local profConfig = CraftScan.DB.characters[char].professions[profInfo.professionID]
             if profConfig then
-                local recipeConfig =
-                    CraftScan.DB.characters[char].professions[profInfo.professionID].recipes[recipeID]
-                recipeConfig.scan_state = CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
-                CraftScan.Config.UpdateProfession(char, profInfo.professionID, profConfig)
+                local recipeConfig = profConfig.recipes[recipeID]
+                if recipeConfig then
+                    recipeConfig.scan_state = CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
+                    CraftScan.Config.UpdateProfession(char, profInfo.professionID, profConfig)
+                end
 
                 -- else, just trained a new profession and need to open it to ScanAllRecipes
             end
