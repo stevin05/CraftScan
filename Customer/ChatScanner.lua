@@ -629,7 +629,7 @@ end
 -- Because we can't reverse look up from item link to crafting profession, we do
 -- the translation when a profession is opened scan any saved items and see if
 -- they are related to this profession.
-function CraftScan.Scanner.UpdateAnalyticsProfIDs(parentProfID)
+local function UpdateAnalyticsProfIDs(parentProfID)
     if not CraftScan.DB.analytics.enabled then
         return
     end
@@ -637,6 +637,8 @@ function CraftScan.Scanner.UpdateAnalyticsProfIDs(parentProfID)
     if not CraftScan.DB.analytics.seen_items then
         return
     end
+
+    local ppInfo = C_TradeSkillUI.GetBaseProfessionInfo()
 
     local itemIDs = nil
     for itemID, itemInfo in pairs(CraftScan.DB.analytics.seen_items) do
@@ -659,11 +661,15 @@ function CraftScan.Scanner.UpdateAnalyticsProfIDs(parentProfID)
             end
 
             if itemIDs[itemID] then
-                itemInfo.ppID = parentProfID
+                itemInfo.ppID = ppInfo.professionID
             end
         end
     end
 end
+CraftScan.Events:Register('TRADESKILL_OPENED', function()
+    local ppInfo = C_TradeSkillUI.GetBaseProfessionInfo()
+    CraftScan.DoOnceForTag(ppInfo.professionID, UpdateAnalyticsProfIDs)
+end)
 
 local function GetCrafterForMessage(customer, message, overrides)
     message = string.lower(message)

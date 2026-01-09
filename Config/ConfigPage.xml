@@ -17,6 +17,12 @@
 
 		<Frames>
 			<Button parentKey="CloseButton" inherits="UIPanelCloseButtonDefaultAnchors" />
+			<Frame parentKey="MaximizeMinimize" inherits="MaximizeMinimizeButtonFrameTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent.CloseButton" relativePoint="LEFT"
+						x="0" y="0" />
+				</Anchors>
+			</Frame>
 
 			<Frame parentKey="Menu" mixin="CraftScanConfigMenuMixin">
 				<Scripts>
@@ -63,7 +69,7 @@
 					<Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.Background"
-								relativePoint="TOPLEFT" />
+								relativePoint="TOPLEFT" y="-10" />
 							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Background"
 								relativePoint="BOTTOMRIGHT" x="-14" y="0" />
 						</Anchors>

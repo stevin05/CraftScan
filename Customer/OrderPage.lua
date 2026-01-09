@@ -1099,7 +1099,8 @@ function CraftScan_ResetAnalyticsButtonMixin:OnLoad()
                         local t = type(time) == "table" and time.t or time;
                         local c = type(time) == "table" and time.c or 1;
                         csv = csv ..
-                            string.format("%d,%s,%d,%d,https://www.wowhead.com/item=%d/", itemID, name, t, c, itemID) ..
+                            string.format("%d,%s,%d,%d,https://www.wowhead.com/item=%d/", itemID, name, t,
+                                c, itemID) ..
                             "\n";
                     end
                 end
@@ -1333,6 +1334,7 @@ SetupPopupDialog("CRAFT_SCAN_CONFIRM_CONFIG_DELETE", {
 
             CraftScan.Config.RemoveMissingProfessionNodes(crafterInfo.name)
             CraftScan.OnCrafterListModified();
+            CraftScan.Events:Emit('CHARACTER_DISABLED', crafterInfo.name, parentProfID)
         else
             print("CraftScan confirmation failed.")
         end

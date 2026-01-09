@@ -1,6 +1,6 @@
 local CraftScan = select(2, ...)
 
-local DEBUG = false;
+local DEBUG = true;
 local DEBUG_FRAMES = false;
 
 CraftScan.Debug = {}

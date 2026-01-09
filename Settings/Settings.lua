@@ -308,7 +308,7 @@ CraftScan.Utils.onLoad(function()
             options,
             nil,
             function()
-                CraftScan.UpdateShowButtonHeight()
+                CraftScan.Events:Emit('BUTTON_HEIGHT')
             end
         )
         --L(LID.CUSTOMER_TIMEOUT_TOOLTIP));
@@ -397,7 +397,6 @@ CraftScan.Utils.onLoad(function()
             Settings.CreateCheckbox(category, setting, L(LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP))
         initializer:AddSearchTags(L(LID.CRAFT_SCAN))
     end
-
     Settings.RegisterAddOnCategory(category)
 end)
 

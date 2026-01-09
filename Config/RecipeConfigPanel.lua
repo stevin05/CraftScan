@@ -7,7 +7,7 @@ local function L(id)
 end
 
 local panel = nil
-function CraftScan.Config.LoadRecipeConfigOptions(configInfo)
+function CraftScan.Config.LoadRecipeConfigOptions(configInfo, isCollapsed)
     if not panel then
         panel = CreateFrame(
             'Frame',
@@ -16,7 +16,7 @@ function CraftScan.Config.LoadRecipeConfigOptions(configInfo)
             'CraftScanRecipeConfigPanelTemplate'
         )
     end
-    panel:Init(configInfo)
+    panel:Init(configInfo, isCollapsed)
     return panel
 end
 
@@ -95,7 +95,7 @@ function CraftScanRecipeConfigPanelMixin:PlaceStateButtons()
     end
 end
 
-function CraftScanRecipeConfigPanelMixin:Init(configInfo)
+function CraftScanRecipeConfigPanelMixin:Init(configInfo, isCollapsed)
     self.configInfo = configInfo
     self.Left:Hide()
     self.Right:Hide()
@@ -141,8 +141,23 @@ function CraftScanRecipeConfigPanelMixin:Init(configInfo)
         CHECK_BOX_WIDTH
     )
 
+    self:Layout(isCollapsed)
+
     self.Left:Show()
     self.Right:Show()
+end
+
+function CraftScanRecipeConfigPanelMixin:Layout(isCollapsed)
+    if isCollapsed then
+        self.Right:ClearAllPoints()
+        self.Right:SetPoint('TOP', self.Left, 'BOTTOM')
+        self.Right:SetWidth(350)
+        self:SetWidth(350)
+    else
+        self.Right:ClearAllPoints()
+        self.Right:SetPoint('TOPRIGHT', self, 'TOPRIGHT', 0, -80)
+        self:SetWidth(750)
+    end
 end
 
 function CraftScanRecipeConfigPanelMixin:SetupEnableAllButton()

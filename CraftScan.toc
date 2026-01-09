@@ -31,6 +31,9 @@ Locals/zhTW.lua
 Locals/zhCN.lua
 Locals/Localization.lua
 
+Utils/Debug.lua
+Utils/EventBus.lua
+Utils/DoOnce.lua
 Utils/Utils.xml
 Utils/ReleaseNotes.xml
 Utils/Dialog.xml
@@ -40,7 +43,6 @@ Utils/TooltipPlot.lua
 Utils/WaitGroup.lua
 Utils/Comm.lua
 Utils/FStrings.lua
-Utils/Debug.lua
 
 Config/RecipeSchematicMenu.xml
 

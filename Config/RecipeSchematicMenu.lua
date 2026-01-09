@@ -5,85 +5,15 @@ local function L(id)
     return CraftScan.LOCAL:GetText(id)
 end
 
--- References to our saved variables. These are populated as we get the
--- information needed to populate them.
-local playerNameWithRealm = nil
-local db_player = nil
-local db_prof = nil
-local db_parent_prof = nil
-local db_recipes = nil
-local db_current_expansion_recipes = nil
-local currentExpansionProfID = nil
-local selectedRecipeID = nil
-
-local saved = CraftScan.Utils.saved
-
-local showMenuButton = nil
-function CraftScan.UpdateShowButtonHeight()
-    if showMenuButton then
-        if CraftScan.DB.settings.show_button_height then
-            showMenuButton:SetPoint(
-                'TOPLEFT',
-                ProfessionsFrame.CraftingPage.SchematicForm,
-                'BOTTOMLEFT',
-                2,
-                -4 + CraftScan.DB.settings.show_button_height
-            )
-        else
-            showMenuButton:SetPoint(
-                'TOPLEFT',
-                ProfessionsFrame.CraftingPage.SchematicForm,
-                'BOTTOMLEFT',
-                2,
-                -4
-            )
-        end
-    end
-end
-
-local showMenuButtonInitialized = false
-local function CreateMenuShownButton()
-    if showMenuButtonInitialized then
-        return
-    end
-    showMenuButton = CreateFrame(
-        'Button',
-        'CraftScanToggleScannerConfigButton',
-        ProfessionsFrame.CraftingPage.SchematicForm,
-        'CraftScan_ScannerConfigButtonTemplate'
-    )
-    showMenuButton:SetText(L('Open in CraftScan'))
-    CraftScan.UpdateShowButtonHeight()
-    showMenuButtonInitialized = true
-end
-
 local function IsDecor(itemInfo)
+    if not itemInfo then
+        return false
+    end
+
     local tryGetOwnedInfo = false
     return C_HousingCatalog.GetCatalogEntryInfoByItem(itemInfo, tryGetOwnedInfo) ~= nil
 end
 CraftScan.IsDecor = IsDecor
-
-local function PlayerKnowsProfession(profession)
-    for _, prof in ipairs(CraftScan.CONST.PROFESSIONS) do
-        if prof.professionID == profession.parentProfessionID then
-            return true
-        end
-    end
-
-    return false
-end
-
-local function IsPlayerProfession(profession)
-    -- Ignore Cooking, Fishing, gathering professions (we don't have
-    -- default keywords for them), and weird 'professions' like Emerald
-    -- Dream rep boxes (no parentProfessionID).
-    return profession.isPrimaryProfession
-        and profession.parentProfessionID
-        and CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS[profession.parentProfessionID]
-        and not C_TradeSkillUI.IsTradeSkillGuild()
-        and not C_TradeSkillUI.IsTradeSkillLinked()
-        and PlayerKnowsProfession(profession)
-end
 
 local function DeleteNonOrderRecipe(recipes, recipeID)
     -- Upgrade-style code that can be removed at some point. We
@@ -105,16 +35,229 @@ local function DeleteNonOrderRecipe(recipes, recipeID)
     end
 end
 
-local function ScanAllRecipes()
-    -- Once all items are done processing, we update the tree view
+-- Define the valid profession enum lookup table
+local SCANNABLE_PROFESSIONS = {
+    [164] = true, -- "Blacksmithing",
+    [165] = true, -- "Leatherworking",
+    [171] = true, -- "Alchemy",
+    [197] = true, -- "Tailoring",
+    [202] = true, -- "Engineering",
+    [333] = true, -- "Enchanting",
+    [755] = true, -- "Jewelcrafting",
+    [773] = true, -- "Inscription",
+}
+
+local function PlayerKnowsProfession(baseProfessionID)
+    local learnedProfs = { GetProfessions() }
+    for _, index in pairs(learnedProfs) do
+        local _, _, _, _, _, _, learnedID = GetProfessionInfo(index)
+        if learnedID == baseProfessionID then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function SaveConcentrationData(skillLineID, profConfig)
+    if C_ProfSpecs.SkillLineHasSpecialization(skillLineID) then
+        local currencyID = C_TradeSkillUI.GetConcentrationCurrencyID(skillLineID)
+        local concentrationData = CraftScan.ConcentrationData(currencyID)
+        profConfig.concentration = concentrationData:Serialize()
+    end
+end
+
+local function GetValidatedPPInfo()
+    if
+        not C_TradeSkillUI.IsTradeSkillReady()
+        or C_TradeSkillUI.IsTradeSkillGuild()
+        or C_TradeSkillUI.IsTradeSkillLinked()
+        or C_TradeSkillUI.IsNPCCrafting()
+        or C_TradeSkillUI.IsRuneforging()
+    then
+        return nil
+    end
+
+    local ppInfo = C_TradeSkillUI.GetBaseProfessionInfo()
+
+    -- Make extremely sure that we don't scan in anything that isn't one of the
+    -- main professions. We've had problems with this in the past due to random
+    -- professions like the Emerald Dream Supply Crate system.
+    if
+        not ppInfo
+        or not ppInfo.isPrimaryProfession
+        or not ppInfo.professionID
+        or not SCANNABLE_PROFESSIONS[ppInfo.professionID]
+        or not PlayerKnowsProfession(ppInfo.professionID)
+    then
+        return nil
+    end
+
+    return ppInfo
+end
+
+local function GetParentContext()
+    local ppInfo = GetValidatedPPInfo()
+    if not ppInfo then
+        return nil
+    end
+
+    local name = CraftScan.GetPlayerName(true)
+    local updated = false
+
+    -- Create the character entry if this is the first time we're seeing it.
+    local db = CraftScan.DB.characters[name]
+    if not db then
+        db = {
+            professions = {},
+            parent_professions = {},
+            sourceID = CraftScan.DB.settings.my_uuid,
+        }
+        CraftScan.DB.characters[name] = db
+    end
+
+    local ppID = ppInfo.professionID
+    local dbPP = db.parent_professions[ppID]
+
+    if dbPP and dbPP.character_disabled then
+        return { ppInfo = ppInfo, dbPP = dbPP, name = name, db = db }
+    end
+
+    if not dbPP then
+        dbPP = CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG)
+        db.parent_professions[ppID] = dbPP
+        updated = true
+    end
+
+    return {
+        ppInfo = ppInfo,
+        name = name,
+        db = db,
+        dbPP = dbPP,
+        updated = updated,
+    }
+end
+
+local function AddProfessionContext(ctxt)
+    if ctxt.currentExpID then
+        -- Make ourselves idempotent for convenience
+        return ctxt
+    end
+
+    local profInfos = C_TradeSkillUI.GetChildProfessionInfos()
+    if not profInfos or #profInfos == 0 then
+        return nil
+    end
+
+    ctxt.db.professions = ctxt.db.professions or {}
+
+    local currentExpID = 0
+    for _, info in ipairs(profInfos) do
+        local expID = info.professionID
+
+        -- Track the highest ID to determine the "Current Expansion"
+        if expID > currentExpID then
+            currentExpID = expID
+        end
+
+        if not ctxt.db.professions[expID] then
+            local entry = {
+                recipes = {},
+                parentProfID = ctxt.ppInfo.professionID,
+            }
+            SaveConcentrationData(expID, entry)
+            ctxt.db.professions[expID] = entry
+            ctxt.updated = true
+        end
+    end
+
+    -- Attach expansion data to the context
+    ctxt.profInfos = profInfos
+    ctxt.currentExpID = currentExpID
+    ctxt.dbCurrentExp = ctxt.db.professions[currentExpID]
+
+    local selectedRecipeInfo = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
+    local selectedProfession = selectedRecipeInfo
+            and C_TradeSkillUI.GetProfessionInfoByRecipeID(selectedRecipeInfo.recipeID)
+        or C_TradeSkillUI.GetChildProfessionInfo()
+
+    ctxt.selectedExpProfInfo = selectedProfession
+    ctxt.dbSelectedExp = ctxt.db.professions[selectedProfession.professionID]
+
+    return ctxt
+end
+
+local function GetContext()
+    local ctxt = GetParentContext()
+    if ctxt then
+        return AddProfessionContext(ctxt)
+    end
+    return nil
+end
+
+CraftScan.Events:Register('CONCENTRATION_UPDATED', function()
+    local ctxt = GetContext()
+    if ctxt then
+        SaveConcentrationData(ctxt.selectedExpProfInfo.professionID, ctxt.dbSelectedExp)
+    end
+end)
+
+local scanned = {}
+local function AllScanned(profInfos)
+    for _, info in ipairs(profInfos) do
+        if not scanned[info.professionID] then
+            return false
+        end
+    end
+    return true
+end
+
+local function ScanAllRecipes(OnScanComplete, forceScan)
+    local ctxt = GetParentContext()
+    if not ctxt or ctxt.dbPP.character_disabled then
+        return
+    end
+
+    ctxt = AddProfessionContext(ctxt)
+    if not ctxt then
+        return
+    end
+
+    if forceScan then
+        for _, info in ipairs(ctxt.profInfos) do
+            scanned[info.professionID] = nil
+        end
+    elseif AllScanned(ctxt.profInfos) then
+        return
+    end
+    CraftScan.Events:Emit('PROFESSION_SCAN_BEGIN')
+
     local professions = {}
     local waitGroup = CraftScan.WaitGroup(function()
-        for id, config in pairs(professions) do
-            CraftScan.Config.UpdateProfession(playerNameWithRealm, id, config)
+        for _, info in ipairs(ctxt.profInfos) do
+            scanned[info.professionID] = true
+        end
+
+        -- Once all items are done processing, we update the tree view
+        if ctxt.updated then
+            for id, config in pairs(professions) do
+                CraftScan.Config.UpdateProfession(ctxt.name, id, config)
+            end
+
+            -- Seed the profession on any linked accounts
+            CraftScanComm:ShareCharacterData()
+        end
+
+        -- We intentionally do not pass ctxt here. It is not always 100% correct
+        -- in the button context because we loaded it based on a TRADESKILL
+        -- event, not a RECIPE_SELECTED event. Let the button re-generate a new
+        -- context based on the currently selected recipe.
+        CraftScan.Events:Emit('PROFESSION_SCAN_COMPLETE')
+
+        if OnScanComplete then
+            OnScanComplete()
         end
     end)
-
-    local perFrame = 1
 
     local function ProcessRecipe(unused, id)
         local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
@@ -125,11 +268,10 @@ local function ScanAllRecipes()
             item = Item:CreateFromItemLink(recipeInfo.hyperlink)
         end
 
-        local profConfig = saved(db_player.professions, profInfo.professionID, {})
-        profConfig.parentProfID = profInfo.parentProfessionID
-        professions[profInfo.professionID] = profConfig
+        local profConfig = ctxt.db.professions[profInfo.professionID]
+        local recipes = profConfig.recipes
 
-        local recipes = saved(profConfig, 'recipes', {})
+        professions[profInfo.professionID] = profConfig
 
         if item and not item:IsItemEmpty() then
             waitGroup:Add()
@@ -142,11 +284,7 @@ local function ScanAllRecipes()
                     local isDecor = IsDecor(item:GetItemID())
 
                     local recipeConfig = nil
-                    if
-                        isDecor
-                        and currentExpansionProfID ~= profInfo.professionID
-                        and recipes[id]
-                    then
+                    if isDecor and ctxt.currentExpID ~= profInfo.professionID and recipes[id] then
                         -- We already saved decor into legacy expansion
                         -- configs, so if we find it there, move it to the
                         -- current expansion config. Decor is expansion-less in
@@ -154,14 +292,23 @@ local function ScanAllRecipes()
                         -- current expansion for convenience.
                         recipeConfig = recipes[id]
                         recipes[id] = nil
-                        db_current_expansion_recipes[id] = recipeConfig
+                        ctxt.dbCurrentExp.recipes[id] = recipeConfig
+                        context.updated = true
                     else
-                        recipeConfig =
-                            saved(isDecor and db_current_expansion_recipes or recipes, id, {
+                        recipeConfig = isDecor and ctxt.dbCurrentExp.recipes[id] or recipes[id]
+                        if not recipeConfig then
+                            ctxt.updated = true
+                            recipeConfig = {
                                 scan_state = recipeInfo.learned
                                         and CraftScan.CONST.RECIPE_STATES.PENDING_REVIEW
                                     or CraftScan.CONST.RECIPE_STATES.UNLEARNED,
-                            })
+                            }
+                            if isDecor then
+                                ctxt.dbCurrentExp.recipes[id] = recipeConfig
+                            else
+                                recipes[id] = recipeConfig
+                            end
+                        end
                     end
 
                     if
@@ -186,39 +333,199 @@ local function ScanAllRecipes()
     local OnFinish = function()
         waitGroup:Close()
     end
+
+    local perFrame = 5
     CraftScan.TimeSlice(C_TradeSkillUI.GetAllRecipeIDs(), perFrame, ProcessRecipe, OnFinish)
 end
+CraftScan.Events:Register('TRADESKILL_OPENED', ScanAllRecipes)
 
-CraftScan.RecipeSchematicMenu = {}
-CraftScan.RecipeSchematicMenu.UpdateLabelText = function(recipeID)
-    if showMenuButton then
-        if db_parent_prof.character_disabled then
-            showMenuButton.ScanningLabel:Hide()
-        else
-            if recipeID == selectedRecipeID then
-                if db_recipes[recipeID] or db_current_expansion_recipes[recipeID] then
-                    showMenuButton.ScanningLabel:SetText(
-                        CraftScan.RecipeStateName(
-                            db_recipes[recipeID] or db_current_expansion_recipes[recipeID],
-                            db_prof
-                        )
-                    )
-                    showMenuButton.ScanningLabel:Show()
-                else
-                    showMenuButton.ScanningLabel:SetText(L('Not supported'))
-                end
-            end
+local function CreateMenuShownButton()
+    local button = CreateFrame(
+        'Button',
+        'CraftScanToggleScannerConfigButton',
+        ProfessionsFrame.CraftingPage.SchematicForm,
+        'CraftScan_ScannerConfigButtonTemplate'
+    )
+
+    CraftScan.Events:Register({
+        'RECIPE_SELECTED',
+        'PROFESSION_SCAN_BEGIN',
+        'PROFESSION_SCAN_COMPLETE',
+        'CHARACTER_ENABLED',
+        'TETHER_CHANGED',
+    }, function(...)
+        button:Setup(...)
+    end)
+
+    CraftScan.Events:Register('CONFIG_PAGE_MAXIMIZED', function(...)
+        button.tethered = false
+        button:Setup(...)
+    end)
+
+    CraftScan.Events:Register('BUTTON_HEIGHT', function(...)
+        button:UpdateHeight(...)
+    end)
+    button:UpdateHeight()
+
+    CraftScan.Events:Register('UPDATE_RECIPE_LABEL', function(...)
+        button:UpdateRecipeLabel(...)
+    end)
+
+    CraftScan.Events:Register('CHARACTER_DISABLED', function(name)
+        local ctxt = GetParentContext()
+        if ctxt and ctxt.name == name then
+            button:Setup(ctxt)
         end
-    end
+    end)
+
+    ProfessionsFrame:HookScript('OnHide', function()
+        if button.tethered then
+            CraftScanConfigPage:Hide()
+        end
+    end)
 end
 
-local seen_profs = {}
-local update_scan_complete = {}
-local function OnRecipeSelected()
-    if not C_TradeSkillUI.IsTradeSkillReady() then
+local function OpenRecipe()
+    local ctxt = GetContext()
+    if not ctxt then
         return
     end
 
+    local recipeInfo = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
+    local profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(recipeInfo.recipeID)
+
+    local isDecor = IsDecor(recipeInfo.hyperlink)
+    local profID = isDecor and ctxt.currentExpID or profession.professionID
+    local profConfig = isDecor and ctxt.dbCurrentExp or ctxt.dbSelectedExp
+    if profConfig.recipes[recipeInfo.recipeID] then
+        CraftScan.Events:Emit('OPEN_RECIPE', ctxt.name, profID, recipeInfo.recipeID)
+    end
+end
+
+CraftScan_ScannerConfigButtonMixin = {}
+
+function CraftScan_ScannerConfigButtonMixin:Setup(ctxt)
+    ctxt = ctxt or GetParentContext()
+    if not ctxt then
+        self:Hide()
+        return
+    end
+
+    if ctxt.dbPP.character_disabled then
+        self:SetText(L(LID.SCANNER_CONFIG_DISABLED))
+        self.ScanningLabel:Hide()
+        self:SetEnabled(true)
+        self:Show()
+        self.character_disabled = true
+        if self.tethered then
+            self.tethered = false
+            CraftScanConfigPage:Hide()
+        end
+        return
+    end
+
+    ctxt = AddProfessionContext(ctxt)
+    if not ctxt then
+        self:Hide()
+        return
+    end
+
+    self:SetEnabled(AllScanned(ctxt.profInfos))
+    self:UpdateRecipeLabel(nil, ctxt)
+    if not AllScanned(ctxt.profInfos) then
+        self:SetText(L('Loading...'))
+    else
+        if ProfessionsFrame.CraftingPage.SchematicForm:IsShown() then
+            if self.tethered == true then
+                self:SetText(L('Hide CraftScan'))
+                OpenRecipe()
+            else
+                self:SetText(L('Open in CraftScan'))
+            end
+        end
+    end
+    self:Show()
+end
+
+function CraftScan_ScannerConfigButtonMixin:UpdateHeight()
+    local offset = CraftScan.DB.settings.show_button_height or 0
+    self:SetPoint(
+        'TOPLEFT',
+        ProfessionsFrame.CraftingPage.SchematicForm,
+        'BOTTOMLEFT',
+        2,
+        -4 + offset
+    )
+end
+
+function CraftScan_ScannerConfigButtonMixin:UpdateRecipeLabel(recipeID, ctxt)
+    self.ScanningLabel:Hide()
+
+    if ctxt then
+        ctxt = AddProfessionContext(ctxt)
+    else
+        ctxt = GetContext()
+    end
+    if not ctxt then
+        return
+    end
+
+    local selectedRecipeInfo = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
+    if not selectedRecipeInfo then
+        -- We aren't displaying a recipe, so nothing to update.
+        return
+    end
+
+    if not recipeID then
+        recipeID = selectedRecipeInfo.recipeID
+    elseif selectedRecipeInfo.recipeID ~= recipeID then
+        -- We aren't displaying the selected recipe, so nothing to update.
+        return
+    end
+
+    -- We look in the current profession and the current expansion in case the
+    -- recipe is a decor item.
+    local profConfig = ctxt.dbSelectedExp
+    local recipeConfig = profConfig.recipes[recipeID]
+    if not recipeConfig then
+        profConfig = ctxt.dbCurrentExp
+        recipeConfig = profConfig.recipes[recipeID]
+    end
+
+    if recipeConfig then
+        self.ScanningLabel:SetText(CraftScan.RecipeStateName(recipeConfig, profConfig))
+    else
+        self.ScanningLabel:SetText(L('Not supported'))
+        if self.tethered then
+            CraftScanConfigPage:Hide()
+        end
+    end
+    self.ScanningLabel:Show()
+end
+
+function CraftScan_ScannerConfigButtonMixin:OnClick(button)
+    if self.character_disabled then
+        local ctxt = GetParentContext()
+        if ctxt then
+            self.character_disabled = nil
+            ctxt.dbPP.character_disabled = nil
+            local OnScanComplete = function()
+                CraftScan.Events:Emit('CHARACTER_ENABLED', ctxt)
+            end
+            local forceScan = true
+            ScanAllRecipes(OnScanComplete, forceScan)
+        end
+        return
+    end
+
+    self.tethered = not self.tethered
+    if not self.tethered then
+        CraftScanConfigPage:SetMenuCollapsed(false)
+    end
+    CraftScan.Events:Emit('TETHER_CHANGED')
+end
+
+local function OnRecipeSelected()
     -- Some other addons trigger this without actually showing the frame, then
     -- our setup fails because it's trying to position elements on a hidden
     -- frame.
@@ -226,113 +533,15 @@ local function OnRecipeSelected()
         return
     end
 
-    local recipe = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
-    local profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(recipe.recipeID)
-    if not IsPlayerProfession(profession) then
-        return
+    local ctxt = GetParentContext()
+    if ctxt then
+        CraftScan.DoOnce(CreateMenuShownButton)
+
+        CraftScan.State.professionID = ctxt.ppInfo.professionID
+        CraftScan.Frames.MainButton:UpdateIcon()
     end
 
-    CreateMenuShownButton()
-
-    local seen = seen_profs[profession.parentProfessionID]
-    if not seen then
-        seen_profs[profession.parentProfessionID] = true
-        CraftScan.Scanner.UpdateAnalyticsProfIDs(profession.parentProfessionID)
-    end
-
-    -- At this point, the player has opened a tradeskill window, so it makes
-    -- sense to start tracking that character. Initialize the saved variables.
-    playerNameWithRealm = CraftScan.GetPlayerName(true)
-    db_player = saved(CraftScan.DB.characters, playerNameWithRealm, {})
-
-    -- my_uuid is initialized when linked to a new account, at which point all
-    -- current characters are tagged. If this character is added after account
-    -- linking, tag it as well.
-    if not db_player.sourceID and CraftScan.DB.settings.my_uuid then
-        db_player.sourceID = CraftScan.DB.settings.my_uuid
-    end
-
-    db_player.parent_professions = db_player.parent_professions or {}
-    db_parent_prof = db_player.parent_professions[profession.parentProfessionID]
-    local is_new = not db_parent_prof
-    if is_new then
-        db_parent_prof = CraftScan.Utils.DeepCopy(CraftScan.CONST.DEFAULT_PPCONFIG)
-        db_player.parent_professions[profession.parentProfessionID] = db_parent_prof
-    end
-
-    db_player.professions = db_player.professions or {}
-
-    db_prof = saved(db_player.professions, profession.professionID, {})
-    db_prof.parentProfID = profession.parentProfessionID
-
-    CraftScan.SaveConcentrationData()
-
-    db_recipes = saved(db_prof, 'recipes', {})
-
-    CraftScan.State.professionID = profession.parentProfessionID
-    CraftScan.Frames.MainButton:UpdateIcon()
-
-    if is_new then
-        -- Seed the profession on any linked accounts
-        CraftScanComm:ShareCharacterData()
-    end
-
-    -- Decor is an expansion-less system, so we aggregate
-    -- decor items from all expansions into the primary
-    -- config for each profession.
-    --
-    -- The current expansion will always be the maximum
-    -- value profession ID with the same parent profession
-    -- ID.
-    db_current_expansion_recipes = db_recipes
-    currentExpansionProfID = profession.professionID
-    for profID, prof in pairs(db_player.professions) do
-        if prof.parentProfID == db_prof.parentProfID and currentExpansionProfID < profID then
-            currentExpansionProfID = profID
-            db_current_expansion_recipes = prof.recipes
-        end
-    end
-
-    if db_parent_prof.character_disabled then
-        showMenuButton:SetDisabled()
-    elseif is_new or not seen then
-        ScanAllRecipes()
-    end
-
-    selectedRecipeID = recipe.recipeID
-    CraftScan.RecipeSchematicMenu.UpdateLabelText(selectedRecipeID)
-end
-
-CraftScan_ScannerConfigButtonMixin = {}
-
-function CraftScan_ScannerConfigButtonMixin:SetDisabled()
-    self:SetText(L(LID.SCANNER_CONFIG_DISABLED))
-    self:Show()
-end
-
-function CraftScan_ScannerConfigButtonMixin:OnClick(button)
-    local recipe = ProfessionsFrame.CraftingPage.SchematicForm:GetRecipeInfo()
-    local profession = C_TradeSkillUI.GetProfessionInfoByRecipeID(recipe.recipeID)
-
-    if db_parent_prof.character_disabled then
-        db_parent_prof.character_disabled = false
-
-        ScanAllRecipes()
-
-        local playerNameWithRealm = CraftScan.GetPlayerName(true)
-        CraftScanComm:ShareCharacterModification(playerNameWithRealm, profession.parentProfessionID)
-
-        showMenuButton:SetText(L('Open in CraftScan'))
-    end
-
-    local isDecor = IsDecor(recipe.hyperlink)
-
-    CraftScanConfigPage:Show()
-    CraftScanConfigPage:SelectRecipe(
-        CraftScan.GetPlayerName(true),
-        isDecor and currentExpansionProfID or profession.professionID,
-        recipe.recipeID
-    )
+    CraftScan.Events:Emit('RECIPE_SELECTED', ctxt)
 end
 
 CraftScan.Utils.onLoad(function()

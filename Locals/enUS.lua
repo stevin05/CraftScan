@@ -449,12 +449,14 @@ function CraftScan.LOCAL_EN:GetData()
         ['dialog.pending_review_state'] = 'Pending review',
         ['dialog.pending_review_state.tooltip.body'] = 'Move this recipe back to the pending review section.\n\nPending review is intended as a staging area so you can easily track recipes you intend to enable once you have enough knowledge to craft them at max rank.',
 
-        ['Open in CraftScan'] = 'Open in CraftScan',
+        ['Open in CraftScan'] = 'Attach CraftScan',
 
         ['dialog.enable_all'] = 'Enable all',
         ['dialog.enable_all.tooltip.body'] = 'Enable scanning for all recipes that are currently pending review. Unlearned recipes will not be automatically enabled when they are learned.',
         ['Not supported'] = 'Not scannable',
         ['decor'] = 'Decor',
+        ['Loading...'] = 'Loading...',
+        ['Hide CraftScan'] = 'Detach CraftScan',
 
         -- ChatGPT prompt:
         -- I'm writing a world of warcraft addon. I'm going to give you entries from my catalog of english messages. I want you to translate it to deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, and zhTW. Please ouput each language in its own copy/paste box. Please do not change the keys of the catalog. I want to be able to copy paste your output directly into the other language files. Please keep translations concise and use a world of warcraft context when possible. Here are the entries.

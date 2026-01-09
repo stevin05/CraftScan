@@ -66,6 +66,8 @@ AceConfigCmd:CreateChatCommand('cs', 'CraftScan')
 
 table.insert(UISpecialFrames, 'CraftScanConfigPage')
 
+local menuInitialized = false
+
 local function IsEmptyNode(node)
     for _, child in ipairs(node:GetNodes()) do
         if child.data and (child.data.configInfo or child.data.headerInfo) then
@@ -142,19 +144,6 @@ local function GetScanStateDisplayOrder(recipeConfig, profConfig)
     end
 end
 
-function CraftScan.SaveConcentrationData()
-    local skillLineID = C_TradeSkillUI.GetProfessionChildSkillLineID()
-    if C_ProfSpecs.SkillLineHasSpecialization(skillLineID) then
-        local currencyID = C_TradeSkillUI.GetConcentrationCurrencyID(skillLineID)
-        local concentrationData = CraftScan.ConcentrationData(currencyID)
-        local char = CraftScan.GetPlayerName(true)
-        local profConfig = CraftScan.DB.characters[char].professions[skillLineID]
-        if profConfig then
-            profConfig.concentration = concentrationData:Serialize()
-        end
-    end
-end
-
 local function SortByHeaderLabel(lhs, rhs)
     return strcmputf8i(lhs.data.headerInfo.label, rhs.data.headerInfo.label) < 0
 end
@@ -190,6 +179,7 @@ local function MakeProfessionNodeFactory(root)
         local isCurrent = CraftScan.Utils.IsCurrentExpansion(profID)
         if not db[isCurrent] then
             local expansionNode = root:Insert({
+                parentKey = isCurrent,
                 order = isCurrent and 3 or 4,
                 headerInfo = {
                     label = L(isCurrent and 'Crafters' or 'Legacy Crafters'),
@@ -453,15 +443,106 @@ function CraftScanConfigPageMixin:ToggleVisibility()
     if self:IsShown() then
         self:Hide()
     else
+        self:SetMenuCollapsed(false)
         self:Show()
     end
 end
 
-function CraftScanConfigPageMixin:SelectRecipe(char, profID, recipeID)
+function CraftScanConfigPageMixin:AnchorToProfessionPage()
+    local profFrame = _G['ProfessionsFrame']
+    if not profFrame or not profFrame:IsShown() then
+        return
+    end
+
+    self:ClearAllPoints()
+    if self.isMenuCollapsed then
+        self:SetPoint('TOPLEFT', profFrame, 'TOPRIGHT', 0, 0)
+        self:SetPoint('BOTTOMLEFT', profFrame, 'BOTTOMRIGHT', 0, 0)
+    else
+        local menuWidth = self.Menu:GetWidth()
+        self:SetPoint('TOPLEFT', profFrame, 'TOPRIGHT', -menuWidth, 0)
+        self:SetPoint('BOTTOMLEFT', profFrame, 'BOTTOMRIGHT', -menuWidth, 0)
+    end
+
+    -- Ensure we stay behind Blizzard
+    self:SetFrameLevel(math.max(0, profFrame:GetFrameLevel() - 1))
+    profFrame:Raise()
+end
+
+function CraftScanConfigPageMixin:ResizeOptionsPanel(collapsed, activeOptions)
+    local width = 1105
+    if collapsed then
+        if activeOptions then
+            width = activeOptions:GetWidth()
+        else
+            width = width - 350
+        end
+    end
+    self:SetWidth(width)
+end
+
+function CraftScanConfigPageMixin:SetMenuCollapsed(collapsed)
+    if self.isMenuCollapsed == collapsed then
+        return
+    end
+
+    self.isMenuCollapsed = collapsed
+    self.Menu:SetShown(not collapsed)
+
+    if self.Menu.activeOptions and self.Menu.activeOptions.Layout then
+        self.Menu.activeOptions:Layout(collapsed)
+    end
+
+    self:ResizeOptionsPanel(collapsed, self.Menu.activeOptions)
+
+    -- Update the Options panel anchoring
+    self.Options:ClearAllPoints()
+    if collapsed then
+        -- COLLAPSED: Snap the options to the LEFT edge of the whole frame
+        self.Options:SetPoint('TOPLEFT', self, 'TOPLEFT', 4, -62)
+        self.Options:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -4, 4)
+    else
+        -- EXPANDED: Snap it back to the RIGHT side of the Menu
+        self.Options:SetPoint('TOPLEFT', self.Menu, 'TOPRIGHT', 0, 0)
+        self.Options:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', 0, 4)
+    end
+
+    -- 3. Update the button's internal state so the arrow points the right way
+    if collapsed then
+        self.MaximizeMinimize:Minimize()
+    else
+        self.MaximizeMinimize:Maximize()
+    end
+
+    if collapsed and ProfessionsFrame:IsShown() then
+        self:AnchorToProfessionPage()
+    end
+end
+
+CraftScan.Events:Register('ACTIVE_OPTION_UPDATED', function(activeOptions)
+    local page = CraftScanConfigPage
+    page:ResizeOptionsPanel(page.isMenuCollapsed, activeOptions)
+end)
+
+function CraftScanConfigPageMixin:ToggleMenu()
+    self:SetMenuCollapsed(not self.isMenuCollapsed)
+end
+
+function CraftScanConfigPageMixin:SelectRecipe(char, profID, recipeID, retryCount)
+    retryCount = retryCount or 0
+
+    self:Show()
+
+    if ProfessionsFrame.CraftingPage.SchematicForm:IsShown() then
+        self:SetMenuCollapsed(true)
+        self:AnchorToProfessionPage()
+    end
+
     local menu = self.Menu
+    local dataProvider = menu.dataProvider
 
     -- Find the tree node containing what we need.
-    local node = self.Menu.dataProvider:FindElementDataByPredicate(function(node)
+    local node = dataProvider:FindElementDataByPredicate(function(node)
         local data = node:GetData()
         return data.configInfo
             and data.configInfo.recipeID
@@ -471,10 +552,15 @@ function CraftScanConfigPageMixin:SelectRecipe(char, profID, recipeID)
     end, TreeDataProviderConstants.IncludeCollapsed)
 
     if node then
-        menu.ExpandToNode(menu.dataProvider:GetRootNode(), node:GetData().configInfo)
+        menu.ExpandToNode(dataProvider:GetRootNode(), node:GetData().configInfo)
         menu.selectionBehavior:SelectElementData(node)
-        menu.dataProvider:Invalidate()
+        dataProvider:Invalidate()
         menu.ScrollBox:ScrollToElementData(node)
+    elseif retryCount < 50 then
+        -- Fail / Retry: The recipe isn't loaded yet.
+        C_Timer.After(0.1, function()
+            self:SelectRecipe(char, profID, recipeID, retryCount + 1)
+        end)
     end
 end
 
@@ -490,6 +576,19 @@ function CraftScanConfigPageMixin:OnLoad()
     self:SetTitle(L('CraftScan'))
 
     self:SetUserPlaced(true)
+
+    CraftScan.Events:Register('OPEN_RECIPE', function(...)
+        self:SelectRecipe(...)
+    end)
+
+    -- Initialize the Maximize/Minimize button
+    self.MaximizeMinimize:SetOnMaximizedCallback(function()
+        CraftScan.Events:Emit('CONFIG_PAGE_MAXIMIZED')
+        self:SetMenuCollapsed(false)
+    end)
+    self.MaximizeMinimize:SetOnMinimizedCallback(function()
+        self:SetMenuCollapsed(true)
+    end)
 end
 
 CraftScanConfigMenuMixin = {}
@@ -588,7 +687,9 @@ function CraftScanConfigMenuMixin:OnLoad()
                 end
                 CraftScanConfigPage.Options:Hide()
 
-                self.activeOptions = configInfo.LoadOptions(configInfo)
+                self.activeOptions =
+                    configInfo.LoadOptions(configInfo, CraftScanConfigPage.isMenuCollapsed)
+                CraftScan.Events:Emit('ACTIVE_OPTION_UPDATED', self.activeOptions)
                 self.activeOptions:Show()
                 --CraftScanConfigPage.Options:SetScrollChild(self.activeOptions)
                 CraftScanConfigPage.Options:Show()
@@ -611,6 +712,7 @@ function CraftScanConfigMenuMixin:OnLoad()
     -- Pending as they are learned.
     self:RegisterEvent('NEW_RECIPE_LEARNED')
     self:RegisterEvent('TRADE_SKILL_ITEM_CRAFTED_RESULT')
+    self:RegisterEvent('TRADE_SKILL_DATA_SOURCE_CHANGED')
     self:SetScript('OnEvent', function(self, event, ...)
         if event == 'NEW_RECIPE_LEARNED' then
             local recipeID, recipeLevel, baseRecipeID = ...
@@ -629,8 +731,10 @@ function CraftScanConfigMenuMixin:OnLoad()
         elseif event == 'TRADE_SKILL_ITEM_CRAFTED_RESULT' then
             local resultData = ...
             if resultData.concentrationSpent and resultData.concentrationSpent ~= 0 then
-                CraftScan.SaveConcentrationData()
+                CraftScan.Events:Emit('CONCENTRATION_UPDATED')
             end
+        elseif event == 'TRADE_SKILL_DATA_SOURCE_CHANGED' then
+            CraftScan.Events:Emit('TRADESKILL_OPENED')
         end
     end)
 end
@@ -656,7 +760,6 @@ end
 CraftScan.Config = {}
 CraftScan.Config.OnConfigChange = OnConfigChange
 
-local menuInitialized = false
 function CraftScanConfigMenuMixin:OnShow()
     if menuInitialized then
         return
@@ -670,7 +773,7 @@ function CraftScanConfigMenuMixin:OnShow()
 
     SetSortComparator(node, SortByHeaderLabel)
 
-    node:Insert({
+    local generalNode = node:Insert({
         order = 0,
         configInfo = {
             label = L('General'),
@@ -714,6 +817,8 @@ function CraftScanConfigMenuMixin:OnShow()
     end
 
     self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
+    self.selectionBehavior:SelectElementData(generalNode)
+    self.ScrollBox:ScrollToElementData(generalNode)
 end
 
 CraftScanConfigMenuHeaderMixin = {}
@@ -823,10 +928,11 @@ function CraftScan.Config.OnRecipeScanStateChange(configInfo, skipReload)
         newParent:Invalidate()
 
         -- Update the Options panel based on the new state.
-        configInfo.LoadOptions(configInfo)
+        menu.activeOptions = configInfo.LoadOptions(configInfo, CraftScanConfigPage.isMenuCollapsed)
+        CraftScan.Events:Emit('ACTIVE_OPTION_UPDATED', menu.activeOptions)
     end
 
-    CraftScan.RecipeSchematicMenu.UpdateLabelText(configInfo.recipeID)
+    CraftScan.Events:Emit('UPDATE_RECIPE_LABEL', configInfo.recipeID)
 end
 
 function CraftScan.Config.UpdateProfession(char, profID, profConfig)
