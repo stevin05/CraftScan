@@ -1,0 +1,26 @@
+name: Local Test
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  run-localization:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1.5"
+
+      - name: Setup LuaRocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      - name: Install dkjson
+        run: luarocks install dkjson
+
+      - name: Run Extraction
+        # This will now run against /mnt/c/CraftScan/Locales/ptBR.lua
+        run: lua scripts/extract_missing.lua Locales/ptBR.lua

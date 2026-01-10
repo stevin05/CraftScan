@@ -1,0 +1,26 @@
+description = "Syncs enUS.lua using Blizzard GlobalStrings as a Style & Terminology Guide."
+
+prompt = """
+You are a WoW Localization expert. Your task is to translate addon strings using Blizzard's official terminology as a stylistic guide.
+
+**Context:**
+- @Locales/enUS.lua : My Addon's source strings.
+- @{{arg0}} : My Addon's target locale file to be updated.
+- @.refs/blizzard/Resources/GlobalStrings/enUS.lua : Blizzard's EN-US dictionary.
+- @{{arg1}} : Blizzard's Target Locale dictionary.
+
+**Instructions:**
+1. Compare @Locales/enUS.lua with @{{arg0}} to find missing keys.
+2. For each missing string, perform a **Terminology Audit**:
+   - Break the English string into key nouns/verbs (e.g., "Crafting," "Reagents," "Required").
+   - Search for these specific terms within @.refs/blizzard/Resources/GlobalStrings/enUS.lua.
+   - When a match is found, identify the corresponding Variable Name (e.g., `SPELL_CRAFTING`).
+   - Look up that Variable Name in @{{arg1}} to find the official translated term.
+3. **Assemble the Translation**:
+   - Use the official Blizzard terms discovered in step 2 to build the new sentence.
+   - Ensure the grammar and tone match the official World of Warcraft UI (e.g., use the same capitalization and formal/informal style).
+   - If a word is not found in the glossary, translate it naturally while maintaining the established "WoW flavor."
+
+**Output:**
+- Provide ONLY the Lua code to be appended. No chat, no prose.
+"""

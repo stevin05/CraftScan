@@ -6,29 +6,29 @@ CraftScan.LOCAL.LOCAL_EN = {}
 
 function CraftScan.LOCAL:Init()
     local currentLocale = GetLocale()
-    CraftScan.LOCAL.LOCAL_EN = CraftScan.LOCAL_EN:GetData() -- always load english locals for fallback translations
+    CraftScan.LOCAL.LOCAL_EN = CraftScan.LOCAL_EN
     if currentLocale == CraftScan.CONST.LOCALES.EN then
         CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL.LOCAL_EN
     elseif currentLocale == CraftScan.CONST.LOCALES.DE then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_DE:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_DE
     elseif currentLocale == CraftScan.CONST.LOCALES.IT then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_IT:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_IT
     elseif currentLocale == CraftScan.CONST.LOCALES.RU then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_RU:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_RU
     elseif currentLocale == CraftScan.CONST.LOCALES.PT then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_PT:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_PT
     elseif currentLocale == CraftScan.CONST.LOCALES.ES then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_ES:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_ES
     elseif currentLocale == CraftScan.CONST.LOCALES.FR then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_FR:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_FR
     elseif currentLocale == CraftScan.CONST.LOCALES.MX then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_MX:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_MX
     elseif currentLocale == CraftScan.CONST.LOCALES.KO then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_KO:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_KO
     elseif currentLocale == CraftScan.CONST.LOCALES.TW then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_TW:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_TW
     elseif currentLocale == CraftScan.CONST.LOCALES.CN then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_CN:GetData()
+        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_CN
     else
         error("CraftScan Error: Client not supported: " .. tostring(currentLocale))
     end
