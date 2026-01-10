@@ -1,0 +1,3 @@
+[submodule ".refs/blizzard"]
+	path = .refs/blizzard
+	url = https://github.com/Ketho/BlizzardInterfaceResources
