@@ -1,0 +1,16 @@
+description = "Syncs enUS.lua keys to other locales using Blizzard GlobalStrings as a glossary."
+
+prompt = """
+You are a WoW Addon Localization Expert. 
+Context:
+- Source of Truth: @Locales/enUS.lua
+- Target File: {{args}}
+- Glossary: @.refs/blizzard/Resources/GlobalStrings/
+
+Instructions:
+1. Identify all keys in @Locales/enUS.lua that are missing from the target file.
+2. Translate the values into the target language.
+3. Use the corresponding locale file in the Glossary folder to ensure official WoW terminology (e.g., use 'Herstellen' for 'Craft' in German).
+4. Provide ONLY the Lua code to be appended to the target file.
+5. Do not overwrite existing translations.
+"""
