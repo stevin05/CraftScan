@@ -1,45 +1,13 @@
 local CraftScan = select(2, ...)
 
 CraftScan.LOCAL = {}
-CraftScan.LOCAL.LOCAL_CLIENT = {}
-CraftScan.LOCAL.LOCAL_EN = {}
-
-function CraftScan.LOCAL:Init()
-    local currentLocale = GetLocale()
-    CraftScan.LOCAL.LOCAL_EN = CraftScan.LOCAL_EN
-    if currentLocale == CraftScan.CONST.LOCALES.EN then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL.LOCAL_EN
-    elseif currentLocale == CraftScan.CONST.LOCALES.DE then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_DE
-    elseif currentLocale == CraftScan.CONST.LOCALES.IT then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_IT
-    elseif currentLocale == CraftScan.CONST.LOCALES.RU then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_RU
-    elseif currentLocale == CraftScan.CONST.LOCALES.PT then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_PT
-    elseif currentLocale == CraftScan.CONST.LOCALES.ES then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_ES
-    elseif currentLocale == CraftScan.CONST.LOCALES.FR then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_FR
-    elseif currentLocale == CraftScan.CONST.LOCALES.MX then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_MX
-    elseif currentLocale == CraftScan.CONST.LOCALES.KO then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_KO
-    elseif currentLocale == CraftScan.CONST.LOCALES.TW then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_TW
-    elseif currentLocale == CraftScan.CONST.LOCALES.CN then
-        CraftScan.LOCAL.LOCAL_CLIENT = CraftScan.LOCAL_CN
-    else
-        error("CraftScan Error: Client not supported: " .. tostring(currentLocale))
-    end
-end
 
 -- Swap this with the real implementation so anything not localized will stand
 -- out as not ~'s.
 --[[
 ---@param ID CraftScan.LOCALIZATION_IDS
 function CraftScan.LOCAL:GetText(ID)
-    local result = CraftScan.LOCAL.LOCAL_EN[ID]
+    local result = CraftScan.L[ID]
     if result then
         return string.rep("~", #result)
     end
@@ -48,18 +16,9 @@ end
 ]]
 
 function CraftScan.LOCAL:Exists(ID)
-    return CraftScan.LOCAL.LOCAL_EN[ID] ~= nil
+    return CraftScan.L[ID] ~= nil
 end
 
 function CraftScan.LOCAL:GetText(ID)
-    local localizedText = CraftScan.LOCAL.LOCAL_CLIENT[ID]
-
-    if not localizedText then
-        local englishtext = CraftScan.LOCAL.LOCAL_EN[ID]
-        return englishtext or ID; -- default to english
-    else
-        return localizedText
-    end
+    return CraftScan.L[ID] or ID
 end
-
-CraftScan.LOCAL:Init();

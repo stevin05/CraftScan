@@ -1,11 +1,27 @@
-name: Local Test
-on: 
+# To call locally: C:\Users\Kevin\Documents\Game\act.exe workflow_call --secret-file C:\Users\Kevin\Documents\Game\.secrets -W .\.github\workflows\localize.yml --bind --input target_langs=zhCN,zhTW
+# If running under ProgramFiles (x86), you need to alias it to a directory without a (, which breaks linux.
+
+name: Localization Logic
+on:
   push:
-  workflow_dispatch:
+      branches:
+        - main
+  workflow_call:
+    inputs:
+      target_langs: # Comma separated
+        required: false
+        type: string
+    secrets:
+      GEMINI_API_KEY:
+        required: true
 
 jobs:
-  run-localization:
+  translate:
     runs-on: ubuntu-latest
+    env:
+      # If inputs.target_langs exists (call), use it. 
+      # Otherwise (push), use your hardcoded list.
+      FINAL_LANGS: ${{ inputs.target_langs || 'deDE,esES,esMX,frFR,itIT,koKR,ptBR,ruRU,zhCN,zhTW' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,9 +34,36 @@ jobs:
       - name: Setup LuaRocks
         uses: leafo/gh-actions-luarocks@v4
 
-      - name: Install dkjson
-        run: luarocks install dkjson
+      - name: Install Dependencies
+        run: |
+          luarocks install dkjson
+          pip3 install --break-system-packages -U google-genai requests
 
-      - name: Run Extraction
-        # This will now run against /mnt/c/CraftScan/Locales/ptBR.lua
-        run: lua scripts/extract_missing.lua Locales/ptBR.lua
+      - name: Extract Missing Translations
+        run: |
+          # Converts comma list to space list for Lua args
+          LANGS=$(echo "${{ env.FINAL_LANGS }}" | tr ',' ' ')
+          lua scripts/extract_missing.lua $LANGS
+
+      - name: AI Translate Missing Translations
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python3 scripts/gemini_translate.py "${{ env.FINAL_LANGS }}"
+
+      - name: Validate and Commit
+        if: ${{ !env.ACT }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Loop through each language to validate before adding
+          IFS=',' read -ra ADDR <<< "${{ env.FINAL_LANGS}}"
+          for lang in "${ADDR[@]}"; do
+            FILE="Locales/$lang.lua"
+            if [ -f "$FILE" ]; then
+              luac -p "$FILE"
+              git add "$FILE"
+            fi
+          done
+          
+          git diff --staged --quiet || (git commit -m "AI: Update Translations [skip ci]" && git push)

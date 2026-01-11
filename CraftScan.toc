@@ -18,18 +18,18 @@ Libs/LibDeflate.lua
 
 Consts.lua
 
-Locals/enUS.lua
-Locals/deDE.lua
-Locals/itIT.lua
-Locals/ruRU.lua
-Locals/ptBR.lua
-Locals/frFR.lua
-Locals/esES.lua
-Locals/esMX.lua
-Locals/koKR.lua
-Locals/zhTW.lua
-Locals/zhCN.lua
-Locals/Localization.lua
+Locales/enUS.lua
+Locales/deDE.lua
+Locales/itIT.lua
+Locales/ruRU.lua
+Locales/ptBR.lua
+Locales/frFR.lua
+Locales/esES.lua
+Locales/esMX.lua
+Locales/koKR.lua
+Locales/zhTW.lua
+Locales/zhCN.lua
+Locales/Localization.lua
 
 Utils/Debug.lua
 Utils/EventBus.lua

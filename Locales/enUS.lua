@@ -1,6 +1,18 @@
+-- Here, we define CraftScan.L, with our full dictionary of user visible
+-- strings. Each locale file then starts with a check - if it is not the current
+-- locale, it returns immediately, doing nothing. If it is the current locale,
+-- it overwrites entries in CraftScan.L. Any key that only has English gets
+-- the default English value. Any key with a localized string gets overwritten
+-- with the localized version.
+--
+-- For this to work, enUS.lua must be listed first in the .toc
+--
+-- Note that you do not need to localize strings manually. See the localize.yml
+-- github workflow. Any push automatically looks up any new English entries in
+-- this file and uses Gemini to localize them for all supported languages.
 local CraftScan = select(2, ...)
 local LID = CraftScan.CONST.TEXT
-local L = {
+CraftScan.L = {
     -- I eventually got tired of the whole LID enum tedium copy/pasted from
     -- CraftSim, so newer short ones are just the raw English string as the
     -- key, which is easier to read in the code anyway.
@@ -406,4 +418,3 @@ local L = {
     ['Loading...'] = 'Loading...',
     ['Hide CraftScan'] = 'Detach CraftScan',
 }
-CraftScan.LOCAL_EN = L

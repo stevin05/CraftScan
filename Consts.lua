@@ -164,20 +164,6 @@ CraftScan.CONST.TEXT = {
     RN_SUBSTITUTION_TAGS = 11700,
 }
 
-CraftScan.CONST.LOCALES = {
-    EN = 'enUS',
-    DE = 'deDE',
-    IT = 'itIT',
-    RU = 'ruRU',
-    PT = 'ptBR',
-    ES = 'esES',
-    FR = 'frFR',
-    MX = 'esMX',
-    KO = 'koKR',
-    TW = 'zhTW',
-    CN = 'zhCN',
-}
-
 -- Stolen from WeakAuras. Presumably also only works if the user has WeakAuras installed to provide the sounds.
 local WeakAurasSoundPath = 'Interface\\Addons\\WeakAuras\\Media\\Sounds\\'
 local PowerAurasSoundPath = 'Interface\\Addons\\WeakAuras\\PowerAurasMedia\\Sounds\\'

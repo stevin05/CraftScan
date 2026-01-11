@@ -1,51 +1,83 @@
-local json = require("dkjson")
+local json = require('dkjson')
 
--- 1. Create the Addon Object (The namespace)
-local CraftScan = {} 
+local CraftScan = {}
+local target_locales = {}
 
--- 2. Execute Consts.lua
--- We pass the table as the second arg to satisfy: local CraftScan = select(2, ...)
-local consts_chunk = assert(loadfile("Consts.lua"))
-consts_chunk("CraftScan", CraftScan)
-
--- 3. Function to load Locale and "sniff" for the L table
-local function get_locale_table(path)
-    local f = loadfile(path)
-    if not f then return nil end
-
-    -- Run the locale file with the same CraftScan environment
-    f("CraftScan", CraftScan)
-
-    -- The file does: CraftScan.LOCAL_XX = L
-    -- We find that specific key and extract the table
-    for key, val in pairs(CraftScan) do
-        if type(key) == "string" and key:find("^LOCAL_") then
-            local found_table = val
-            -- Important: Clear it so the NEXT file (target) doesn't see it
-            CraftScan[key] = nil 
-            return found_table
-        end
-    end
+-- Collect all locales from command line arguments
+for i = 1, #arg do
+    table.insert(target_locales, arg[i])
 end
 
--- 4. Compare and Export
-local target_file = arg[1]
-local en_table = get_locale_table("Locales/enUS.lua")
-local target_table = get_locale_table(target_file) or {}
-
-if not en_table then
-    print("Error: Could not load enUS.lua")
+if #target_locales == 0 then
+    print("❌ Usage: lua extract_missing.lua <lang1> <lang2> ...")
     os.exit(1)
 end
 
-local missing = {}
-for k, v in pairs(en_table) do
-    if not target_table[k] then
-        missing[k] = v
+-- Load Constants once
+local consts_path = 'Consts.lua'
+local consts_chunk, err = loadfile(consts_path)
+if not consts_chunk then
+    print('FAILED to load Consts.lua: ' .. tostring(err))
+    os.exit(1)
+end
+consts_chunk('CraftScan', CraftScan)
+
+-- Setup Reverse Lookup Table (Common for all languages)
+local ReverseLID = {}
+local RN_Bases = {}
+for key, value in pairs(CraftScan.CONST.TEXT) do
+    ReverseLID[value] = 'LID.' .. key
+    if key:find('^RN_') then
+        table.insert(RN_Bases, { name = 'LID.' .. key, value = value })
     end
 end
+table.sort(RN_Bases, function(a, b) return a.value < b.value end)
 
--- 5. Write to JSON
-local out = io.open("missing_keys.json", "w")
-out:write(json.encode(missing, { indent = true }))
-out:close()
+local function get_key_name(key)
+    if type(key) ~= 'number' then return key end
+    if ReverseLID[key] then return ReverseLID[key] end
+    local best_base = nil
+    for _, base in ipairs(RN_Bases) do
+        if key > base.value then best_base = base else break end
+    end
+    if best_base and best_base.name:find('RN_') then
+        local offset = key - best_base.value
+        if offset < 10 then return string.format('%s + %d', best_base.name, offset) end
+    end
+    return tostring(key)
+end
+
+local function get_locale_table(path)
+    local f, err = loadfile(path)
+    if not f then return nil end
+    f('CraftScan', CraftScan)
+    local L = CraftScan.L
+    CraftScan.L = {} -- Clean load of the next language
+    return L
+end
+
+-- Process each locale
+local en_table = get_locale_table('Locales/enUS.lua')
+if not en_table then os.exit(1) end
+
+for _, locale in ipairs(target_locales) do
+    print('🔍 Extracting: ' .. locale)
+    local target_table = get_locale_table('Locales/' .. locale .. '.lua') or {}
+    local missing = {}
+    local count = 0
+    
+    for k, v in pairs(en_table) do
+        if not target_table[k] then
+            missing[get_key_name(k)] = v
+            count = count + 1
+        end
+    end
+
+    local out_path = 'missing_keys_' .. locale .. '.json'
+    local out = io.open(out_path, 'w')
+    if out then
+        out:write(json.encode(missing, { indent = true }))
+        out:close()
+        print('✅ Saved ' .. count .. ' keys to ' .. out_path)
+    end
+end

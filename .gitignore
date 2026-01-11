@@ -1,2 +1,7 @@
 CraftScan.code-workspace
 .vscode/
+
+# Gemini Localization temporary files
+missing_keys_*.json
+
+.lua*

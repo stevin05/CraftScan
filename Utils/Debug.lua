@@ -1,6 +1,6 @@
 local CraftScan = select(2, ...)
 
-local DEBUG = true;
+local DEBUG = false;
 local DEBUG_FRAMES = false;
 
 CraftScan.Debug = {}
@@ -8,6 +8,9 @@ CraftScan.Debug = {}
 function CraftScan.Debug.Enable(value)
     DEBUG = value
     print("CraftScan debugging" .. (DEBUG and " enabled (use /dev to see output)" or "disabled"))
+    if DEBUG then
+        CraftScan.Debug.Print(CraftScan, "CraftScan")
+    end
 end
 
 CraftScan.Debug.IsEnabled = function() return DEBUG end
