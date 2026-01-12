@@ -262,6 +262,11 @@ local function ScanAllRecipes(OnScanComplete, forceScan)
     local function ProcessRecipe(unused, id)
         local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
         local profInfo = C_TradeSkillUI.GetProfessionInfoByRecipeID(id)
+        if not profInfo.parentProfessionID then
+            -- Some shadowlands recipes report an unknown expansion and have no
+            -- parent professionID. We just ignore them.
+            return
+        end
 
         local item = nil
         if not recipeInfo.isRecraft and recipeInfo.hyperlink then
