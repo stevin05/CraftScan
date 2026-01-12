@@ -417,4 +417,5 @@ CraftScan.L = {
     ['decor'] = 'Decor',
     ['Loading...'] = 'Loading...',
     ['Hide CraftScan'] = 'Detach CraftScan',
+    ['test AI localize'] = 'This is a dummy message to test the localize.yml github action.'
 }

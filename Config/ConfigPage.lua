@@ -910,6 +910,9 @@ function CraftScanConfigMenuItemMixin:SetSelected(selected)
 end
 
 function CraftScan.Config.OnRecipeScanStateChange(configInfo, skipReload)
+    -- If the tree hasn't initialized the configInfo yet, nothing to do.
+    if not configInfo.treeNode then return end
+
     local menu = CraftScanConfigPage.Menu
     local newParent = menu.GetRecipeParentNode(
         configInfo.char,

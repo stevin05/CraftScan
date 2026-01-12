@@ -104,6 +104,8 @@ function CraftScanRecipeConfigPanelMixin:Init(configInfo, isCollapsed)
 
     self:SetupRecipeIcon()
 
+    self:Layout(isCollapsed)
+
     -- We present a different config page based on the scan state. For disabled
     -- items, we show only an enable button. For enabled items, we show a disable
     -- button. For pending items we show both an enable and disable button. For
@@ -140,8 +142,6 @@ function CraftScanRecipeConfigPanelMixin:Init(configInfo, isCollapsed)
         'item.omit_profession',
         CHECK_BOX_WIDTH
     )
-
-    self:Layout(isCollapsed)
 
     self.Left:Show()
     self.Right:Show()
