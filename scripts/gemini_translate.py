@@ -237,7 +237,6 @@ def main():
                         model_index += 1
                         model = available_models[model_index]
                         print(f"  🔄 Swapping to model: {model}")
-                        model = genai.GenerativeModel(model)
                     else:
                         print("  🛑 All models exhausted. Stopping this language.")
                         sys.exit(1)  # Fail the job so we know it stopped
