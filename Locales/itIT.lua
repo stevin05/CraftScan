@@ -421,3 +421,6 @@ L["proxy_send_enabled_tooltip"] = "Quando viene rilevato un ordine del cliente, 
 L["tag.invalid.braces"] = "I tag non possono includere '{' o '}' ."
 L["tag.invalid.context"] = "Questo è un tag integrato e sensibile al contesto. È supportato solo nei saluti e verrà sostituito con dettagli in base alla richiesta del cliente."
 L["tag.invalid.unique"] = "I tag devono essere unici."
+
+-- AI Generated: 2026-01-12 00:24:06 using models/gemini-2.5-flash
+L["test AI localize"] = "Questo è un messaggio di prova per verificare l'azione localize.yml di GitHub."

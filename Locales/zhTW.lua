@@ -421,3 +421,6 @@ L["proxy_send_enabled_tooltip"] = "當偵測到顧客訂單時，將其發送至
 L["tag.invalid.braces"] = "標籤不能包含 '{' 或 '}' 符號。"
 L["tag.invalid.context"] = "這是一個內建的上下文敏感標籤。它僅在問候語中受支援，並將根據顧客請求替換為詳細資訊。"
 L["tag.invalid.unique"] = "標籤必須是唯一的。"
+
+-- AI Generated: 2026-01-12 00:25:33 using models/gemini-2.5-flash
+L["test AI localize"] = "這是個測試訊息，用來測試 localize.yml GitHub action。"

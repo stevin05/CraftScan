@@ -421,3 +421,6 @@ L["proxy_send_enabled_tooltip"] = "Wenn eine Kundenbestellung erkannt wird, an v
 L["tag.invalid.braces"] = "Tags dürfen '{' oder '}' nicht enthalten."
 L["tag.invalid.context"] = "Dies ist ein eingebauter kontextsensitiver Tag. Er wird nur in Begrüßungen unterstützt und wird durch Details basierend auf der Kundenanfrage ersetzt."
 L["tag.invalid.unique"] = "Tags müssen eindeutig sein."
+
+-- AI Generated: 2026-01-12 00:22:53 using models/gemini-2.5-flash
+L["test AI localize"] = "Dies ist eine Probenachricht, um die 'localize.yml'-GitHub-Aktion zu überprüfen."

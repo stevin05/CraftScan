@@ -421,3 +421,6 @@ L["proxy_send_enabled_tooltip"] = "Cuando se detecta un pedido de cliente, reenv
 L["tag.invalid.braces"] = "Las etiquetas no pueden incluir '{' o '}'."
 L["tag.invalid.context"] = "Esta es una etiqueta sensible al contexto integrada. Solo es compatible en saludos y se reemplazará con detalles basados en el pedido del cliente."
 L["tag.invalid.unique"] = "Las etiquetas deben ser únicas."
+
+-- AI Generated: 2026-01-12 00:23:09 using models/gemini-2.5-flash
+L["test AI localize"] = "Este es un mensaje de prueba para probar la acción localize.yml de GitHub."

@@ -421,3 +421,6 @@ L["proxy_send_enabled_tooltip"] = "当检测到客户订单时，将其发送给
 L["tag.invalid.braces"] = "标签不能包含“{”或“}”。"
 L["tag.invalid.context"] = "这是一个内置的上下文敏感标签。它仅在招呼语中支持，并将根据客户请求替换为详细信息。"
 L["tag.invalid.unique"] = "标签必须是唯一的。"
+
+-- AI Generated: 2026-01-12 00:25:16 using models/gemini-2.5-flash
+L["test AI localize"] = "这是一条用于测试 localize.yml GitHub Action 的消息。"

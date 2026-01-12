@@ -421,3 +421,6 @@ L["proxy_send_enabled_tooltip"] = "Quand une commande client est détectée, l�
 L["tag.invalid.braces"] = "Les balises ne peuvent pas inclure « { » ou « } »."
 L["tag.invalid.context"] = "Ceci est une balise intégrée sensible au contexte. Elle n’est prise en charge que dans les salutations et sera remplacée par des détails basés sur la demande du client."
 L["tag.invalid.unique"] = "Les balises doivent être uniques."
+
+-- AI Generated: 2026-01-12 00:23:47 using models/gemini-2.5-flash
+L["test AI localize"] = "Ceci est un message factice pour tester l'action localize.yml de GitHub."
