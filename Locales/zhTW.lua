@@ -423,3 +423,6 @@ L["tag.invalid.unique"] = "標籤必須是唯一的。"
 
 -- AI Generated: 2026-01-12 00:25:33 using models/gemini-2.5-flash
 L["test AI localize"] = "這是個測試訊息，用來測試 localize.yml GitHub action。"
+
+-- AI Generated: 2026-01-22 14:59:09 using models/gemini-flash-latest
+L["Details: Sound alerts."] = "音效警報使用 LibSharedMedia。點擊此頁面右上角的「開啟設定」即可選擇音效。"
