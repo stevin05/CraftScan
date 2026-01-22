@@ -28,7 +28,7 @@ local function CreateDropdown(category, variable, key, name, options, tooltip, o
 end
 
 local function SetupMultiSelectDropdown(dropdown, setting, options, width, initTooltip)
-    local function Inserter(rootDescription, isSelected, setSelected)
+    local function Inserter(setting, rootDescription)
         -- Instead of the default dropdown buttons, we use checkboxes, and
         -- convert the checked ones into a list that gets saved into the
         -- specified variableKey in the settings DB.
@@ -201,9 +201,18 @@ CraftScan.Utils.onLoad(function()
     do
         local function GetOptions()
             local container = Settings.CreateControlTextContainer()
-            for _, entry in ipairs(CraftScan.CONST.SOUNDS) do
-                container:Add(entry.path, entry.name)
+            local LSM = LibStub('LibSharedMedia-3.0', true)
+
+            if LSM then
+                local allSounds = LSM:List('sound')
+                for _, soundName in ipairs(allSounds) do
+                    local path = LSM:Fetch('sound', soundName)
+                    container:Add(tostring(path), soundName)
+                end
+            else
+                container:Add('12867', 'Default: Auction Ding')
             end
+
             return container:GetData()
         end
 

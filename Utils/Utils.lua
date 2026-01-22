@@ -699,6 +699,13 @@ local function UpgradePersistentConfig()
         CraftScan.DB.settings.collapse_chat_context = false
     end
 
+    if
+        CraftScan.DB.settings.ping_sound
+        and string.find(CraftScan.DB.settings.ping_sound, 'WeakAuras')
+    then
+        CraftScan.DB.settings.ping_sound = nil
+    end
+
     -- After changing placeholders in customer greetings from %s to {placeholder},
     -- existing configs must be updated to replace %s placeholders with the new ones.
 
