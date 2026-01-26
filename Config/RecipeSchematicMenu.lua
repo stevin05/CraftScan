@@ -274,6 +274,12 @@ local function ScanAllRecipes(OnScanComplete, forceScan)
         end
 
         local profConfig = ctxt.db.professions[profInfo.professionID]
+        if not profConfig then
+            -- This is to fix #86, but no idea how it happened. The prior ctxt
+            -- setup should have ensured that any profession we're scanning in
+            -- has a place to go.
+            return
+        end
         local recipes = profConfig.recipes
 
         professions[profInfo.professionID] = profConfig

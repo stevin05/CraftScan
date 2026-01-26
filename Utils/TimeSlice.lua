@@ -23,7 +23,17 @@ function TaskQueue:ProcessNext()
         local count = 0
         while index <= total and count < currentTask.perFrame do
             local key = currentTask.keys[index]
-            currentTask.callback(key, currentTask.dataTable[key])
+
+            local success, errorMessage =
+                pcall(currentTask.callback, key, currentTask.dataTable[key])
+
+            if not success then
+                -- Don't emit an endless stream of the same Lua error:w
+                self.queue = {}
+                self.frame:SetScript('OnUpdate', nil)
+                error(errorMessage)
+                return
+            end
 
             index = index + 1
             count = count + 1
