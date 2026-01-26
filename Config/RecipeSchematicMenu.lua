@@ -304,7 +304,7 @@ local function ScanAllRecipes(OnScanComplete, forceScan)
                         recipeConfig = recipes[id]
                         recipes[id] = nil
                         ctxt.dbCurrentExp.recipes[id] = recipeConfig
-                        context.updated = true
+                        ctxt.updated = true
                     else
                         recipeConfig = isDecor and ctxt.dbCurrentExp.recipes[id] or recipes[id]
                         if not recipeConfig then
