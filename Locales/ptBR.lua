@@ -423,3 +423,6 @@ L["tag.invalid.unique"] = "As tags devem ser únicas."
 
 -- AI Generated: 2026-01-12 00:24:41 using models/gemini-flash-lite-latest
 L["test AI localize"] = "Esta é uma mensagem de teste para o github action localize.yml."
+
+-- AI Generated: 2026-01-22 14:58:20 using models/gemini-2.5-flash
+L["Details: Sound alerts."] = "Alertas Sonoros usam LibSharedMedia. O som pode ser selecionado clicando em 'Abrir Configurações' no canto superior direito desta página."
