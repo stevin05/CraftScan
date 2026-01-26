@@ -796,8 +796,10 @@ local function MakeGreetingBuilder()
     end
 
     local function FinalGreeting(context)
-        result = CraftScan.Utils.FString(result, context)
-        return CraftScan.Config.SubstituteTags(result)
+        -- Start by substituting tags, then substitute context. This allows tags
+        -- to include context.
+        result = CraftScan.Config.SubstituteTags(result)
+        return CraftScan.Utils.FString(result, context)
     end
 
     return Greeting, FinalGreeting
@@ -1015,6 +1017,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         return C_Spell.GetSpellTradeSkillLink(skillSpellID)
     end
 
+    local GeneralGreeting, GeneralFinalGreeting = MakeGreetingBuilder()
     local Greeting, FinalGreeting = MakeGreetingBuilder()
     local context = {
         crafter = crafter,
@@ -1022,20 +1025,24 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         profession = profInfo.parentProfessionName,
         profession_link = alt_craft and profInfo.parentProfessionName or GetProfessionLink(),
     }
-    if not profConfig.omit_general and (not recipeConfig or not recipeConfig.omit_general) then
-        if alt_craft then
-            if itemID then
-                Greeting(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'))
-            else
-                Greeting(GetGreeting('GREETING_ALT_HAS_PROF'))
-            end
+    if alt_craft then
+        if itemID then
+            GeneralGreeting(GetGreeting('GREETING_ALT_CAN_CRAFT_ITEM'))
         else
-            if itemID then
-                Greeting(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'))
-            else
-                Greeting(GetGreeting('GREETING_I_HAVE_PROF'))
-            end
+            GeneralGreeting(GetGreeting('GREETING_ALT_HAS_PROF'))
         end
+    else
+        if itemID then
+            GeneralGreeting(GetGreeting('GREETING_I_CAN_CRAFT_ITEM'))
+        else
+            GeneralGreeting(GetGreeting('GREETING_I_HAVE_PROF'))
+        end
+    end
+
+    if not profConfig.omit_general and (not recipeConfig or not recipeConfig.omit_general) then
+        Greeting(GeneralFinalGreeting(context))
+    else
+        context.general_greeting = GeneralFinalGreeting(context)
     end
 
     if CraftScan.State.isBusy then

@@ -46,6 +46,7 @@ local contextSensitiveTags = {
     profession = true,
     profession_link = true,
     crafter = true,
+    general_greeting = true,
 }
 
 function CraftScan.Config.GetSuggestions(text, includeContext)
