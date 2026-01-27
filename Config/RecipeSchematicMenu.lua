@@ -278,6 +278,13 @@ local function ScanAllRecipes(OnScanComplete, forceScan)
             -- This is to fix #86, but no idea how it happened. The prior ctxt
             -- setup should have ensured that any profession we're scanning in
             -- has a place to go.
+            --
+            -- Based on the updated comment, it seems the recipe list we are
+            -- iterating is including an expansion that is not learned by the
+            -- crafter, so this seems a reasonable fix for that issue. We have
+            -- pre-configured a profession slot for each learned profession, and
+            -- if we hit a recipe from an unlearned profession, we simply ignore
+            -- it.
             return
         end
         local recipes = profConfig.recipes
