@@ -699,17 +699,6 @@ local function UpgradePersistentConfig()
         CraftScan.DB.settings.collapse_chat_context = false
     end
 
-    if
-        -- With the deprecation of WeakAuras, reset any ping_sounds still
-        -- referencing WeakAuras files. I named my replacement pack WeakAurasSounds,
-        -- so we allow that.
-        CraftScan.DB.settings.ping_sound
-        and string.find(CraftScan.DB.settings.ping_sound, 'WeakAuras')
-        and not string.find(CraftScan.DB.settings.ping_sound, 'WeakAurasSounds')
-    then
-        CraftScan.DB.settings.ping_sound = nil
-    end
-
     -- After changing placeholders in customer greetings from %s to {placeholder},
     -- existing configs must be updated to replace %s placeholders with the new ones.
 
