@@ -323,6 +323,13 @@ local function MakeProfessionNodeFactory(root)
         -- for the user to see instead of freezing the screen.
         local perFrame = existingRecipeIDs and 5 or 10000000
 
+        if not profConfig.recipes then
+            if onFinished then
+                onFinished()
+            end
+            return
+        end
+
         CraftScan.TimeSlice(profConfig.recipes, perFrame, function(recipeID, recipeConfig)
             if not existingRecipeIDs or not existingRecipeIDs[recipeID] then
                 local parentNode = GetRecipeParentNode(char, profID, profConfig, recipeConfig)
