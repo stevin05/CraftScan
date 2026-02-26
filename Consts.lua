@@ -202,15 +202,16 @@ CraftScan.CONST.PARENT_PROFESSION_ICONS = {
 }
 
 -- ExpansionUpdateTag
-CraftScan.CONST.TWW_PROFESSION_ICONS = {
-    [3017] = 136240, -- Alchemy
-    [3021] = 136241, -- Blacksmithing
-    [3034] = 136244, -- Enchanting
-    [3037] = 136245, -- Engineering
-    [3040] = 237171, -- Inscription
-    [3043] = 134071, -- Jewelcrafting
-    [3046] = 136247, -- Leatherworking
-    [3049] = 136249, -- Tailoring
+CraftScan.CONST.MIDNIGHT_PROFESSION_ICONS = {
+    -- https://wago.tools/db2/SkillLine?filter%5BDisplayName_lang%5D=Midnight&page=1
+    [2906] = 136240, -- Alchemy
+    [2907] = 136241, -- Blacksmithing
+    [2909] = 136244, -- Enchanting
+    [2910] = 136245, -- Engineering
+    [2913] = 237171, -- Inscription
+    [2914] = 134071, -- Jewelcrafting
+    [2915] = 136247, -- Leatherworking
+    [2918] = 136249, -- Tailoring
 }
 
 CraftScan.CONST.PROFESSION_DEFAULT_KEYWORDS = {

@@ -44,7 +44,7 @@ end
 
 function CraftScan.Utils.IsCurrentExpansion(profID)
     -- ExpansionUpdateTag
-    return profID > 2870 -- Lowest TWW profID is 2871, alchemy
+    return profID > 2905 -- Lowest Midnight profID is 2906, alchemy
 end
 
 -- Expecting AARRGGBB
@@ -930,7 +930,7 @@ CraftScan.Utils.GetCurrentProfessionIcon = function()
         -- If we have an active order, return the icon associated with the
         -- requested profession to give a good visual queue about the request.
         local response = CraftScan.OrderToResponse(CraftScan.State.activeOrder)
-        return CraftScan.CONST.TWW_PROFESSION_ICONS[response.professionID]
+        return CraftScan.CONST.MIDNIGHT_PROFESSION_ICONS[response.professionID]
             or CraftScan.CONST.PARENT_PROFESSION_ICONS[response.parentProfID]
     end
 
