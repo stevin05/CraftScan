@@ -723,8 +723,11 @@ function CraftScanConfigMenuMixin:OnLoad()
     self:SetScript('OnEvent', function(self, event, ...)
         if event == 'NEW_RECIPE_LEARNED' then
             local recipeID, recipeLevel, baseRecipeID = ...
+
+            if issecretvalue(recipeID) then return end
+
             local profInfo = C_TradeSkillUI.GetProfessionInfoByRecipeID(recipeID)
-            if not profInfo.isPrimaryProfession or not profInfo.parentProfessionID then
+            if not profInfo.isPrimaryProfession or not profInfo.parentProfessionID or not CraftScan.DB.characters[char] then
                 return
             end
             local char = CraftScan.GetPlayerName(true)

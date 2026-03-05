@@ -83,7 +83,7 @@
                         </Anchors>
                     </Frame>
                     <Frame parentKey="RequiredConcentration" inherits="CraftScanSliderTemplate">
-                        <Size x="335" y="28" />
+                        <Size x="335" y="43" />
                         <Anchors>
                             <Anchor point="TOPLEFT" relativeKey="$parent.Commission"
                                 relativePoint="BOTTOMLEFT" />

@@ -1381,6 +1381,8 @@ local function ReceiveDeserialized(msg, sender)
 end
 
 function CraftScanComm:OnCommReceived(prefix, payload, distribution, sender)
+    if issecretvalue(payload) then return end
+
     CraftScan.Utils.printTable('Received from', sender)
     CraftScan.Utils.printTable('distribution', distribution)
     if not CraftScan.State.realmID or string.find(sender, '-') == nil then

@@ -1256,6 +1256,9 @@ end
 
 local function OnMessage_(self, event, ...)
     local message, customer = ...
+
+    if issecretvalue(message) then return end
+
     local customerGuid = select(12, ...)
     CraftScan.OnMessage(event, message, customer, customerGuid)
 end
