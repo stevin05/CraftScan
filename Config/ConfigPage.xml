@@ -66,6 +66,11 @@
 							<Anchor point="BOTTOMRIGHT" x="0" y="0" />
 						</Anchors>
 					</Frame>
+					<Frame parentKey="Spinner" inherits="SpinnerTemplate" frameLevel="2200">
+						<Anchors>
+							<Anchor point="CENTER" />
+						</Anchors>
+					</Frame>
 					<Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.Background"

@@ -314,7 +314,7 @@ function CraftScan.Scanner.LoadConfig()
                     end
                 end
 
-                local perFrame = 10
+                local perFrame = 1000
                 waitGroup:Add()
                 CraftScan.TimeSlice(prof.recipes, perFrame, ProcessRecipe, function()
                     waitGroup:Done()

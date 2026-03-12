@@ -9,10 +9,17 @@
     <Scripts>
       <OnClick method="OnClick" />
     </Scripts>
-
+    <Frames>
+      <Frame parentKey="Spinner" inherits="SpinnerTemplate" frameLevel="2200" hidden="true">
+        <Size x="22" y="22" />
+        <Anchors>
+          <Anchor point="CENTER" />
+        </Anchors>
+      </Frame>
+    </Frames>
     <Layers>
       <Layer level="ARTWORK">
-        <FontString parentKey="ScanningLabel" inherits="GameFontHighlightSmall2" 
+        <FontString parentKey="ScanningLabel" inherits="GameFontHighlightSmall2"
           justifyV="CENTER" justifyH="LEFT">
           <Size x="200" y="20" />
           <Anchors>

@@ -357,6 +357,7 @@ local function ScanAllRecipes(OnScanComplete, forceScan)
 end
 CraftScan.Events:Register('TRADESKILL_OPENED', ScanAllRecipes)
 
+local attachButton = nil
 local function CreateMenuShownButton()
     local button = CreateFrame(
         'Button',
@@ -364,6 +365,7 @@ local function CreateMenuShownButton()
         ProfessionsFrame.CraftingPage.SchematicForm,
         'CraftScan_ScannerConfigButtonTemplate'
     )
+    attachButton = button
 
     CraftScan.Events:Register({
         'RECIPE_SELECTED',
@@ -416,11 +418,21 @@ local function OpenRecipe()
     local profID = isDecor and ctxt.currentExpID or profession.professionID
     local profConfig = isDecor and ctxt.dbCurrentExp or ctxt.dbSelectedExp
     if profConfig.recipes[recipeInfo.recipeID] then
-        CraftScan.Events:Emit('OPEN_RECIPE', ctxt.name, profID, recipeInfo.recipeID)
+        CraftScan.Events:Emit('OPEN_RECIPE', ctxt.name, profID, recipeInfo.recipeID, attachButton)
     end
 end
 
 CraftScan_ScannerConfigButtonMixin = {}
+
+function CraftScan_ScannerConfigButtonMixin:AttachedMenuLoading()
+    self:SetEnabled(false)
+    self.Spinner:SetShown(true)
+end
+
+function CraftScan_ScannerConfigButtonMixin:AttachedMenuLoadComplete()
+    self:SetEnabled(true)
+    self.Spinner:SetShown(false)
+end
 
 function CraftScan_ScannerConfigButtonMixin:Setup(ctxt)
     ctxt = ctxt or GetParentContext()

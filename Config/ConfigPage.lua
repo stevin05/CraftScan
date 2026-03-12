@@ -185,8 +185,8 @@ local function MakeProfessionNodeFactory(root)
                     label = L(isCurrent and 'Crafters' or 'Legacy Crafters'),
                     startCollapsed = not isCurrent,
                 },
+                sorter = SortByHeaderLabel,
             })
-            SetSortComparator(expansionNode, SortByHeaderLabel)
             db[isCurrent] = expansionNode
         end
 
@@ -208,9 +208,9 @@ local function MakeProfessionNodeFactory(root)
                     GetLabelColor = GetCrafterNameColor,
                     label = CraftScan.NameAndRealmToName(char, true),
                 },
+                sorter = SortByHeaderLabel,
             })
 
-            SetSortComparator(charNode, SortByHeaderLabel)
             charNode:Insert({ order = 1, bottomPadding = true })
             db[isCurrent][char] = charNode
         end
@@ -241,8 +241,8 @@ local function MakeProfessionNodeFactory(root)
                     ppConfig = CraftScan.DB.characters[char].parent_professions[profConfig.parentProfID],
                     LoadOptions = CraftScan.Config.LoadProfessionConfigOptions,
                 },
+                sorter = false,
             })
-            SetSortComparator(profNode)
             -- Scan_state is set as order, so 1-4 for pending/on/off/unlearned.
             -- Add some bottom padding by setting order higher than that - 10.
             profNode:Insert({ order = 10, bottomPadding = true })
@@ -262,8 +262,8 @@ local function MakeProfessionNodeFactory(root)
                     label = CraftScan.RecipeStateName(recipeConfig, profConfig),
                     startCollapsed = true,
                 },
+                sorter = SortByItemLabel,
             })
-            SetSortComparator(sectionNode, SortByItemLabel)
             sectionNode:Insert({ order = 1, bottomPadding = true })
             profNode[recipeScanState] = sectionNode
         end
@@ -321,7 +321,7 @@ local function MakeProfessionNodeFactory(root)
         -- it, there's a bit of a screen lock up as the tree is updated, so we
         -- time slice that into small chunks so the tree updates in real time
         -- for the user to see instead of freezing the screen.
-        local perFrame = existingRecipeIDs and 5 or 10000000
+        local perFrame = existingRecipeIDs and 5 or 2000000
 
         if not profConfig.recipes then
             if onFinished then
@@ -535,39 +535,49 @@ function CraftScanConfigPageMixin:ToggleMenu()
     self:SetMenuCollapsed(not self.isMenuCollapsed)
 end
 
-function CraftScanConfigPageMixin:SelectRecipe(char, profID, recipeID, retryCount)
-    retryCount = retryCount or 0
+function CraftScanConfigPageMixin:SelectRecipe(char, profID, recipeID, attachButton)
+    local menu = self.Menu
 
-    self:Show()
+    local function OnMenuInitialized()
+        if ProfessionsFrame.CraftingPage.SchematicForm:IsShown() then
+            self:SetMenuCollapsed(true)
+            self:AnchorToProfessionPage()
+        end
 
-    if ProfessionsFrame.CraftingPage.SchematicForm:IsShown() then
-        self:SetMenuCollapsed(true)
-        self:AnchorToProfessionPage()
+        local dataProvider = menu.dataProvider
+
+        -- Find the tree node containing what we need.
+        local node = dataProvider:FindElementDataByPredicate(function(node)
+            local data = node:GetData()
+            return data.configInfo
+                and data.configInfo.recipeID
+                and data.configInfo.recipeID == recipeID
+                and data.configInfo.char == char
+                and data.configInfo.profID == profID
+        end, TreeDataProviderConstants.IncludeCollapsed)
+
+        if node then
+            menu.ExpandToNode(dataProvider:GetRootNode(), node:GetData().configInfo)
+            menu.selectionBehavior:SelectElementData(node)
+            dataProvider:Invalidate()
+            menu.ScrollBox:ScrollToElementData(node)
+        end
     end
 
-    local menu = self.Menu
-    local dataProvider = menu.dataProvider
-
-    -- Find the tree node containing what we need.
-    local node = dataProvider:FindElementDataByPredicate(function(node)
-        local data = node:GetData()
-        return data.configInfo
-            and data.configInfo.recipeID
-            and data.configInfo.recipeID == recipeID
-            and data.configInfo.char == char
-            and data.configInfo.profID == profID
-    end, TreeDataProviderConstants.IncludeCollapsed)
-
-    if node then
-        menu.ExpandToNode(dataProvider:GetRootNode(), node:GetData().configInfo)
-        menu.selectionBehavior:SelectElementData(node)
-        dataProvider:Invalidate()
-        menu.ScrollBox:ScrollToElementData(node)
-    elseif retryCount < 50 then
-        -- Fail / Retry: The recipe isn't loaded yet.
-        C_Timer.After(0.1, function()
-            self:SelectRecipe(char, profID, recipeID, retryCount + 1)
-        end)
+    if self:IsShown() then
+        OnMenuInitialized()
+    else
+        if attachButton then
+            attachButton:AttachedMenuLoading()
+        end
+        menu.onMenuInitialized = function()
+            OnMenuInitialized()
+            self:Show()
+            if attachButton then
+                attachButton:AttachedMenuLoadComplete()
+            end
+        end
+        menu:InitMenu()
     end
 end
 
@@ -724,10 +734,16 @@ function CraftScanConfigMenuMixin:OnLoad()
         if event == 'NEW_RECIPE_LEARNED' then
             local recipeID, recipeLevel, baseRecipeID = ...
 
-            if issecretvalue(recipeID) then return end
+            if issecretvalue(recipeID) then
+                return
+            end
 
             local profInfo = C_TradeSkillUI.GetProfessionInfoByRecipeID(recipeID)
-            if not profInfo.isPrimaryProfession or not profInfo.parentProfessionID or not CraftScan.DB.characters[char] then
+            if
+                not profInfo.isPrimaryProfession
+                or not profInfo.parentProfessionID
+                or not CraftScan.DB.characters[char]
+            then
                 return
             end
             local char = CraftScan.GetPlayerName(true)
@@ -773,18 +789,29 @@ end
 CraftScan.Config = {}
 CraftScan.Config.OnConfigChange = OnConfigChange
 
+function CraftScanConfigMenuMixin:OnMenuInitialized()
+    if self.onMenuInitialized then
+        self.onMenuInitialized()
+        self.onMenuInitialized = nil
+    end
+end
+
 function CraftScanConfigMenuMixin:OnShow()
+    self:InitMenu()
+end
+
+function CraftScanConfigMenuMixin:InitMenu()
     if menuInitialized then
+        self:OnMenuInitialized()
         return
     end
+
     menuInitialized = true
 
     local dataProvider = CreateTreeDataProvider()
     self.dataProvider = dataProvider
 
     local node = dataProvider:GetRootNode()
-
-    SetSortComparator(node, SortByHeaderLabel)
 
     local generalNode = node:Insert({
         order = 0,
@@ -809,6 +836,18 @@ function CraftScanConfigMenuMixin:OnShow()
         local excludeCollapsed = false
         dataProvider:ForEach(function(node)
             local elementData = node:GetData()
+
+            -- Now that the full tree is populated, apply the sorter for a
+            -- single n*log(n) sort instead of the original n*n*log(n) we got
+            -- from applying the sorter before inserting children.
+            if elementData.sorter ~= nil then
+                if elementData.sorter then
+                    SetSortComparator(node, elementData.sorter)
+                else
+                    SetSortComparator(node)
+                end
+                elementData.sorter = nil
+            end
             if elementData.headerInfo and elementData.headerInfo.startCollapsed then
                 node:SetCollapsed(true)
 
@@ -821,17 +860,33 @@ function CraftScanConfigMenuMixin:OnShow()
         end, excludeCollapsed)
     end
 
+    -- Wait until we have fully populated the tree to render it. Before
+    -- rendering, we collapse almost all the nodes so we only display the
+    -- current expansion's professions
+    local waitGroup = CraftScan.WaitGroup(function()
+        CollapseTree()
+        SetSortComparator(node, SortByHeaderLabel)
+        self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
+        self.selectionBehavior:SelectElementData(generalNode)
+        self.ScrollBox:ScrollToElementData(generalNode)
+        self.Spinner:SetShown(false)
+        self:OnMenuInitialized()
+    end)
+
+    local OnProfessionLoadComplete = function()
+        waitGroup:Done()
+    end
+
+    self.Spinner:SetShown(true)
     self.GetRecipeParentNode, self.PopulateProfessionNode, self.UpdateProfessionNode, self.RemoveMissingProfessionNodes, self.ExpandToNode =
         MakeProfessionNodeFactory(node)
     for char, charConfig in pairs(CraftScan.DB.characters) do
         for profID, profConfig in pairs(charConfig.professions) do
-            self.PopulateProfessionNode(char, profID, profConfig, nil, CollapseTree)
+            waitGroup:Add()
+            self.PopulateProfessionNode(char, profID, profConfig, nil, OnProfessionLoadComplete)
         end
     end
-
-    self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
-    self.selectionBehavior:SelectElementData(generalNode)
-    self.ScrollBox:ScrollToElementData(generalNode)
+    waitGroup:Close()
 end
 
 CraftScanConfigMenuHeaderMixin = {}
@@ -924,7 +979,9 @@ end
 
 function CraftScan.Config.OnRecipeScanStateChange(configInfo, skipReload)
     -- If the tree hasn't initialized the configInfo yet, nothing to do.
-    if not configInfo.treeNode then return end
+    if not configInfo.treeNode then
+        return
+    end
 
     local menu = CraftScanConfigPage.Menu
     local newParent = menu.GetRecipeParentNode(

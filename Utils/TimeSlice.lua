@@ -6,45 +6,49 @@ local TaskQueue = {
     frame = CreateFrame('Frame'),
 }
 
---- Processes the next task in the queue
-function TaskQueue:ProcessNext()
-    if #self.queue == 0 then
-        self.isProcessing = false
-        self.frame:SetScript('OnUpdate', nil)
+function TaskQueue:Start()
+    if self.isProcessing then
         return
     end
 
-    self.isProcessing = true
-    local currentTask = table.remove(self.queue, 1)
-    local index = 1
-    local total = #currentTask.keys
-
-    local function OnUpdate()
-        local count = 0
-        while index <= total and count < currentTask.perFrame do
-            local key = currentTask.keys[index]
-
-            local success, errorMessage =
-                pcall(currentTask.callback, key, currentTask.dataTable[key])
-
-            if not success then
-                -- Don't emit an endless stream of the same Lua error:w
-                self.queue = {}
+    local OnUpdate = function()
+        if not self.currentTask then
+            if #self.queue == 0 then
+                self.isProcessing = false
                 self.frame:SetScript('OnUpdate', nil)
-                error(errorMessage)
                 return
             end
 
-            index = index + 1
+            self.isProcessing = true
+            self.currentTask = table.remove(self.queue, 1)
+            self.currentIndex = 1
+        end
+
+        local task = self.currentTask
+        local total = #task.keys
+        local count = 0
+
+        while self.currentIndex <= total and count < task.perFrame do
+            local key = task.keys[self.currentIndex]
+            local success, err = pcall(task.callback, key, task.dataTable[key])
+
+            if not success then
+                self.queue = {}
+                self.currentTask = nil
+                self.frame:SetScript('OnUpdate', nil)
+                error(err)
+                return
+            end
+
+            self.currentIndex = self.currentIndex + 1
             count = count + 1
         end
 
-        if index > total then
-            self.frame:SetScript('OnUpdate', nil)
-            if currentTask.onFinish then
-                currentTask.onFinish()
+        if self.currentIndex > total then
+            if task.onFinish then
+                task.onFinish()
             end
-            self:ProcessNext() -- Start next queued item
+            self.currentTask = nil -- This triggers the next task check on the next frame
         end
     end
     self.frame:SetScript('OnUpdate', OnUpdate)
@@ -69,7 +73,7 @@ local function TimeSlice(dataTable, perFrame, callback, onFinish)
     })
 
     if not TaskQueue.isProcessing then
-        TaskQueue:ProcessNext()
+        TaskQueue:Start()
     end
 end
 
