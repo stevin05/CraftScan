@@ -372,14 +372,13 @@ local function CreateMenuShownButton()
         'PROFESSION_SCAN_BEGIN',
         'PROFESSION_SCAN_COMPLETE',
         'CHARACTER_ENABLED',
-        'TETHER_CHANGED',
     }, function(...)
         button:Setup(...)
     end)
 
-    CraftScan.Events:Register('CONFIG_PAGE_MAXIMIZED', function(...)
-        button.tethered = false
-        button:Setup(...)
+    CraftScan.Events:Register('TETHER_CHANGED', function(tethered)
+        button.tethered = tethered
+        button:Setup()
     end)
 
     CraftScan.Events:Register('BUTTON_HEIGHT', function(...)
@@ -552,7 +551,7 @@ function CraftScan_ScannerConfigButtonMixin:OnClick(button)
     if not self.tethered then
         CraftScanConfigPage:SetMenuCollapsed(false)
     end
-    CraftScan.Events:Emit('TETHER_CHANGED')
+    CraftScan.Events:Emit('TETHER_CHANGED', self.tethered)
 end
 
 local function OnRecipeSelected()

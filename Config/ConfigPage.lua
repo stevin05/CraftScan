@@ -446,6 +446,10 @@ function CraftScanConfigPageMixin:OnShow()
     self:SetPortraitToAsset(icon or 4620670)
 end
 
+function CraftScanConfigPageMixin:OnHide()
+    CraftScan.Events:Emit('TETHER_CHANGED', false)
+end
+
 function CraftScanConfigPageMixin:ToggleVisibility()
     if self:IsShown() then
         self:Hide()
@@ -474,6 +478,14 @@ function CraftScanConfigPageMixin:AnchorToProfessionPage()
     -- Ensure we stay behind Blizzard
     self:SetFrameLevel(math.max(0, profFrame:GetFrameLevel() - 1))
     profFrame:Raise()
+
+    -- TSM seems to be breaking the auto-hide based on parenthood, so we
+    -- manually hide the config page when the Schematic form is hidden.
+    ProfessionsFrame.CraftingPage.SchematicForm:HookScript('OnHide', function()
+        if self.tethered then
+            self:Hide()
+        end
+    end)
 end
 
 function CraftScanConfigPageMixin:ResizeOptionsPanel(collapsed, activeOptions)
@@ -598,9 +610,14 @@ function CraftScanConfigPageMixin:OnLoad()
         self:SelectRecipe(...)
     end)
 
+    self.tethered = false
+    CraftScan.Events:Register('TETHER_CHANGED', function(tethered)
+        self.tethered = tethered
+    end)
+
     -- Initialize the Maximize/Minimize button
     self.MaximizeMinimize:SetOnMaximizedCallback(function()
-        CraftScan.Events:Emit('CONFIG_PAGE_MAXIMIZED')
+        CraftScan.Events:Emit('TETHER_CHANGED', false)
         self:SetMenuCollapsed(false)
     end)
     self.MaximizeMinimize:SetOnMinimizedCallback(function()
