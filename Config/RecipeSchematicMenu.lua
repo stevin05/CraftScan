@@ -361,7 +361,7 @@ local attachButton = nil
 local function CreateMenuShownButton()
     local button = CreateFrame(
         'Button',
-        'CraftScanToggleScannerConfigButton',
+        nil,
         ProfessionsFrame.CraftingPage.SchematicForm,
         'CraftScan_ScannerConfigButtonTemplate'
     )

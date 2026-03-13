@@ -135,7 +135,7 @@ function CraftScanCrafterOrderListElementMixin:OnLineEnter()
         local qualityIDs = C_TradeSkillUI.GetQualitiesForRecipe(response.recipeID);
         local qualityIdx = qualityIDs and #qualityIDs or 0;
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetRecipeResultItem(response.recipeID, reagents, nil, nil, qualityIDs and qualityIDs[qualityIdx]);
+        securecall(GameTooltip.SetRecipeResultItem, GameTooltip, response.recipeID, reagents, nil, nil, qualityIDs and qualityIDs[qualityIdx]);
     end
 
     -- In addition, pop up a tooltip that looks like the chat window. We copy

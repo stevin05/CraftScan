@@ -226,7 +226,7 @@ function CraftScanRecipeConfigPanelMixin:SetupRecipeIcon()
     self.RecipeIcon.Icon:SetTexture(outputItemInfo.icon)
     self.RecipeIcon:SetScript('OnEnter', function()
         GameTooltip:SetOwner(self.RecipeIcon, 'ANCHOR_RIGHT')
-        GameTooltip:SetRecipeResultItem(self.configInfo.recipeID)
+        securecall(GameTooltip.SetRecipeResultItem, GameTooltip, self.configInfo.recipeID)
     end)
 
     self.RecipeIcon:SetScript('OnLeave', function()
