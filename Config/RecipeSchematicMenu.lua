@@ -288,6 +288,9 @@ local function ScanAllRecipes(OnScanComplete, forceScan)
             return
         end
         local recipes = profConfig.recipes
+        if not recipes then
+            return -- Someone hit this too somehow.
+        end
 
         professions[profInfo.professionID] = profConfig
 
