@@ -1128,6 +1128,7 @@ function CraftScan.Utils.ChatHistoryTooltip:Show(name, anchor, order, header, in
     GameTooltip_AddBlankLineToTooltip(tooltip)
 
     if not response.greeting_sent then
+        CraftScan.RebuildResponseMessage(order)
         tooltip:AddLine(L('Proposed Greeting'), 1, 1, 1)
         local wc = ChatTypeInfo['WHISPER']
         for _, line in ipairs(response.message) do
