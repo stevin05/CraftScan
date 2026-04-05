@@ -973,39 +973,15 @@ end
 
 CraftScan.Utils.GetGreeting = GetGreeting
 
-local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo, item, overrides)
-    -- At this point, we have everything we need to generate a response to the message.
-    local itemLink = item and item:GetItemLink() or nil
-
-    -- TODO - Want to make the item look 5*, but this doesn't send through chat.
-    --if itemLink then
-    --local tier5 = Professions.GetChatIconMarkupForQuality(5, true, 0);
-    --itemLink = itemLink .. " " .. tier5;
-    --end
-
-    -- We keep a history of our customers to avoid spamming the same person repeatedly.
-    local customerInfo = CraftScan.DB.customers[customer]
-
-    -- Be as specific as possible about what we're responding to.
-    local profID = crafterInfo.profID
-    local recipeID = recipeInfo and recipeInfo.recipeID
-    local responseID = recipeID or profID
-
-    local needsResultCallbackOnly = overrides and overrides.resultCallback
-
-    local responses = saved(customerInfo, 'responses', {})
-    local response = saved(responses, responseID, {})
-    local firstInteraction = not next(response)
-    if response.greeting_sent and not needsResultCallbackOnly then
-        -- We already messaged the customer about this craft
-        return
-    end
-
+-- Builds the greeting text for a pending order. Computes alt_craft based on
+-- the *current* logged-in character so the message stays accurate when the
+-- player logs into the crafter character after the notification was created.
+local function BuildRawGreeting(crafterFullName, profID, itemID, itemLink, recipeID)
     local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(profID)
-    local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[profID]
+    local profConfig = CraftScan.DB.characters[crafterFullName].professions[profID]
     local recipeConfig = recipeID and profConfig.recipes[recipeID] or nil
 
-    local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter)
+    local crafter = CraftScan.NameAndRealmToName(crafterFullName)
     local alt_craft = crafter ~= CraftScan.GetPlayerName()
 
     local function GetProfessionLink()
@@ -1021,7 +997,7 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     local Greeting, FinalGreeting = MakeGreetingBuilder()
     local context = {
         crafter = crafter,
-        item = itemLink or L(LID.GREETING_LINK_BACKUP),
+        item = itemLink or (itemID and select(2, GetItemInfo(itemID))) or L(LID.GREETING_LINK_BACKUP),
         profession = profInfo.parentProfessionName,
         profession_link = alt_craft and profInfo.parentProfessionName or GetProfessionLink(),
     }
@@ -1061,7 +1037,61 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
         Greeting(GetGreeting('GREETING_ALT_SUFFIX'))
     end
 
-    greeting = FinalGreeting(context)
+    return FinalGreeting(context), alt_craft
+end
+
+-- If the player has logged into the crafter character since the notification
+-- was saved, the stored message may say "my alt X can craft this" even though
+-- we are now playing X. Rebuild it so it uses the first-person greeting.
+CraftScan.RebuildResponseMessage = function(order)
+    local response = CraftScan.OrderToResponse(order)
+    if not response or response.greeting_sent or not response.crafterFullName then
+        return
+    end
+    local crafter = CraftScan.NameAndRealmToName(response.crafterFullName)
+    local currentAltCraft = crafter ~= CraftScan.GetPlayerName()
+    if currentAltCraft == response.alt_craft then
+        return
+    end
+    local greeting, newAltCraft =
+        BuildRawGreeting(response.crafterFullName, response.professionID, response.itemID, nil, response.recipeID)
+    response.message = SplitResponse(greeting)
+    response.alt_craft = newAltCraft
+end
+
+local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo, item, overrides)
+    -- At this point, we have everything we need to generate a response to the message.
+    local itemLink = item and item:GetItemLink() or nil
+
+    -- TODO - Want to make the item look 5*, but this doesn't send through chat.
+    --if itemLink then
+    --local tier5 = Professions.GetChatIconMarkupForQuality(5, true, 0);
+    --itemLink = itemLink .. " " .. tier5;
+    --end
+
+    -- We keep a history of our customers to avoid spamming the same person repeatedly.
+    local customerInfo = CraftScan.DB.customers[customer]
+
+    -- Be as specific as possible about what we're responding to.
+    local profID = crafterInfo.profID
+    local recipeID = recipeInfo and recipeInfo.recipeID
+    local responseID = recipeID or profID
+
+    local needsResultCallbackOnly = overrides and overrides.resultCallback
+
+    local responses = saved(customerInfo, 'responses', {})
+    local response = saved(responses, responseID, {})
+    local firstInteraction = not next(response)
+    if response.greeting_sent and not needsResultCallbackOnly then
+        -- We already messaged the customer about this craft
+        return
+    end
+
+    local profInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(profID)
+    local profConfig = CraftScan.DB.characters[crafterInfo.crafter].professions[profID]
+
+    local crafter = CraftScan.NameAndRealmToName(crafterInfo.crafter)
+    local greeting, alt_craft = BuildRawGreeting(crafterInfo.crafter, profID, itemID, itemLink, recipeID)
 
     if needsResultCallbackOnly then
         -- Erase the persistent state associated with this since it's just a
@@ -1115,6 +1145,8 @@ local function handleResponse(message, customer, crafterInfo, itemID, recipeInfo
     local customerStartedInteraction = overrides and overrides.customerStartedInteraction
 
     response.crafterName = crafter
+    response.crafterFullName = crafterInfo.crafter
+    response.alt_craft = alt_craft
     response.professionID = profID
     response.parentProfID = profInfo.parentProfessionID
     response.professionName = profInfo.parentProfessionName
