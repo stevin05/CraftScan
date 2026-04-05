@@ -15,6 +15,7 @@ embeds.xml
 Libs/classic.lua
 Libs/LibSerialize.lua
 Libs/LibDeflate.lua
+Libs/RobotsDotTxtClient.lua
 
 Consts.lua
 

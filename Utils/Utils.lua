@@ -83,6 +83,7 @@ function CraftScan.Utils.ColorizedProfessionNameByID(professionID)
 end
 
 function CraftScan.Utils.SendResponses(responses, customer)
+    RobotsDotTxtAPI.NotifyCustomer(customer, 'CraftScan')
     for _, response in pairs(responses) do
         SendChatMessage(response, 'WHISPER', select(2, GetDefaultLanguage()), customer)
     end
