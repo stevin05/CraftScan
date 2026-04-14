@@ -97,6 +97,7 @@ function CraftScan.GreetCustomer(button, order)
     local response = CraftScan.OrderToResponse(order)
     if button == "LeftButton" then
         if not response.greeting_sent then
+            CraftScan.RebuildResponseMessage(order)
             CraftScan.Utils.SendResponses(response.message, order.customerName)
             response.greeting_sent = true
             -- TODO: More efficient way to update the display?
