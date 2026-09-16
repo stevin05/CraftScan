@@ -1286,10 +1286,46 @@ function CraftScan.OnMessage(event, message, customer, customerGuid, overrides)
     return false
 end
 
+local EVENT_CHANNEL_KEYS = {
+    CHAT_MSG_SAY = 'SAY',
+    CHAT_MSG_PARTY = 'PARTY',
+    CHAT_MSG_GUILD = 'GUILD',
+}
+
+-- Both the settings dropdown and the scanner derive channel keys here so the
+-- saved values always match what the event handler compares against.
+function CraftScan.Scanner.ChannelKey(event, channelBaseName)
+    if event ~= 'CHAT_MSG_CHANNEL' then
+        return EVENT_CHANNEL_KEYS[event]
+    end
+    if not channelBaseName then
+        return nil
+    end
+    local info = C_ChatInfo.GetChannelInfoFromIdentifier(channelBaseName)
+    return info and info.shortcut or channelBaseName
+end
+
+function CraftScan.Scanner.IsChannelIgnored(channelKey)
+    local ignored = channelKey and CraftScan.DB.settings.ignored_channels
+    if not ignored then
+        return false
+    end
+    for _, entry in ipairs(ignored) do
+        if entry == channelKey then
+            return true
+        end
+    end
+    return false
+end
+
 local function OnMessage_(self, event, ...)
     local message, customer = ...
 
     if issecretvalue(message) then return end
+
+    if CraftScan.Scanner.IsChannelIgnored(CraftScan.Scanner.ChannelKey(event, select(9, ...))) then
+        return
+    end
 
     local customerGuid = select(12, ...)
     CraftScan.OnMessage(event, message, customer, customerGuid)
