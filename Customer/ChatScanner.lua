@@ -1318,10 +1318,22 @@ function CraftScan.Scanner.IsChannelIgnored(channelKey)
     return false
 end
 
+-- Requests from other realms (cross-realm zones, groups) can't be crafted for,
+-- and in practice that includes connected realms.
+local function IsCraftableRealm(name)
+    local realm = name:match('^[^-]+%-(.+)$')
+    if not realm then
+        return true
+    end
+    local ShortenRealmName = CraftScan.Utils.ShortenRealmName
+    return ShortenRealmName(realm) == ShortenRealmName(GetRealmName())
+end
+
 local function OnMessage_(self, event, ...)
     local message, customer = ...
 
     if issecretvalue(message) then return end
+    if customer and not IsCraftableRealm(customer) then return end
 
     if CraftScan.Scanner.IsChannelIgnored(CraftScan.Scanner.ChannelKey(event, select(9, ...))) then
         return
