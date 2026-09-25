@@ -27,22 +27,26 @@ local function CreateDropdown(category, variable, key, name, options, tooltip, o
     initializer:AddSearchTags(L(LID.CRAFT_SCAN))
 end
 
-local function SetupMultiSelectDropdown(dropdown, setting, options, width, initTooltip)
+local function SetupMultiSelectDropdown(dropdown, setting, options, initTooltip)
     local function Inserter(setting, rootDescription)
         -- Instead of the default dropdown buttons, we use checkboxes, and
         -- convert the checked ones into a list that gets saved into the
         -- specified variableKey in the settings DB.
         local function IsSelected(value)
+            local found = false
             local values = CraftScan.DB.settings[setting.variableKey]
-            if values == nil then
-                return false
-            end
-            for _, entry in ipairs(values) do
-                if entry == value then
-                    return true
+            if values ~= nil then
+                for _, entry in ipairs(values) do
+                    if entry == value then
+                        found = true
+                        break
+                    end
                 end
             end
-            return false
+            if setting.invertSelection then
+                return not found
+            end
+            return found
         end
 
         local function SetSelected(value)
@@ -94,6 +98,9 @@ function CraftScanSettingsMultiSelectDropDownMixin:SetupDropdownMenu(
         -- instead of the comma separated list.
         local values = CraftScan.DB.settings[setting.variableKey]
         local count = values and #values or 0
+        if setting.invertSelection then
+            count = math.max(0, #options() - count)
+        end
         return string.format(L(LID.MULTI_SELECT_BUTTON_TEXT), count)
     end)
     self.Control.Dropdown:GenerateMenu() -- Apply our custom selection text immediately.
@@ -101,7 +108,15 @@ function CraftScanSettingsMultiSelectDropDownMixin:SetupDropdownMenu(
     self.Control.DecrementButton:Hide()
 end
 
-local function CreateMultiSelectDropdown(category, variable, key, name, options, tooltip)
+local function CreateMultiSelectDropdown(
+    category,
+    variable,
+    key,
+    name,
+    options,
+    tooltip,
+    invertSelection
+)
     local function GetValue()
         -- No-op. It's done by the menu checkbox get/sets
         return ''
@@ -129,6 +144,7 @@ local function CreateMultiSelectDropdown(category, variable, key, name, options,
     )
 
     initializer.data.setting.variableKey = key
+    initializer.data.setting.invertSelection = invertSelection
 
     local layout = SettingsPanel:GetLayout(category)
     layout:AddInitializer(initializer)
@@ -195,6 +211,53 @@ CraftScan.Utils.onLoad(function()
             L(LID.ADDON_WHITELIST_LABEL),
             GetOptions,
             L(LID.ADDON_WHITELIST_TOOLTIP)
+        )
+    end
+
+    do
+        local function GetOptions()
+            local selected = CraftScan.DB.settings['ignored_channels']
+            local found = {}
+            local container = Settings.CreateControlTextContainer()
+
+            local function Add(key, label)
+                if key and not found[key] then
+                    found[key] = true
+                    container:Add(key, label)
+                end
+            end
+
+            Add('SAY', SAY)
+            Add('PARTY', PARTY)
+            Add('GUILD', GUILD)
+
+            local channels = { GetChannelList() }
+            for i = 2, #channels, 3 do
+                local shortName = channels[i]
+                local _, fullName = GetChannelName(shortName)
+                Add(CraftScan.Scanner.ChannelKey('CHAT_MSG_CHANNEL', fullName), shortName)
+            end
+
+            -- Leave channels you have left in the list so they can be re-enabled.
+            if selected then
+                for _, key in ipairs(selected) do
+                    Add(key, key)
+                end
+            end
+
+            return container:GetData()
+        end
+
+        CreateMultiSelectDropdown(
+            category,
+            'CRAFT_SCAN_WATCHED_CHANNELS',
+            'ignored_channels',
+            L('Watched chat channels'),
+            GetOptions,
+            L(
+                'Only scan the chat channels checked here. Whispers are always scanned so customers can reach you directly.'
+            ),
+            true
         )
     end
 
