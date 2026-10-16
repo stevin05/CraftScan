@@ -997,7 +997,7 @@ local function BuildRawGreeting(crafterFullName, profID, itemID, itemLink, recip
     local Greeting, FinalGreeting = MakeGreetingBuilder()
     local context = {
         crafter = crafter,
-        item = itemLink or (itemID and select(2, GetItemInfo(itemID))) or L(LID.GREETING_LINK_BACKUP),
+        item = itemLink or (itemID and select(2, C_Item.GetItemInfo(itemID))) or L(LID.GREETING_LINK_BACKUP),
         profession = profInfo.parentProfessionName,
         profession_link = alt_craft and profInfo.parentProfessionName or GetProfessionLink(),
     }
