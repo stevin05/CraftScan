@@ -300,7 +300,7 @@ local function ScanAllRecipes(OnScanComplete, forceScan)
                 -- Not finding an enum to use for this. Non-binding items will
                 -- likely never be requested via crafting.
                 -- https://wowpedia.fandom.com/wiki/LE_ITEM_BIND
-                local bindType = select(14, GetItemInfo(item:GetItemLink()))
+                local bindType = select(14, C_Item.GetItemInfo(item:GetItemLink()))
                 if bindType ~= 0 then
                     local isDecor = IsDecor(item:GetItemID())
 
