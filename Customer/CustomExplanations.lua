@@ -231,4 +231,36 @@ function CraftScan_CustomExplanationsButtonMixin:Init()
             end);
         end
     end);
+
+    -- The crafting order result already has Blizzard's whisper menu next to the
+    -- customer's name. Add the configured explanations there so they can be
+    -- sent without leaving the completed order.
+    Menu.ModifyMenu("MENU_PROFESSIONS_CRAFTER_ORDER_VIEW", function(owner, rootDescription)
+        local orderView = owner:GetParent() and owner:GetParent():GetParent();
+        local order = orderView and orderView.order;
+        if not order or not order.customerName then
+            return;
+        end
+
+        local whisperStatus = orderView:GetWhisperCustomerStatus();
+        local canWhisper = whisperStatus == Enum.ChatWhisperTargetStatus.CanWhisper
+            or whisperStatus == Enum.ChatWhisperTargetStatus.CanWhisperGuild;
+        if not canWhisper or not next(CraftScan.DB.settings.explanations) then
+            return;
+        end
+
+        rootDescription:CreateDivider();
+        rootDescription:CreateTitle(L("CraftScan") .. " - " .. L("Custom Explanations"));
+        for _, entry in ipairs(CreateUIExplanations()) do
+            local label = entry.label;
+            local text = entry.text;
+            local button = rootDescription:CreateButton(label, function()
+                CraftScan.Utils.SendResponses(CraftScan.Utils.SplitResponse(text), order.customerName);
+            end);
+
+            button:SetTooltip(function(tooltip, elementDescription)
+                GameTooltip_AddNormalLine(tooltip, CraftScan.MakeTextWhite(text));
+            end);
+        end
+    end);
 end
