@@ -142,6 +142,8 @@ CraftScan.CONST.TEXT = {
     SCANNING_ON = 138,
     SCANNING_OFF = 139,
     UNLEARNED = 140,
+    HIDE_ADDON_TOGGLE_BUTTON_LABEL = 141,
+    HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP = 142,
 
     -- Release notes have multiple lines that are sequential. Spaced out by hundreds to give more than enough room.
     RN_WELCOME = 10000,
@@ -174,6 +176,7 @@ CraftScan.CONST.DEFAULT_SETTINGS = {
     disabled_addon_whitelist = 'None',
     show_button_height = 0,
     alert_icon_scale = 100,
+    hide_addon_toggle_button = false,
 }
 
 CraftScan.CONST.PROFESSION_COLORS = {

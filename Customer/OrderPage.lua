@@ -1966,6 +1966,13 @@ function CraftScan_AddonToggleButtonMixin:OnLeave()
     GameTooltip:Hide()
 end
 
+function CraftScan.UpdateAddonToggleButton()
+    local page = CraftScan.Frames.OrdersPage
+    if page then
+        page.BrowseFrame.AddonToggleButton:SetShown(not CraftScan.DB.settings.hide_addon_toggle_button)
+    end
+end
+
 CraftScan_TabButtonMixin = {}
 
 function CraftScan_TabButtonMixin:UpdateTabWidth()
@@ -2293,6 +2300,7 @@ CraftScan.Utils.onLoad(function()
     table.insert(UISpecialFrames, "CraftScanCraftingOrderPage"); -- Make 'esc' close the frame
     UIPanelWindows["CraftScanCraftingOrderPage"] = { area = "doublewide", pushable = 1, whileDead = 1 }
 
+    CraftScan.UpdateAddonToggleButton()
     frame.BrowseFrame.AddonToggleButton:SetButtonText();
     frame.BrowseFrame.AutoReplyButton:SetButtonText();
     frame.BrowseFrame.CustomExplanationsButton:Init();

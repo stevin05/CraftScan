@@ -406,6 +406,27 @@ CraftScan.Utils.onLoad(function()
             Settings.CreateCheckbox(category, setting, L(LID.COLLAPSE_CHAT_CONTEXT_TOOLTIP))
         initializer:AddSearchTags(L(LID.CRAFT_SCAN))
     end
+    do
+        local default = CraftScan.CONST.DEFAULT_SETTINGS.hide_addon_toggle_button
+        local setting = Settings.RegisterAddOnSetting(
+            category,
+            'CRAFTSCAN_HIDE_ADDON_TOGGLE_BUTTON',
+            'hide_addon_toggle_button',
+            CraftScan.DB.settings,
+            type(default),
+            L(LID.HIDE_ADDON_TOGGLE_BUTTON_LABEL),
+            default
+        )
+        setting:SetValueChangedCallback(function()
+            CraftScan.UpdateAddonToggleButton()
+        end)
+        local initializer = Settings.CreateCheckbox(
+            category,
+            setting,
+            L(LID.HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP)
+        )
+        initializer:AddSearchTags(L(LID.CRAFT_SCAN))
+    end
     Settings.RegisterAddOnCategory(category)
 end)
 
