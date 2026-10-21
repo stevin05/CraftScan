@@ -426,3 +426,7 @@ L["test AI localize"] = "Это тестовое сообщение для пр�
 
 -- AI Generated: 2026-01-22 14:58:43 using models/gemini-2.5-flash
 L["Details: Sound alerts."] = "Подробности: Звуковые оповещения. Звуковые оповещения используют LibSharedMedia. Звук можно выбрать, щелкнув по кнопке \"Открыть настройки\" в правом верхнем углу этой страницы."
+
+-- AI Generated: 2026-10-21 22:46:17 using models/gemini-2.5-flash
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_LABEL] = "Скрыть кнопку «Отключить модификации»"
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP] = "При включении полностью скрывает кнопку «Отключить модификации» в меню команд чата."

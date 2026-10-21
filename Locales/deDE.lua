@@ -426,3 +426,7 @@ L["test AI localize"] = "Dies ist eine Probenachricht, um die 'localize.yml'-Git
 
 -- AI Generated: 2026-01-22 14:56:19 using models/gemini-2.5-flash
 L["Details: Sound alerts."] = "Soundalarme verwenden LibSharedMedia. Der Ton kann durch Klicken auf 'Optionen öffnen' in der oberen rechten Ecke dieser Seite ausgewählt werden."
+
+-- AI Generated: 2026-10-21 22:44:06 using models/gemini-2.5-flash
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_LABEL] = "Schaltfläche 'Addons deaktivieren' ausblenden"
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP] = "Bei Aktivierung wird die Schaltfläche 'Addons deaktivieren' auf dem Chat-Befehlsmenü vollständig ausgeblendet."

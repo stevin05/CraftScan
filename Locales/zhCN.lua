@@ -424,3 +424,7 @@ L["tag.invalid.unique"] = "标签必须是唯一的。"
 
 -- AI Generated: 2026-01-12 00:25:16 using models/gemini-2.5-flash
 L["test AI localize"] = "这是一条用于测试 localize.yml GitHub Action 的消息。"
+
+-- AI Generated: 2026-10-21 22:46:35 using models/gemini-2.5-flash
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_LABEL] = "隐藏禁用插件按钮"
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP] = "启用后，在聊天命令面板上完全隐藏禁用插件按钮。"

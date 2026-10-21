@@ -426,3 +426,7 @@ L["test AI localize"] = "這是個測試訊息，用來測試 localize.yml GitHu
 
 -- AI Generated: 2026-01-22 14:59:09 using models/gemini-flash-latest
 L["Details: Sound alerts."] = "音效警報使用 LibSharedMedia。點擊此頁面右上角的「開啟設定」即可選擇音效。"
+
+-- AI Generated: 2026-10-21 22:46:51 using models/gemini-2.5-flash
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_LABEL] = "隱藏關閉插件按鈕"
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP] = "啟用時，會完全隱藏對話命令功能表上的關閉插件按鈕。"

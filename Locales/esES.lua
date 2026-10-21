@@ -426,3 +426,7 @@ L["test AI localize"] = "Este es un mensaje de prueba para probar la acción loc
 
 -- AI Generated: 2026-01-22 14:56:39 using models/gemini-2.5-flash
 L["Details: Sound alerts."] = "Las alertas sonoras usan LibSharedMedia. El sonido se puede seleccionar haciendo clic en 'Abrir configuración' en la esquina superior derecha de esta página."
+
+-- AI Generated: 2026-10-21 22:44:25 using models/gemini-2.5-flash
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_LABEL] = "Ocultar el botón Desactivar addons"
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP] = "Cuando está activada, oculta completamente el botón Desactivar addons en el Menú Chat."

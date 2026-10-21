@@ -426,3 +426,7 @@ L["test AI localize"] = "Ceci est un message factice pour tester l'action locali
 
 -- AI Generated: 2026-01-22 14:57:18 using models/gemini-2.5-flash
 L["Details: Sound alerts."] = "Les alertes sonores utilisent LibSharedMedia. Le son peut être sélectionné en cliquant sur « Ouvrir les paramètres » dans le coin supérieur droit de cette page."
+
+-- AI Generated: 2026-10-21 22:45:04 using models/gemini-2.5-flash
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_LABEL] = "Masquer le bouton Désactiver les add-ons"
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP] = "Lorsque cette option est activée, elle masque complètement le bouton Désactiver les add-ons du panneau des commandes de discussion."

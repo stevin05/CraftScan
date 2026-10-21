@@ -426,3 +426,7 @@ L["test AI localize"] = "localize.yml github 액션 테스트를 위한 더미 �
 
 -- AI Generated: 2026-01-22 14:58:01 using models/gemini-2.5-flash
 L["Details: Sound alerts."] = "소리 알림은 LibSharedMedia를 사용합니다. 소리는 이 페이지 우측 상단의 '설정 열기'를 클릭하여 선택할 수 있습니다."
+
+-- AI Generated: 2026-10-21 22:45:40 using models/gemini-2.5-flash
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_LABEL] = "애드온 비활성화 버튼 숨기기"
+L[LID.HIDE_ADDON_TOGGLE_BUTTON_TOOLTIP] = "활성화하면 대화창 메뉴에 있는 애드온 비활성화 버튼을 완전히 숨깁니다."
